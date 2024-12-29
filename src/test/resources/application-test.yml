@@ -1,0 +1,16 @@
+spring:
+  config:
+    activate:
+      on-profile: test
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+
+secret:
+  aes-secret: hwlnrtkelvehk
+  cognito-client-id: 511tjlb7ejhcv4a6r8u2vudfhc
+  cognito-auth-redirect-uri: http://localhost:80/v1/auth/cognito
+  cognito-issuer: https://cognito-idp.ap-northeast-2.amazonaws.com/ap-northeast-2_45OUbYhf2
+  swagger-username: test
+  swagger-password: test
