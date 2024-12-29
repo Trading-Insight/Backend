@@ -18,35 +18,21 @@ import java.util.List;
 
 @Configuration
 public class SwaggerConfiguration {
+    private static final String BEARER_TOKEN_PREFIX = "Bearer";
+
     @Bean
-    public OpenAPI openApi() {
-        SecurityRequirement securityRequirement = new SecurityRequirement().addList("Access Token");
+    public OpenAPI openAPI() {
+        String securityJwtName = "JWT";
+        SecurityRequirement securityRequirement = new SecurityRequirement().addList(securityJwtName);
+        Components components = new Components()
+            .addSecuritySchemes(securityJwtName, new SecurityScheme()
+                .name(securityJwtName)
+                .type(SecurityScheme.Type.HTTP)
+                .scheme(BEARER_TOKEN_PREFIX)
+                .bearerFormat(securityJwtName));
 
         return new OpenAPI()
-                .addServersItem(new Server().url("/"))
-                .info(new Info()
-                        .title("Tradin API")
-                        .description("자물쇠가 있는 API는 요청 헤더에 Key: Authorization, Value: Bearer {token}을 포함해야 합니다."))
-                .components(new Components()
-                        .addSecuritySchemes("Access Token",
-                                new SecurityScheme().type(SecurityScheme.Type.HTTP)
-                                        .scheme("bearer")
-                                        .bearerFormat("JWT")
-                                        .in(SecurityScheme.In.HEADER)
-                                        .name("Authorization")))
-                .security(List.of(securityRequirement));
-    }
-
-    @Bean
-    public OperationCustomizer customize() {
-        return (Operation operation, HandlerMethod handlerMethod) -> {
-            DisableAuthInSwagger methodAnnotation =
-                    handlerMethod.getMethodAnnotation(DisableAuthInSwagger.class);
-
-            if (methodAnnotation != null) {
-                operation.setSecurity(Collections.emptyList());
-            }
-            return operation;
-        };
+            .addSecurityItem(securityRequirement)
+            .components(components);
     }
 }
