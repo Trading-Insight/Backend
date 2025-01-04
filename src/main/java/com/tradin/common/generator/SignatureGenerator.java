@@ -7,7 +7,7 @@ import org.apache.commons.codec.binary.Hex;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
-import static com.tradin.common.exception.ExceptionMessage.SIGNATURE_GENERATION_FAIL_EXCEPTION;
+import static com.tradin.common.exception.ExceptionType.SIGNATURE_GENERATION_FAIL_EXCEPTION;
 
 @UtilityClass
 public class SignatureGenerator {

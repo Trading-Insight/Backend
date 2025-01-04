@@ -21,8 +21,8 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.*;
 
-import static com.tradin.common.exception.ExceptionMessage.NOT_FOUND_OPEN_POSITION_EXCEPTION;
-import static com.tradin.common.exception.ExceptionMessage.NOT_FOUND_STRATEGY_EXCEPTION;
+import static com.tradin.common.exception.ExceptionType.NOT_FOUND_OPEN_POSITION_EXCEPTION;
+import static com.tradin.common.exception.ExceptionType.NOT_FOUND_STRATEGY_EXCEPTION;
 import static com.tradin.module.strategy.domain.TradingType.BOTH;
 
 @Service
