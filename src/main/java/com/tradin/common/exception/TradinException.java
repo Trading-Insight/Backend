@@ -1,15 +1,24 @@
 package com.tradin.common.exception;
 
 import lombok.Getter;
-import org.springframework.http.HttpStatus;
 
 @Getter
 public class TradinException extends RuntimeException {
 
-    private final HttpStatus httpStatus;
+    private final ExceptionType errorType;
 
-    public TradinException(ExceptionMessage exceptionMessage) {
-        super(exceptionMessage.getMessage());
-        this.httpStatus = exceptionMessage.getHttpStatus();
+    private final Object data;
+
+    public TradinException(ExceptionType exceptionType) {
+        super(exceptionType.getMessage());
+        this.errorType = exceptionType;
+        this.data = null;
     }
+
+    public TradinException(ExceptionType exceptionType, Object data) {
+        super(exceptionType.getMessage());
+        this.errorType = exceptionType;
+        this.data = data;
+    }
+
 }

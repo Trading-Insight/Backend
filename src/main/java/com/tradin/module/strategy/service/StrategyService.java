@@ -1,6 +1,9 @@
 package com.tradin.module.strategy.service;
 
-import com.tradin.common.exception.ExceptionMessage;
+import static com.tradin.common.exception.ExceptionType.NOT_SUBSCRIBED_STRATEGY_EXCEPTION;
+import static com.tradin.module.strategy.domain.TradingType.LONG;
+
+import com.tradin.common.exception.ExceptionType;
 import com.tradin.common.exception.TradinException;
 import com.tradin.common.utils.AESUtils;
 import com.tradin.module.feign.service.BinanceFeignService;
@@ -19,16 +22,12 @@ import com.tradin.module.trade.service.TradeService;
 import com.tradin.module.users.domain.Users;
 import com.tradin.module.users.service.UsersService;
 import com.tradin.module.users.service.dto.SubscribeStrategyDto;
+import java.util.Collections;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Collections;
-import java.util.List;
-
-import static com.tradin.common.exception.ExceptionMessage.NOT_SUBSCRIBED_STRATEGY_EXCEPTION;
-import static com.tradin.module.strategy.domain.TradingType.LONG;
 
 @Service
 @Transactional
@@ -138,7 +137,7 @@ public class StrategyService {
 
     private Strategy findById(Long id) {
         return strategyRepository.findById(id)
-                .orElseThrow(() -> new TradinException(ExceptionMessage.NOT_FOUND_STRATEGY_EXCEPTION));
+                .orElseThrow(() -> new TradinException(ExceptionType.NOT_FOUND_STRATEGY_EXCEPTION));
     }
 
     private void closeOngoingHistory(Strategy strategy, Position exitPosition) {
@@ -159,7 +158,7 @@ public class StrategyService {
 
     private Strategy findByName(String name) {
         return strategyRepository.findByName(name)
-                .orElseThrow(() -> new TradinException(ExceptionMessage.NOT_FOUND_STRATEGY_EXCEPTION));
+                .orElseThrow(() -> new TradinException(ExceptionType.NOT_FOUND_STRATEGY_EXCEPTION));
     }
 
     private List<StrategyInfoDao> findFutureStrategyInfoDaos() {

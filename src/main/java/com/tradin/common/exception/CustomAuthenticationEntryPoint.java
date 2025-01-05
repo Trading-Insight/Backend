@@ -16,18 +16,15 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
                          HttpServletResponse response,
                          AuthenticationException authException) throws IOException {
 
-        HttpStatus status = ExceptionMessage.EMPTY_HEADER_EXCEPTION.getHttpStatus();
-        String message = ExceptionMessage.EMPTY_HEADER_EXCEPTION.getMessage();
+        HttpStatus status = ExceptionType.EMPTY_HEADER_EXCEPTION.getHttpStatus();
+        String message = ExceptionType.EMPTY_HEADER_EXCEPTION.getMessage();
 
         response.setStatus(status.value());
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
 
-        ExceptionResponse exceptionResponse = ExceptionResponse.builder()
-                .httpStatus(status)
-                .message(message)
-                .build();
 
-        new ObjectMapper().writeValue(response.getWriter(), exceptionResponse);
+
+        new ObjectMapper().writeValue(response.getWriter(), status);
     }
 }
