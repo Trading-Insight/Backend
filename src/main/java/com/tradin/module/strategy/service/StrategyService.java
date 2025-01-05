@@ -1,5 +1,8 @@
 package com.tradin.module.strategy.service;
 
+import static com.tradin.common.exception.ExceptionType.NOT_SUBSCRIBED_STRATEGY_EXCEPTION;
+import static com.tradin.module.strategy.domain.TradingType.LONG;
+
 import com.tradin.common.exception.ExceptionType;
 import com.tradin.common.exception.TradinException;
 import com.tradin.common.utils.AESUtils;
@@ -19,16 +22,12 @@ import com.tradin.module.trade.service.TradeService;
 import com.tradin.module.users.domain.Users;
 import com.tradin.module.users.service.UsersService;
 import com.tradin.module.users.service.dto.SubscribeStrategyDto;
+import java.util.Collections;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Collections;
-import java.util.List;
-
-import static com.tradin.common.exception.ExceptionType.NOT_SUBSCRIBED_STRATEGY_EXCEPTION;
-import static com.tradin.module.strategy.domain.TradingType.LONG;
 
 @Service
 @Transactional

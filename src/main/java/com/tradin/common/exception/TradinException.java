@@ -20,4 +20,5 @@ public class TradinException extends RuntimeException {
         this.errorType = exceptionType;
         this.data = data;
     }
+
 }
