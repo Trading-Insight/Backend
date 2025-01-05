@@ -1,6 +1,6 @@
 package com.tradin.common.utils;
 
-import com.tradin.common.exception.ExceptionMessage;
+import com.tradin.common.exception.ExceptionType;
 import com.tradin.common.exception.TradinException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -42,7 +42,7 @@ public class AESUtils {
         } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException |
                  InvalidAlgorithmParameterException | IllegalBlockSizeException |
                  BadPaddingException e) {
-            throw new TradinException(ExceptionMessage.ENCRYPT_FAIL_EXCEPTION);
+            throw new TradinException(ExceptionType.ENCRYPT_FAIL_EXCEPTION);
         }
     }
 
@@ -61,7 +61,7 @@ public class AESUtils {
             return new String(cipher.doFinal(encrypted));
         } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException |
                  InvalidAlgorithmParameterException | IllegalBlockSizeException | BadPaddingException e) {
-            throw new TradinException(ExceptionMessage.DECRYPT_FAIL_EXCEPTION);
+            throw new TradinException(ExceptionType.DECRYPT_FAIL_EXCEPTION);
         }
     }
 }

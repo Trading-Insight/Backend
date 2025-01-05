@@ -18,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 
-import static com.tradin.common.exception.ExceptionMessage.NOT_FOUND_USER_EXCEPTION;
+import static com.tradin.common.exception.ExceptionType.NOT_FOUND_USER_EXCEPTION;
 
 @Service
 @Transactional
