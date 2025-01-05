@@ -1,13 +1,14 @@
 package com.tradin.module.strategy.controller.dto.response;
 
 import com.tradin.module.strategy.domain.repository.dao.StrategyInfoDao;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 
-@AllArgsConstructor
-@Getter
-public class FindStrategiesInfoResponseDto {
-    private final List<StrategyInfoDao> strategiesInfo;
+
+public record FindStrategiesInfoResponseDto (
+    @Schema(description = "전략 리스트") List<StrategyInfoDao> strategiesInfos
+) {
+    public static FindStrategiesInfoResponseDto of(List<StrategyInfoDao> strategiesInfos) {
+        return new FindStrategiesInfoResponseDto(strategiesInfos);
+    }
 }
