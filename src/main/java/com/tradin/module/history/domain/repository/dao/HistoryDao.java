@@ -4,28 +4,22 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.querydsl.core.annotations.QueryProjection;
 import com.tradin.module.strategy.domain.Position;
-import lombok.Getter;
-import lombok.Setter;
+import io.swagger.v3.oas.annotations.media.Schema;
 
-@Getter
-@Setter
-public class HistoryDao {
-    private final Long id;
-    private final Position entryPosition;
-    private final Position exitPosition;
-    private final double profitRate;
-    private double compoundProfitRate;
+@Schema(description = "히스토리 정보")
+public record HistoryDao(
+    @Schema(description = "히스토리 ID", example = "1") Long id,
+    @Schema(description = "진입 포지션") Position entryPosition,
+    @Schema(description = "종료 포지션") Position exitPosition,
+    @Schema(description = "수익률") double profitRate,
+    @Schema(description = "복리 수익률") double compoundProfitRate) {
 
     @JsonCreator
     @QueryProjection
     public HistoryDao(@JsonProperty("id") Long id,
-                      @JsonProperty("entryPosition") Position entryPosition,
-                      @JsonProperty("exitPosition") Position exitPosition,
-                      @JsonProperty("profitRate") double profitRate) {
-        this.id = id;
-        this.entryPosition = entryPosition;
-        this.exitPosition = exitPosition;
-        this.profitRate = profitRate;
-        this.compoundProfitRate = 0;
+        @JsonProperty("entryPosition") Position entryPosition,
+        @JsonProperty("exitPosition") Position exitPosition,
+        @JsonProperty("profitRate") double profitRate) {
+        this(id, entryPosition, exitPosition, profitRate, 0);
     }
 }
