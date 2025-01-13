@@ -20,17 +20,26 @@ public class HistoryService {
     private final StrategyReader strategyReader;
     private final HistoryReader historyReader;
 
+    @Transactional
     public BackTestResponseDto backTest(BackTestDto request, Pageable pageable) {
-        StrategyInfoDao strategyInfoDao = strategyReader.readStrategyInfoDaoById(request.getId());
-        List<HistoryDao> historyDaos = historyReader.readHistoryByIdAndPeriodAndTradingType(
+        StrategyInfoDao strategyInfoDao = readStrategyInfoDaoById(request);
+        List<HistoryDao> historyDaos = readHistoryByIdAndPeriodAndTradingType(request, pageable);
+
+        return BackTestResponseDto.of(strategyInfoDao, historyDaos);
+    }
+
+    private List<HistoryDao> readHistoryByIdAndPeriodAndTradingType(BackTestDto request, Pageable pageable) {
+        return historyReader.readHistoryByIdAndPeriodAndTradingType(
             request.getId(),
             request.getStartDate(),
             request.getEndDate(),
             request.getTradingType(),
             pageable
         );
+    }
 
-        return BackTestResponseDto.of(strategyInfoDao, historyDaos);
+    private StrategyInfoDao readStrategyInfoDaoById(BackTestDto request) {
+        return strategyReader.readStrategyInfoDaoById(request.getId());
     }
 
 //    private BackTestResponseDto calculateHistoryDaos(List<HistoryDao> historyDaos,

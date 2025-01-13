@@ -21,58 +21,62 @@ public class HistoryReader {
     public List<HistoryDao> readHistoryByIdAndPeriodAndTradingType(Long strategyId, LocalDate startDate, LocalDate endDate, TradingType tradingType, Pageable pageable) {
         String cacheKey = "strategyId:" + strategyId;
 
-        List<HistoryDao> cachedHistories = HistoryCacheReader.readHistoryByIdAndPeriod(cacheKey, startDate, endDate, pageable);
+        List<HistoryDao> cachedHistories = readCachedHistories(startDate, endDate, pageable, cacheKey);
 
         if (isCachedHistoriesEmpty(cachedHistories)) {
-            return findHistoryByIdAndPeriodAndTradingType(strategyId, startDate, endDate, tradingType, cacheKey);
+            return findAndFilterHistoriesByIdAndPeriodAndTradingType(strategyId, startDate, endDate, tradingType, cacheKey);
         }
 
         return filterByPeriodAndTradingType(cachedHistories, startDate, endDate, tradingType);
     }
 
-    private List<HistoryDao> findHistoryByIdAndPeriodAndTradingType(Long strategyId, LocalDate startDate, LocalDate endDate, TradingType tradingType, String cacheKey) {
-        List<HistoryDao> historyDaos = historyRepository.findHistoryDaoByStrategyId(strategyId);
-        addHistoryCache(cacheKey, historyDaos);
-
-        return filterByPeriodAndTradingType(historyDaos, startDate, endDate, tradingType);
+    private List<HistoryDao> readCachedHistories(LocalDate startDate, LocalDate endDate, Pageable pageable, String cacheKey) {
+        return HistoryCacheReader.readHistoryByIdAndPeriod(cacheKey, startDate, endDate, pageable);
     }
 
-    private boolean isCachedHistoriesEmpty(List<HistoryDao> historyDaos) {
-        return historyDaos.isEmpty();
+    private List<HistoryDao> findAndFilterHistoriesByIdAndPeriodAndTradingType(Long strategyId, LocalDate startDate, LocalDate endDate, TradingType tradingType, String cacheKey) {
+        List<HistoryDao> histories = historyRepository.findHistoryByStrategyId(strategyId);
+        addHistoryCache(cacheKey, histories);
+
+        return filterByPeriodAndTradingType(histories, startDate, endDate, tradingType);
     }
 
-    private void addHistoryCache(String cacheKey, List<HistoryDao> historyDaos) {
-        HistoryCacheProcessor.addHistoryCache(cacheKey, historyDaos);
+    private boolean isCachedHistoriesEmpty(List<HistoryDao> histories) {
+        return histories.isEmpty();
     }
 
-    private List<HistoryDao> filterByPeriodAndTradingType(List<HistoryDao> historyDaos, LocalDate startDate, LocalDate endDate, TradingType tradingType) {
-        List<HistoryDao> filteredHistoryDaos = historyDaos.stream()
-            .filter(historyDao -> isInPeriod(historyDao, startDate, endDate))
-            .filter(historyDao -> isCorrespondTradingType(historyDao, tradingType))
+    private void addHistoryCache(String cacheKey, List<HistoryDao> histories) {
+        HistoryCacheProcessor.addHistoryCache(cacheKey, histories);
+    }
+
+    private List<HistoryDao> filterByPeriodAndTradingType(List<HistoryDao> histories, LocalDate startDate, LocalDate endDate, TradingType tradingType) {
+        List<HistoryDao> filteredHistories = histories.stream()
+            .filter(history -> isInPeriod(history, startDate, endDate))
+            .filter(history -> isCorrespondTradingType(history, tradingType))
             .toList();
 
-        return calculateCompoundProfitRate(filteredHistoryDaos, startDate, endDate);
+        return calculateCompoundProfitRate(filteredHistories, startDate, endDate);
     }
 
-    private boolean isInPeriod(HistoryDao historyDao, LocalDate startDate, LocalDate endDate) {
-        return historyDao.entryPosition().getTime().toLocalDate().isAfter(startDate) &&
-            historyDao.exitPosition().getTime().toLocalDate().isBefore(endDate);
+    private boolean isInPeriod(HistoryDao history, LocalDate startDate, LocalDate endDate) {
+        return history.entryPosition().getTime().toLocalDate().isAfter(startDate) &&
+            history.exitPosition().getTime().toLocalDate().isBefore(endDate);
     }
 
-    private boolean isCorrespondTradingType(HistoryDao historyDao, TradingType tradingType) {
+    private boolean isCorrespondTradingType(HistoryDao history, TradingType tradingType) {
         return switch (tradingType) {
-            case LONG -> historyDao.entryPosition().getTradingType().equals(TradingType.LONG);
-            case SHORT -> historyDao.entryPosition().getTradingType().equals(TradingType.SHORT);
-            case BOTH -> historyDao.entryPosition().getTradingType().equals(TradingType.LONG) ||
-                historyDao.entryPosition().getTradingType().equals(TradingType.SHORT);
+            case LONG -> history.entryPosition().getTradingType().equals(TradingType.LONG);
+            case SHORT -> history.entryPosition().getTradingType().equals(TradingType.SHORT);
+            case BOTH -> history.entryPosition().getTradingType().equals(TradingType.LONG) ||
+                history.entryPosition().getTradingType().equals(TradingType.SHORT);
             default -> false;
         };
     }
 
-    private List<HistoryDao> calculateCompoundProfitRate(List<HistoryDao> filteredHistoryDaos, LocalDate startDate, LocalDate endDate) {
+    private List<HistoryDao> calculateCompoundProfitRate(List<HistoryDao> filteredHistories, LocalDate startDate, LocalDate endDate) {
         double[] cumulativeProfitRate = {0.0};
 
-        return filteredHistoryDaos.stream()
+        return filteredHistories.stream()
             .map(history -> {
                 cumulativeProfitRate[0] = calculateCompound(cumulativeProfitRate[0], history.profitRate());
                 return new HistoryDao(
