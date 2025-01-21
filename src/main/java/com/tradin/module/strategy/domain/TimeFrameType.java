@@ -6,9 +6,12 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public enum StrategyType {
-    FUTURE("선물"),
-    SPOT("현물");
+public enum TimeFrameType {
+    ONE_HOUR("1시간"),
+    FOUR_HOUR("4시간"),
+    SIX_HOUR("6시간"),
+    TWELVE_HOUR("12시간"),
+    ONE_DAY("1일");
 
     private final String value;
 }
