@@ -1,13 +1,12 @@
 name: Tradin_CI
+
 on:
   push:
     branches:
-      - dev
-  pull_request:
-    types: [ opened, synchronize, reopened ]
+      - '**'
 jobs:
-  build:
-    name: Build and analyze
+  build-springboot:
+    name: Build and analyze (SpringBoot)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -20,22 +19,16 @@ jobs:
           java-version: 17
           distribution: 'temurin'
 
-      - name: Cache SonarCloud packages
-        uses: actions/cache@v3
-        with:
-          path: ~/.sonar/cache
-          key: ${{ runner.os }}-sonar
-          restore-keys: ${{ runner.os }}-sonar
-
       - name: Cache Gradle packages
         uses: actions/cache@v3
         with:
-          path: ~/.gradle/caches
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
-          restore-keys: ${{ runner.os }}-gradle
 
-      - name: Build and analyze
+      - name: Build and analyze (SpringBoot)
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: ./gradlew clean build sonarqube --info
+        run: |
+          ./gradlew clean build

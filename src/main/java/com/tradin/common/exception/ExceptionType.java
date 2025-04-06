@@ -24,6 +24,10 @@ public enum ExceptionType {
     WRONG_PASSWORD_EXCEPTION(UNAUTHORIZED, "비밀번호가 일치하지 않습니다."),
     EMAIL_ALREADY_EXISTS_EXCEPTION(UNAUTHORIZED, "이미 존재하는 이메일입니다."),
     NOT_FOUND_JWK_PARTS_EXCEPTION(UNAUTHORIZED, "존재하지 않는 kid입니다."),
+    INVALID_JWT_SIGNATURE_EXCEPTION(UNAUTHORIZED, "유효하지 않은 JWT 서명입니다."),
+    EXPIRED_JWT_TOKEN_EXCEPTION(UNAUTHORIZED, "만료된 JWT 토큰입니다."),
+    UNSUPPORTED_JWT_TOKEN_EXCEPTION(UNAUTHORIZED, "지원하지 않는 JWT 토큰입니다."),
+    NOT_FOUND_JWT_CLAIMS_EXCEPTION(UNAUTHORIZED, "JWT Claims가 존재하지 않습니다."),
 
     //403 Forbidden
 
@@ -46,8 +50,7 @@ public enum ExceptionType {
     DECRYPT_FAIL_EXCEPTION(INTERNAL_SERVER_ERROR, "복호화에 실패하였습니다."),
     SIGNATURE_GENERATION_FAIL_EXCEPTION(INTERNAL_SERVER_ERROR, "JWT 서명 생성에 실패하였습니다."),
     PUBLIC_KEY_GENERATE_FAIL_EXCEPTION(INTERNAL_SERVER_ERROR, "공개키 생성에 실패하였습니다."),
-    INTERNAL_SERVER_ERROR_EXCEPTION(INTERNAL_SERVER_ERROR, "서버 내부 오류입니다.");
-    ;
+    INTERNAL_SERVER_ERROR_EXCEPTION(INTERNAL_SERVER_ERROR, "서버 내부 오류입니다.");;
 
     private final HttpStatus httpStatus;
     private final String message;

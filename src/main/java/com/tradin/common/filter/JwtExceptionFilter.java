@@ -1,43 +1,40 @@
 package com.tradin.common.filter;
 
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.tradin.common.exception.TradinException;
+import com.tradin.common.exception.ExceptionType;
+import com.tradin.common.response.TradinResponse;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+@RequiredArgsConstructor
+@Component
 public class JwtExceptionFilter extends OncePerRequestFilter {
+
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
-                                    FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, FilterChain filterChain)
+        throws ServletException, IOException {
         try {
-            filterChain.doFilter(request, response);
-        } catch (TradinException e) {
-            respondException(response, e);
+            filterChain.doFilter(httpServletRequest, httpServletResponse);
+        } catch (Exception e) {
+            httpServletResponse.setStatus(HttpStatus.UNAUTHORIZED.value());
+            httpServletResponse.setContentType(MediaType.APPLICATION_JSON_VALUE);
+            httpServletResponse.setCharacterEncoding("UTF-8");
+            httpServletResponse.getWriter()
+                .write(toJson(TradinResponse.error(ExceptionType.INVALID_JWT_TOKEN_EXCEPTION, e.getMessage())));
         }
     }
 
-    private void respondException(HttpServletResponse response, TradinException e) throws IOException {
-        setResponseHeader(response);
-        writeResponse(response, e);
-    }
-
-    private void setResponseHeader(HttpServletResponse response) {
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-    }
-
-    private void writeResponse(HttpServletResponse response, TradinException e) throws IOException {
-        response.setStatus(e.getErrorType().getHttpStatus().value());
-        response.getWriter().write(toJson(e.getErrorType().getHttpStatus()));
-    }
-
-    private String toJson(HttpStatus exceptionResponse) throws JsonProcessingException {
-        return new ObjectMapper().writeValueAsString(exceptionResponse);
+    private String toJson(TradinResponse<?> response) throws JsonProcessingException {
+        return new ObjectMapper().writeValueAsString(response);
     }
 }

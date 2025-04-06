@@ -13,26 +13,30 @@ import java.io.IOException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+@Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-    private static final String AUTHORIZATION_HEADER_PREFIX = "Authorization";
+
+    private static final List<String> ALLOW_LIST = List.of("/auth", "/swagger-ui", "/api-docs", "/health-check",
+        "/notifications"
+    );
     public static final String BEARER_PREFIX = "Bearer ";
+    public static final String AUTHORIZATION_HEADER_PREFIX = "Authorization";
+
     private final JwtUtil jwtUtil;
-    private static final List<String> ALLOW_LIST = List.of("/swagger-ui", "/api-docs", "/health-check", "/v1/auth/cognito", "/v1/auth/token", "/v1/strategies/future", "/v1/strategies/spot", "/v1/histories");
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
-                                    FilterChain filterChain) throws ServletException, IOException {
-
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+        throws ServletException, IOException {
         if (!isAllowList(request.getRequestURI())) {
             String bearerToken = request.getHeader(AUTHORIZATION_HEADER_PREFIX);
-            String sub = validateHeaderAndGetSub(bearerToken);
-            setAuthentication(sub);
+            Long userId = validateHeaderAndGetUserId(bearerToken);
+            setAuthentication(userId);
         }
-
         filterChain.doFilter(request, response);
     }
 
@@ -40,10 +44,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         return ALLOW_LIST.stream().anyMatch(requestURI::contains);
     }
 
-    private String validateHeaderAndGetSub(String bearerToken) {
+
+    private Long validateHeaderAndGetUserId(String bearerToken) {
         validateHasText(bearerToken);
         validateStartWithBearer(bearerToken);
-        return validateAccessTokenAndGetSub(getAccessTokenFromBearer(bearerToken));
+        return validateAccessToken(getAccessTokenFromBearer(bearerToken));
     }
 
     private void validateHasText(String bearerToken) {
@@ -58,15 +63,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
     }
 
-    private String validateAccessTokenAndGetSub(String accessToken) {
-        return jwtUtil.validateToken(accessToken).get("sub", String.class);
+    private Long validateAccessToken(String accessToken) {
+        return jwtUtil.validateAccessToken(accessToken);
     }
 
     private String getAccessTokenFromBearer(String bearerToken) {
         return bearerToken.substring(BEARER_PREFIX.length());
     }
 
-    private void setAuthentication(String sub) {
-        SecurityContextHolder.getContext().setAuthentication(jwtUtil.getAuthentication(sub));
+    private void setAuthentication(Long userId) {
+        SecurityContextHolder.getContext().setAuthentication(jwtUtil.getAuthentication(userId));
     }
 }

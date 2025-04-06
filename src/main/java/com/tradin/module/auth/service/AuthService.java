@@ -1,52 +1,50 @@
 package com.tradin.module.auth.service;
 
+import static com.tradin.module.users.domain.UserSocialType.GOOGLE;
+
+import com.tradin.common.jwt.JwtProvider;
 import com.tradin.common.jwt.JwtUtil;
+import com.tradin.module.auth.controller.dto.response.TokenResponseDto;
 import com.tradin.module.auth.service.dto.TokenReissueDto;
 import com.tradin.module.auth.service.dto.UserDataDto;
-import com.tradin.module.feign.client.dto.cognito.TokenDto;
-import com.tradin.module.feign.service.CognitoFeignService;
-import com.tradin.module.users.controller.dto.response.TokenResponseDto;
+import com.tradin.module.users.domain.Users;
 import com.tradin.module.users.service.UsersService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import static com.tradin.module.users.domain.UserSocialType.GOOGLE;
-
 @Service
 @Transactional
 @RequiredArgsConstructor
 public class AuthService {
+
+    private final GoogleAuthService googleAuthService;
     private final UsersService usersService;
-    private final CognitoFeignService cognitoFeignService;
     private final JwtUtil jwtUtil;
+    private final JwtProvider jwtProvider;
 
     public TokenResponseDto auth(String code) {
-        TokenDto token = getTokenFromCognito(code);
-        String idToken = token.getId_token();
-        saveUser(extractUserDataFromIdToken(idToken));
+        UserDataDto userDataDto = googleAuthService.getUserInfo(code);
+        Users user = saveOrGetUser(userDataDto);
 
-        return TokenResponseDto.of(token.getAccess_token(), token.getRefresh_token());
+        return createJwtToken(user.getId());
     }
 
-    public String reissueToken(TokenReissueDto tokenReissueDto) {
-        return reissueAccessTokenFromCognito(tokenReissueDto.getRefreshToken());
+    public TokenResponseDto reissueToken(TokenReissueDto request) {
+        Long id = jwtUtil.validateTokensAndGetUserId(request.accessToken(), request.refreshToken());
+        return jwtProvider.createJwtToken(id);
     }
 
-    private TokenDto getTokenFromCognito(String code) {
-        return cognitoFeignService.getTokenFromCognito(code);
+    public TokenResponseDto issueTestToken() {
+        return jwtProvider.createJwtToken(1L);
     }
 
-    private String reissueAccessTokenFromCognito(String refreshToken) {
-        return cognitoFeignService.reissueAccessTokenFromCognito(refreshToken);
+    private TokenResponseDto createJwtToken(Long userId) {
+        return jwtProvider.createJwtToken(userId);
     }
 
-    private UserDataDto extractUserDataFromIdToken(String idToken) {
-        return jwtUtil.extractUserDataFromIdToken(idToken);
-    }
-
-    private void saveUser(UserDataDto userDataDto) {
-        usersService.saveUser(userDataDto, GOOGLE);
+    private Users saveOrGetUser(UserDataDto userDataDto) {
+        return usersService.saveOrGetUser(userDataDto, GOOGLE);
     }
 
 }
