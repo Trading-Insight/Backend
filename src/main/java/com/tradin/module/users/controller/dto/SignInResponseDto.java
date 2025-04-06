@@ -1,7 +1,7 @@
 package com.tradin.module.users.controller.dto;
 
 
-import com.tradin.module.users.controller.dto.response.TokenResponseDto;
+import com.tradin.module.auth.controller.dto.response.TokenResponseDto;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,6 +9,7 @@ import lombok.Getter;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
 public class SignInResponseDto {
+
     private Long id;
     private TokenResponseDto token;
 

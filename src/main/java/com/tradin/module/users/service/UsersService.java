@@ -1,5 +1,7 @@
 package com.tradin.module.users.service;
 
+import static com.tradin.common.exception.ExceptionType.NOT_FOUND_USER_EXCEPTION;
+
 import com.tradin.common.exception.TradinException;
 import com.tradin.common.utils.SecurityUtils;
 import com.tradin.module.auth.service.dto.UserDataDto;
@@ -10,31 +12,29 @@ import com.tradin.module.users.domain.Users;
 import com.tradin.module.users.domain.repository.UsersRepository;
 import com.tradin.module.users.service.dto.ChangeMetadataDto;
 import com.tradin.module.users.service.dto.PingDto;
+import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Optional;
-
-import static com.tradin.common.exception.ExceptionType.NOT_FOUND_USER_EXCEPTION;
-
 @Service
 @Transactional
 @RequiredArgsConstructor
 public class UsersService implements UserDetailsService {
+
     private final BinanceFeignService binanceFeignService;
     private final UsersRepository usersRepository;
 
-    public void saveUser(UserDataDto userDataDto, UserSocialType socialType) {
-        if (!isUserExist(userDataDto.getEmail())) {
-            Users users = userDataDto.toEntity(socialType);
-            usersRepository.save(users);
-        }
+    public Users saveOrFindUser(UserDataDto userDataDto, UserSocialType socialType) {
+        return usersRepository.findByEmail(userDataDto.getEmail())
+            .orElseGet(() -> {
+                Users users = userDataDto.toEntity(socialType);
+                return usersRepository.save(users);
+            });
     }
 
-    //TODO - FeignClient 실패 처리하기
     public String ping(PingDto request) {
         binanceFeignService.getBtcusdtPositionQuantity(request.getBinanceApiKey(), request.getBinanceSecretKey());
         return "pong";
@@ -62,7 +62,7 @@ public class UsersService implements UserDetailsService {
 
     public Users findById(Long id) {
         return usersRepository.findById(id)
-                .orElseThrow(() -> new TradinException(NOT_FOUND_USER_EXCEPTION));
+            .orElseThrow(() -> new TradinException(NOT_FOUND_USER_EXCEPTION));
     }
 
     public List<Users> findAutoTradingSubscriberByStrategyName(String name) {
@@ -84,7 +84,7 @@ public class UsersService implements UserDetailsService {
 
     private Users findBySub(String sub) {
         return usersRepository.findBySub(sub)
-                .orElseThrow(() -> new TradinException(NOT_FOUND_USER_EXCEPTION));
+            .orElseThrow(() -> new TradinException(NOT_FOUND_USER_EXCEPTION));
     }
 
     @Override
