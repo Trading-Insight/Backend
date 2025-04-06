@@ -9,7 +9,6 @@ import com.tradin.module.auth.service.dto.TokenReissueDto;
 import com.tradin.module.auth.service.dto.UserDataDto;
 import com.tradin.module.users.domain.Users;
 import com.tradin.module.users.service.UsersService;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,20 +30,13 @@ public class AuthService {
         return createJwtToken(user.getId());
     }
 
-    public TokenResponseDto createJwtToken(Long userId) {
-        return jwtProvider.createJwtToken(userId);
-    }
-
     public TokenResponseDto reissueToken(TokenReissueDto request) {
-        UUID userId = jwtUtil.validateTokensAndGetUserId(request.getAccessToken(), request.getRefreshToken());
-        return jwtProvider.createJwtToken(userId);
+        Long id = jwtUtil.validateTokensAndGetUserId(request.accessToken(), request.refreshToken());
+        return jwtProvider.createJwtToken(id);
     }
 
-    public SignOutResponseDto deleteToken(final SignOutDto request) {
-        UUID userId = jwtUtil.validateTokensAndGetUserId(request.getAccessToken(), request.getRefreshToken());
-        jwtRemover.deleteRefreshToken(userId);
-
-        return SignOutResponseDto.of(userId);
+    private TokenResponseDto createJwtToken(Long userId) {
+        return jwtProvider.createJwtToken(userId);
     }
 
     private Users saveOrFindUser(UserDataDto userDataDto) {

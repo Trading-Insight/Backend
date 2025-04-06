@@ -24,7 +24,7 @@ public class AuthController {
 
     @Operation(summary = "구글 로그인&회원가입")
     @DisableAuthInSwagger
-    @GetMapping("/cognito")
+    @GetMapping("/google")
     public ResponseEntity<TokenResponseDto> auth(@RequestParam String code) {
         return ResponseEntity.ok(authService.auth(code));
     }
@@ -32,7 +32,7 @@ public class AuthController {
     @DisableAuthInSwagger
     @Operation(summary = "엑세스 토큰 재발급")
     @PostMapping("/token")
-    public ResponseEntity<String> reissueToken(@Valid @RequestBody TokenReissueRequestDto request) {
+    public ResponseEntity<TokenResponseDto> reissueToken(@Valid @RequestBody TokenReissueRequestDto request) {
         return ResponseEntity.ok(authService.reissueToken(request.toServiceDto()));
     }
 }

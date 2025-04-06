@@ -1,9 +1,13 @@
 package com.tradin.common.jwt;
 
 import static com.tradin.common.exception.ExceptionType.DIFFERENT_REFRESH_TOKEN_EXCEPTION;
+import static com.tradin.common.exception.ExceptionType.EXPIRED_JWT_TOKEN_EXCEPTION;
+import static com.tradin.common.exception.ExceptionType.INVALID_JWT_SIGNATURE_EXCEPTION;
 import static com.tradin.common.exception.ExceptionType.INVALID_JWT_TOKEN_EXCEPTION;
+import static com.tradin.common.exception.ExceptionType.NOT_FOUND_JWT_CLAIMS_EXCEPTION;
 import static com.tradin.common.exception.ExceptionType.NOT_FOUND_JWT_USERID_EXCEPTION;
 import static com.tradin.common.exception.ExceptionType.NOT_FOUND_REFRESH_TOKEN_EXCEPTION;
+import static com.tradin.common.exception.ExceptionType.UNSUPPORTED_JWT_TOKEN_EXCEPTION;
 
 import com.tradin.common.exception.TradinException;
 import com.tradin.module.users.domain.Users;
@@ -13,7 +17,6 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -32,7 +35,7 @@ public class JwtUtil {
     private final UsersService userService;
     private final RedisTemplate<String, Object> redisTemplate;
 
-    public UUID validateTokensAndGetUserId(String accessToken, String refreshToken) {
+    public Long validateTokensAndGetUserId(String accessToken, String refreshToken) {
         validateTokenClaims(refreshToken);
         return getUserIdFromTokens(accessToken, refreshToken);
     }
@@ -41,13 +44,13 @@ public class JwtUtil {
         parseClaim(token);
     }
 
-    private UUID getUserIdFromTokens(String accessToken, String refreshToken) {
-        UUID userId = getUserIdFromAccessToken(accessToken);
+    private Long getUserIdFromTokens(String accessToken, String refreshToken) {
+        Long userId = getUserIdFromAccessToken(accessToken);
         validateExistRefreshToken(refreshToken, userId);
         return userId;
     }
 
-    private void validateExistRefreshToken(String refreshToken, UUID userId) {
+    private void validateExistRefreshToken(String refreshToken, Long userId) {
         Object refreshTokenFromDb = redisTemplate.opsForValue().get("RT:" + userId);
 
         if (refreshTokenFromDb == null) {
@@ -79,20 +82,20 @@ public class JwtUtil {
         }
     }
 
-    public UUID getUserIdFromAccessToken(String accessToken) {
-        UUID userId = UUID.fromString(parseClaim(accessToken).get("USER_ID", String.class));
+    public Long getUserIdFromAccessToken(String accessToken) {
+        Long userId = Long.valueOf(parseClaim(accessToken).get("USER_ID", String.class));
         validateExistUserIdFromAccessToken(userId);
         return userId;
     }
 
-    private void validateExistUserIdFromAccessToken(UUID userId) {
+    private void validateExistUserIdFromAccessToken(Long userId) {
         if (userId == null) {
             throw new TradinException(NOT_FOUND_JWT_USERID_EXCEPTION);
         }
     }
 
-    public UUID validateAccessToken(String accessToken) {
-        UUID userId = UUID.fromString(parseClaim(accessToken).get("USER_ID", String.class));
+    public Long validateAccessToken(String accessToken) {
+        Long userId = Long.valueOf(parseClaim(accessToken).get("USER_ID", String.class));
         validateExistUserIdFromAccessToken(userId);
         return userId;
     }
