@@ -25,7 +25,7 @@ public class AuthService {
 
     public TokenResponseDto auth(String code) {
         UserDataDto userDataDto = googleAuthService.getUserInfo(code);
-        Users user = saveOrFindUser(userDataDto);
+        Users user = saveOrGetUser(userDataDto);
 
         return createJwtToken(user.getId());
     }
@@ -39,8 +39,8 @@ public class AuthService {
         return jwtProvider.createJwtToken(userId);
     }
 
-    private Users saveOrFindUser(UserDataDto userDataDto) {
-        return usersService.saveOrFindUser(userDataDto, GOOGLE);
+    private Users saveOrGetUser(UserDataDto userDataDto) {
+        return usersService.saveOrGetUser(userDataDto, GOOGLE);
     }
 
 }

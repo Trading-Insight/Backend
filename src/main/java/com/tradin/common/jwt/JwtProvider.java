@@ -18,7 +18,7 @@ public class JwtProvider {
     private final RedisTemplate<String, Object> redisTemplate;
     private final JwtSecretKeyProvider jwtSecretKeyProvider;
 
-    private static final long ACCESS_TOKEN_EXPIRE_TIME = 7 * 24 * 60 * 60 * 1000L;     // 7일
+    private static final long ACCESS_TOKEN_EXPIRE_TIME = 24 * 60 * 60 * 1000L;    // 1일
     private static final long REFRESH_TOKEN_EXPIRE_TIME = 7 * 24 * 60 * 60 * 1000L;    // 7일
 
     public TokenResponseDto createJwtToken(Long userId) {

@@ -27,7 +27,7 @@ public class UsersService implements UserDetailsService {
     private final BinanceFeignService binanceFeignService;
     private final UsersRepository usersRepository;
 
-    public Users saveOrFindUser(UserDataDto userDataDto, UserSocialType socialType) {
+    public Users saveOrGetUser(UserDataDto userDataDto, UserSocialType socialType) {
         return usersRepository.findByEmail(userDataDto.getEmail())
             .orElseGet(() -> {
                 Users users = userDataDto.toEntity(socialType);

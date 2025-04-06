@@ -1,5 +1,8 @@
 package com.tradin.common.filter;
 
+
+import static com.tradin.common.exception.ExceptionType.INVALID_JWT_EXCEPTION;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tradin.common.exception.TradinException;
@@ -8,13 +11,17 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import org.springframework.http.HttpStatus;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+@RequiredArgsConstructor
+@Component
 public class JwtExceptionFilter extends OncePerRequestFilter {
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
-                                    FilterChain filterChain) throws ServletException, IOException {
+        FilterChain filterChain) throws ServletException, IOException {
         try {
             filterChain.doFilter(request, response);
         } catch (TradinException e) {
@@ -33,11 +40,12 @@ public class JwtExceptionFilter extends OncePerRequestFilter {
     }
 
     private void writeResponse(HttpServletResponse response, TradinException e) throws IOException {
-        response.setStatus(e.getErrorType().getHttpStatus().value());
-        response.getWriter().write(toJson(e.getErrorType().getHttpStatus()));
+        TradinException exceptionResponse = new TradinException(INVALID_JWT_EXCEPTION, e.getMessage());
+        response.setStatus(response.getStatus());
+        response.getWriter().write(toJson(exceptionResponse));
     }
 
-    private String toJson(HttpStatus exceptionResponse) throws JsonProcessingException {
-        return new ObjectMapper().writeValueAsString(exceptionResponse);
+    private String toJson(TradinException tradinException) throws JsonProcessingException {
+        return new ObjectMapper().writeValueAsString(tradinException);
     }
 }

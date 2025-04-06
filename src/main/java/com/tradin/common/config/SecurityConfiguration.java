@@ -1,91 +1,71 @@
 package com.tradin.common.config;
 
 import com.tradin.common.filter.JwtAuthenticationFilter;
-import com.tradin.common.filter.JwtExceptionFilter;
 import com.tradin.common.jwt.JwtUtil;
 import com.tradin.common.utils.PasswordEncoder;
+import java.util.Collections;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfiguration {
+
     private final JwtUtil jwtUtil;
     private final PasswordEncoder passwordEncoder;
-
-    @Value("${secret.swagger-username}")
-    private String swaggerUsername;
-
-    @Value("${secret.swagger-password}")
-    private String swaggerPassword;
-
-    private final String[] SWAGGER_PATTERN = {"/swagger-ui", "/api-docs"};
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        return http.build();
-//            http
-//                .authorizeRequests()
-//                .mvcMatchers("/health-check").permitAll()
-//                .mvcMatchers("/v1/auth/cognito", "/v1/auth/token").permitAll()
-//                .mvcMatchers("/v1/strategies/future", "/v1/strategies/spot").permitAll()
-//                .mvcMatchers("/v1/histories").permitAll()
-//                .mvcMatchers(SWAGGER_PATTERN).authenticated()
-//                .anyRequest().authenticated()
-//                .and()
-//                .cors().configurationSource(corsConfigurationSource())
-//                .and()
-//                .httpBasic()
-//                .and()
-//                .formLogin().disable()
-//                .logout().disable()
-//                .csrf().disable()
-//                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-//                .and()
-//                .headers()
-//                .frameOptions().sameOrigin()
-//                .httpStrictTransportSecurity().disable()
-////                .and()
-////                .exceptionHandling()
-////                .authenticationEntryPoint(new CustomAuthenticationEntryPoint())
-//                .and()
-//                .addFilterBefore(new JwtAuthenticationFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class)
-//                .addFilterBefore(new JwtExceptionFilter(), JwtAuthenticationFilter.class)
-//                .build();
+        permitSwaggerUri(http);
+        setHttp(http);
+        return http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class).build();
     }
 
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-
-        configuration.addAllowedOriginPattern("*");
-        configuration.addAllowedHeader("*");
-        configuration.addAllowedMethod("*");
-        configuration.setAllowCredentials(true);
-
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
-
-        return source;
+    private void setHttp(HttpSecurity http) throws Exception {
+        http.csrf(AbstractHttpConfigurer::disable)
+            .cors(corsConfigurer -> corsConfigurer.configurationSource(corsConfigurationSource()))
+            .formLogin(AbstractHttpConfigurer::disable)
+            .httpBasic(AbstractHttpConfigurer::disable)
+            .sessionManagement(
+                session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            ).authorizeHttpRequests(authorizeRequest ->
+                authorizeRequest
+                    .requestMatchers(new AntPathRequestMatcher("/**")).permitAll()
+                    .anyRequest().authenticated()
+            )
+            .headers(headers -> headers
+                .frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)
+            );
     }
 
-    @Autowired
-    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+    private void permitSwaggerUri(HttpSecurity http) throws Exception {
+        http.authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests
+            .requestMatchers(new AntPathRequestMatcher("/v3/api-docs/**")).permitAll()
+            .requestMatchers(new AntPathRequestMatcher("/swagger-ui/**")).permitAll()
+            .requestMatchers(new AntPathRequestMatcher("/docs/**")).permitAll());
+    }
 
-      auth.inMemoryAuthentication()
-                .withUser(swaggerUsername).password(passwordEncoder.encode(swaggerPassword)).roles("SWAGGER");
+    CorsConfigurationSource corsConfigurationSource() {
+        return request -> {
+            CorsConfiguration config = new CorsConfiguration();
+            config.setAllowedHeaders(Collections.singletonList("*"));
+            config.setAllowedMethods(Collections.singletonList("*"));
+            config.setAllowedOriginPatterns(Collections.singletonList("*"));
+            config.setAllowCredentials(true);
+            return config;
+        };
     }
 }
