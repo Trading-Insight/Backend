@@ -4,6 +4,7 @@ package com.tradin.module.account.domain;
 import com.tradin.common.jpa.AuditTime;
 import com.tradin.module.strategy.domain.Strategy;
 import com.tradin.module.users.domain.Users;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -12,7 +13,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
+import java.util.Date;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -27,6 +30,14 @@ public class Account extends AuditTime {
 
     private String name;
 
+    @Embedded
+    private Balance balance;
+
+    private Boolean autoTradeActivatedYn;
+
+    private Boolean deletedYn;
+
+    private Date deletedAt;
 
     @JoinColumn(name = "user_id", nullable = false)
     @ManyToOne(fetch = FetchType.LAZY)
@@ -36,4 +47,20 @@ public class Account extends AuditTime {
     @OneToOne(fetch = FetchType.LAZY)
     private Strategy strategy;
 
+    @Builder
+    public Account(String name, Users user) {
+        this.name = name;
+        this.autoTradeActivatedYn = false;
+        this.user = user;
+        this.deletedYn = false;
+    }
+
+
+    public void activateAutoTrade() {
+        this.autoTradeActivatedYn = true;
+    }
+
+    public void deactivateAutoTrade() {
+        this.autoTradeActivatedYn = false;
+    }
 }

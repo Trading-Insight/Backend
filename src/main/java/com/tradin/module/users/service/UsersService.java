@@ -1,94 +1,84 @@
 package com.tradin.module.users.service;
 
-import static com.tradin.common.exception.ExceptionType.NOT_FOUND_USER_EXCEPTION;
-
-import com.tradin.common.exception.TradinException;
-import com.tradin.common.utils.SecurityUtils;
+import com.tradin.module.account.implement.AccountProcessor;
 import com.tradin.module.auth.service.dto.UserDataDto;
-import com.tradin.module.feign.service.BinanceFeignService;
 import com.tradin.module.users.controller.dto.response.FindUserInfoResponseDto;
 import com.tradin.module.users.domain.UserSocialType;
 import com.tradin.module.users.domain.Users;
-import com.tradin.module.users.domain.repository.UsersRepository;
-import com.tradin.module.users.service.dto.ChangeMetadataDto;
-import com.tradin.module.users.service.dto.PingDto;
-import java.util.List;
-import java.util.Optional;
+import com.tradin.module.users.implement.UsersProcessor;
+import com.tradin.module.users.implement.UsersReader;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class UsersService implements UserDetailsService {
+public class UsersService {
 
-    private final BinanceFeignService binanceFeignService;
-    private final UsersRepository usersRepository;
+    private final UsersReader usersReader;
+    private final UsersProcessor usersProcessor;
+    private final AccountProcessor accountProcessor;
 
     public Users saveOrGetUser(UserDataDto userDataDto, UserSocialType socialType) {
-        return usersRepository.findByEmail(userDataDto.getEmail())
-            .orElseGet(() -> {
-                Users users = userDataDto.toEntity(socialType);
-                return usersRepository.save(users);
-            });
+        if (isUserExist(userDataDto.getEmail())) {
+            return readUserByEmail(userDataDto);
+        }
+        return createUserAndAccount(userDataDto, socialType);
     }
 
-    public String ping(PingDto request) {
-        binanceFeignService.getBtcusdtPositionQuantity(request.getBinanceApiKey(), request.getBinanceSecretKey());
-        return "pong";
-    }
-
-    public String changeMetaData(ChangeMetadataDto request) {
-        Users user = getUserFromSecurityContext();
-        int changedLeverage = getChangedLeverage(request, user);
-
-        user.changeLeverage(changedLeverage);
-        user.changeQuantityRate(request.getQuantityRate());
-        user.changeTradingType(request.getTradingTypes());
-
-        return "success";
-    }
-
-    public FindUserInfoResponseDto findUserInfo() {
-        Users user = getUserFromSecurityContext();
+    public FindUserInfoResponseDto findUserInfo(Long userId) {
+        Users user = usersReader.findById(userId);
         return new FindUserInfoResponseDto(user.getName(), user.getEmail());
     }
 
-    private int getChangedLeverage(ChangeMetadataDto request, Users user) {
-        return binanceFeignService.changeLeverage(user.getBinanceApiKey(), user.getBinanceSecretKey(), request.getLeverage());
+    private Users createUserAndAccount(UserDataDto userDataDto, UserSocialType socialType) {
+        Users user = usersProcessor.createUser(
+            userDataDto.getEmail(),
+            userDataDto.getSub(),
+            userDataDto.getSocialId(),
+            socialType
+        );
+        accountProcessor.createAccount(user);
+        return user;
     }
 
-    public Users findById(Long id) {
-        return usersRepository.findById(id)
-            .orElseThrow(() -> new TradinException(NOT_FOUND_USER_EXCEPTION));
-    }
-
-    public List<Users> findAutoTradingSubscriberByStrategyName(String name) {
-        return usersRepository.findByAutoTradingSubscriber(name);
-    }
-
-    public Users getUserFromSecurityContext() {
-        Long userId = SecurityUtils.getUserId();
-        return findById(userId);
+    private Users readUserByEmail(UserDataDto userDataDto) {
+        return usersReader.findByEmail(userDataDto.getEmail());
     }
 
     private boolean isUserExist(String email) {
-        return findByEmail(email).isPresent();
+        return usersReader.isUserExist(email);
     }
 
-    private Optional<Users> findByEmail(String email) {
-        return usersRepository.findByEmail(email);
-    }
+//    public Users getUserFromSecurityContext() {
+//        Long userId = SecurityUtils.getUserId();
+//        return findById(userId);
+//    }
+//
+//    public String ping(PingDto request) {
+//        binanceFeignService.getBtcusdtPositionQuantity(request.getBinanceApiKey(), request.getBinanceSecretKey());
+//        return "pong";
+//    }
+//    public String changeMetaData(ChangeMetadataDto request) {
+//        Users user = getUserFromSecurityContext();
+//        int changedLeverage = getChangedLeverage(request, user);
+//
+//        user.changeLeverage(changedLeverage);
+//        user.changeQuantityRate(request.getQuantityRate());
+//        user.changeTradingType(request.getTradingTypes());
+//
+//        return "success";
+//    }
+//    private int getChangedLeverage(ChangeMetadataDto request, Users user) {
+//        return binanceFeignService.changeLeverage(user.getBinanceApiKey(), user.getBinanceSecretKey(), request.getLeverage());
+//    }
+//    public List<Users> findAutoTradingSubscriberByStrategyName(String name) {
+//        return usersRepository.findByAutoTradingSubscriber(name);
+//    }
+//    private boolean isUserExist(String email) {
+//        return findByEmail(email).isPresent();
+//    }
 
-    private Users findBySub(String sub) {
-        return usersRepository.findBySub(sub)
-            .orElseThrow(() -> new TradinException(NOT_FOUND_USER_EXCEPTION));
-    }
 
-    @Override
-    public Users loadUserByUsername(String sub) {
-        return findBySub(sub);
-    }
 }

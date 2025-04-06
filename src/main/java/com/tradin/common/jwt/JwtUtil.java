@@ -11,7 +11,7 @@ import static com.tradin.common.exception.ExceptionType.UNSUPPORTED_JWT_TOKEN_EX
 
 import com.tradin.common.exception.TradinException;
 import com.tradin.module.users.domain.Users;
-import com.tradin.module.users.service.UsersService;
+import com.tradin.module.users.implement.UsersReader;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -30,7 +30,7 @@ import org.springframework.stereotype.Component;
 public class JwtUtil {
 
     private final JwtSecretKeyProvider jwtSecretKeyProvider;
-    private final UsersService userService;
+    private final UsersReader usersReader;
     private final RedisTemplate<String, Object> redisTemplate;
 
     public Long validateTokensAndGetUserId(String accessToken, String refreshToken) {
@@ -99,7 +99,7 @@ public class JwtUtil {
     }
 
     public Authentication getAuthentication(Long userId) {
-        Users user = userService.loadUserByUsername(String.valueOf(userId));
+        Users user = usersReader.loadUserByUsername(String.valueOf(userId));
         return new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
     }
 }

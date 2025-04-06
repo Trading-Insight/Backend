@@ -24,7 +24,7 @@ public class AuthService {
     private final JwtProvider jwtProvider;
 
     public TokenResponseDto auth(String code) {
-        UserDataDto userDataDto = googleAuthService.getUserInfo(code);
+        UserDataDto userDataDto = getUserInfo(code);
         Users user = saveOrGetUser(userDataDto);
 
         return createJwtToken(user.getId());
@@ -33,6 +33,10 @@ public class AuthService {
     public TokenResponseDto reissueToken(TokenReissueDto request) {
         Long id = jwtUtil.validateTokensAndGetUserId(request.accessToken(), request.refreshToken());
         return jwtProvider.createJwtToken(id);
+    }
+
+    private UserDataDto getUserInfo(String code) {
+        return googleAuthService.getUserInfo(code);
     }
 
     public TokenResponseDto issueTestToken() {
