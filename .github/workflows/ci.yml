@@ -27,11 +27,6 @@ jobs:
             ~/.gradle/wrapper
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
 
-      - name: Create application.properties from secret
-        run: |
-          echo "${{ secrets.APPLICATION_SECRET_SPRING }}" > ./main/src/main/resources/application-secret.properties
-        shell: bash
-
       - name: Build and analyze (SpringBoot)
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
