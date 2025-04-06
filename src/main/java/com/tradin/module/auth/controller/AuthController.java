@@ -29,10 +29,17 @@ public class AuthController {
         return ResponseEntity.ok(authService.auth(code));
     }
 
-    @DisableAuthInSwagger
     @Operation(summary = "엑세스 토큰 재발급")
+    @DisableAuthInSwagger
     @PostMapping("/token")
     public ResponseEntity<TokenResponseDto> reissueToken(@Valid @RequestBody TokenReissueRequestDto request) {
         return ResponseEntity.ok(authService.reissueToken(request.toServiceDto()));
+    }
+
+    @Operation(summary = "테스트 토큰 발급")
+    @DisableAuthInSwagger
+    @GetMapping("/test/token")
+    public ResponseEntity<TokenResponseDto> issueTestToken() {
+        return ResponseEntity.ok(authService.issueTestToken());
     }
 }

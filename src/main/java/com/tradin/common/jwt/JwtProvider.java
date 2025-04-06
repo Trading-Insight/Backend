@@ -28,7 +28,7 @@ public class JwtProvider {
 
         // Access Token 생성
         String accessToken = Jwts.builder()
-            .claim("USER_ID", userId)
+            .claim("USER_ID", String.valueOf(userId))
             .setExpiration(accessTokenExpiresIn)
             .signWith(jwtSecretKeyProvider.getSecretKey(), SignatureAlgorithm.HS512)
             .compact();

@@ -66,7 +66,7 @@ secret:
   aes-secret: ${AES_SECRET_KEY}
   swagger-username: ${SWAGGER_USERNAME}
   swagger-password: ${SWAGGER_PASSWORD}
-
+  jwt-secret: ${JWT_SECRET_KEY}
 
 google:
   login:

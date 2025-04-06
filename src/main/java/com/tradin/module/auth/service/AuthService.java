@@ -35,6 +35,10 @@ public class AuthService {
         return jwtProvider.createJwtToken(id);
     }
 
+    public TokenResponseDto issueTestToken() {
+        return jwtProvider.createJwtToken(1L);
+    }
+
     private TokenResponseDto createJwtToken(Long userId) {
         return jwtProvider.createJwtToken(userId);
     }
