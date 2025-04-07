@@ -32,14 +32,14 @@ public class AccountService {
     }
 
     @Transactional
-    public void activateAutoTrading(Long userId, Long id) {
-        Account account = readAccountByIdAndUserId(id, userId);
+    public void activateAutoTrading(Long userId, Long accountId) {
+        Account account = readAccountByIdAndUserId(accountId, userId);
         activateAutoTrading(account);
     }
 
     @Transactional
-    public void deactivateAutoTrading(Long userId, Long id) {
-        Account account = readAccountByIdAndUserId(id, userId);
+    public void deactivateAutoTrading(Long userId, Long accountId) {
+        Account account = readAccountByIdAndUserId(accountId, userId);
         deactivateAutoTrade(account);
     }
 

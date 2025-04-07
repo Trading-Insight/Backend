@@ -2,7 +2,7 @@ package com.tradin.module.account.implement;
 
 
 import static com.tradin.common.exception.ExceptionType.NOT_FOUND_ACCOUNT_EXCEPTION;
-import static com.tradin.common.exception.ExceptionType.NO_ACCOUNT_EXCEPTION;
+import static com.tradin.common.exception.ExceptionType.NOT_FOUND_ANY_ACCOUNT_EXCEPTION;
 
 import com.tradin.common.exception.TradinException;
 import com.tradin.module.account.domain.Account;
@@ -18,7 +18,7 @@ public class AccountReader {
 
     public Account readAccountByUserId(Long userId) {
         return accountRepository.findByUserId(userId)
-            .orElseThrow(() -> new TradinException(NO_ACCOUNT_EXCEPTION));
+            .orElseThrow(() -> new TradinException(NOT_FOUND_ANY_ACCOUNT_EXCEPTION));
     }
 
     public Account readAccountByIdAndUserId(Long id, Long userId) {

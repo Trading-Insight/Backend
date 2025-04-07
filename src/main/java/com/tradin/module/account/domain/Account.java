@@ -1,6 +1,7 @@
 package com.tradin.module.account.domain;
 
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.tradin.common.jpa.AuditTime;
 import com.tradin.module.strategy.domain.Strategy;
 import com.tradin.module.users.domain.Users;
@@ -13,7 +14,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
-import java.util.Date;
+import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -37,7 +38,8 @@ public class Account extends AuditTime {
 
     private Boolean deletedYn;
 
-    private Date deletedAt;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", timezone = "UTC")
+    private LocalDateTime deletedAt;
 
     @JoinColumn(name = "user_id", nullable = false)
     @ManyToOne(fetch = FetchType.LAZY)
@@ -54,7 +56,6 @@ public class Account extends AuditTime {
         this.user = user;
         this.deletedYn = false;
     }
-
 
     public void activateAutoTrade() {
         this.autoTradeActivatedYn = true;

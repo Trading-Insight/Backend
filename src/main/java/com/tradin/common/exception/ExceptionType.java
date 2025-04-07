@@ -38,7 +38,7 @@ public enum ExceptionType {
     NOT_FOUND_ANY_STRATEGY_EXCEPTION(NOT_FOUND, "전략이 아무것도 존재하지 않습니다."),
     NOT_FOUND_SECURITY_CONTEXT_EXCEPTION(NOT_FOUND, "Security Context에 유저 정보가 존재하지 않습니다."),
     NOT_FOUND_ACCOUNT_EXCEPTION(NOT_FOUND, "존재하지 않는 계좌입니다."),
-    NO_ACCOUNT_EXCEPTION(NOT_FOUND, "계좌가 존재하지 않습니다."),
+    NOT_FOUND_ANY_ACCOUNT_EXCEPTION(NOT_FOUND, "활성 계좌가 존재하지 않습니다."),
 
     //405 Method Not Allowed
 

@@ -29,14 +29,14 @@ public class AccountController implements AccountApi {
     }
 
     @PostMapping("/auto-trading/activate")
-    public TradinResponse<String> activateAutoTrading(@AuthenticationPrincipal Long userId, Long id) {
-        accountService.activateAutoTrading(userId, id);
+    public TradinResponse<String> activateAutoTrading(@AuthenticationPrincipal Long userId, Long accountId) {
+        accountService.activateAutoTrading(userId, accountId);
         return TradinResponse.success();
     }
 
     @PostMapping("/auto-trading/deactivate")
-    public TradinResponse<String> deactivateAutoTrading(@AuthenticationPrincipal Long userId, Long id) {
-        accountService.deactivateAutoTrading(userId, id);
+    public TradinResponse<String> deactivateAutoTrading(@AuthenticationPrincipal Long userId, Long accountId) {
+        accountService.deactivateAutoTrading(userId, accountId);
         return TradinResponse.success();
     }
 }
