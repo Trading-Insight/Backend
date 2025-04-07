@@ -5,10 +5,10 @@ import jakarta.persistence.Embeddable;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Embeddable
-public class Balance {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class AutoTradingStatus {
 
     private CoinType coinType;
-    private Double amount;
+    private Boolean autoTradeActivatedYn;
 }

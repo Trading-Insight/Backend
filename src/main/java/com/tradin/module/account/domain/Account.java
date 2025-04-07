@@ -3,9 +3,10 @@ package com.tradin.module.account.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.tradin.common.jpa.AuditTime;
+import com.tradin.module.balance.domain.Balance;
 import com.tradin.module.strategy.domain.Strategy;
 import com.tradin.module.users.domain.Users;
-import jakarta.persistence.Embedded;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -13,8 +14,10 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import java.time.LocalDateTime;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -31,11 +34,6 @@ public class Account extends AuditTime {
 
     private String name;
 
-    @Embedded
-    private Balance balance;
-
-    private Boolean autoTradeActivatedYn;
-
     private Boolean deletedYn;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", timezone = "UTC")
@@ -45,6 +43,9 @@ public class Account extends AuditTime {
     @ManyToOne(fetch = FetchType.LAZY)
     private Users user;
 
+    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Balance> balances;
+
     @JoinColumn(name = "strategy_id")
     @OneToOne(fetch = FetchType.LAZY)
     private Strategy strategy;
@@ -52,16 +53,15 @@ public class Account extends AuditTime {
     @Builder
     public Account(String name, Users user) {
         this.name = name;
-        this.autoTradeActivatedYn = false;
         this.user = user;
         this.deletedYn = false;
     }
 
     public void activateAutoTrade() {
-        this.autoTradeActivatedYn = true;
+        //this.autoTradeActivatedYn = true;
     }
 
     public void deactivateAutoTrade() {
-        this.autoTradeActivatedYn = false;
+        //this.autoTradeActivatedYn = false;
     }
 }
