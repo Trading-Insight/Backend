@@ -21,7 +21,6 @@ public class HistoryController implements HistoryApi {
 
     @GetMapping("")
     public TradinResponse<BackTestResponseDto> backTest(
-        //TODO - TIMEZONE UTC로 통일하기
         @Valid @ModelAttribute BackTestRequestDto request, Pageable pageable) {
         return TradinResponse.success(historyService.backTest(request.toServiceDto(), pageable));
     }

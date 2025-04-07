@@ -6,33 +6,33 @@ import com.tradin.common.exception.ExceptionType;
 import lombok.Getter;
 
 @Getter
-public class TradinResponse<S> {
+public class TradinResponse<T> {
 
-  private final ResultType result;
+    private final ResultType result;
 
-  private final S data;
+    private final T data;
 
-  private final ExceptionMessage error;
+    private final ExceptionMessage error;
 
-  private TradinResponse(ResultType result, S data, ExceptionMessage error) {
-    this.result = result;
-    this.data = data;
-    this.error = error;
-  }
+    private TradinResponse(ResultType result, T data, ExceptionMessage error) {
+        this.result = result;
+        this.data = data;
+        this.error = error;
+    }
 
-  public static TradinResponse<?> success() {
-    return new TradinResponse<>(ResultType.SUCCESS, null, null);
-  }
+    public static <T> TradinResponse<T> success() {
+        return new TradinResponse<>(ResultType.SUCCESS, null, null);
+    }
 
-  public static <S> TradinResponse<S> success(S data) {
-    return new TradinResponse<>(ResultType.SUCCESS, data, null);
-  }
+    public static <T> TradinResponse<T> success(T data) {
+        return new TradinResponse<>(ResultType.SUCCESS, data, null);
+    }
 
-  public static TradinResponse<?> error(ExceptionType error) {
-    return new TradinResponse<>(ResultType.ERROR, null, new ExceptionMessage(error));
-  }
+    public static <T> TradinResponse<T> error(ExceptionType error) {
+        return new TradinResponse<>(ResultType.ERROR, null, new ExceptionMessage(error));
+    }
 
-  public static TradinResponse<?> error(ExceptionType error, Object errorData) {
-    return new TradinResponse<>(ResultType.ERROR, null, new ExceptionMessage(error, errorData));
-  }
+    public static <T> TradinResponse<T> error(ExceptionType error, Object errorData) {
+        return new TradinResponse<>(ResultType.ERROR, null, new ExceptionMessage(error, errorData));
+    }
 }
