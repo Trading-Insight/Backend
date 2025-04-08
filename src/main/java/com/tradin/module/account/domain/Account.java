@@ -4,7 +4,6 @@ package com.tradin.module.account.domain;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.tradin.common.jpa.AuditTime;
 import com.tradin.module.balance.domain.Balance;
-import com.tradin.module.strategy.domain.Strategy;
 import com.tradin.module.users.domain.Users;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -15,7 +14,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.AccessLevel;
@@ -46,9 +44,6 @@ public class Account extends AuditTime {
     @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Balance> balances;
 
-    @JoinColumn(name = "strategy_id")
-    @OneToOne(fetch = FetchType.LAZY)
-    private Strategy strategy;
 
     @Builder
     public Account(String name, Users user) {
