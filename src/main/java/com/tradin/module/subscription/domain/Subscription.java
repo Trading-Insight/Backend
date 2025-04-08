@@ -1,8 +1,8 @@
 package com.tradin.module.subscription.domain;
 
 
+import com.tradin.module.account.domain.Account;
 import com.tradin.module.strategy.domain.Strategy;
-import com.tradin.module.users.domain.Users;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -24,8 +24,8 @@ public class Subscription {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private Users user;
+    @JoinColumn(name = "account_id", nullable = false)
+    private Account account;
 
     @ManyToOne
     @JoinColumn(name = "strategy_id", nullable = false)
@@ -34,9 +34,9 @@ public class Subscription {
     private Boolean isActivated;
 
     @Builder
-    public Subscription(Users user, Strategy strategy) {
-        this.user = user;
+    public Subscription(Account account, Strategy strategy) {
+        this.account = account;
         this.strategy = strategy;
-        this.isActivated = true;
+        this.isActivated = false;
     }
 }

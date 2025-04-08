@@ -1,17 +1,26 @@
 package com.tradin.module.strategy.domain;
 
 import com.tradin.common.jpa.AuditTime;
+import com.tradin.module.subscription.domain.Subscription;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import jakarta.persistence.*;
-
 @Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Strategy extends AuditTime {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -37,6 +46,10 @@ public class Strategy extends AuditTime {
     @Column(nullable = false)
     private int averageHoldingPeriod;
 
+    //TODO
+    @OneToMany(mappedBy = "strategy", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Subscription> subscriptions;
+
     @Builder
     private Strategy(String name, Type type, Rate rate, Count count, Position currentPosition, double profitFactor, int averageHoldingPeriod) {
         this.name = name;
@@ -50,14 +63,14 @@ public class Strategy extends AuditTime {
 
     public static Strategy of(String name, Type type, Rate rate, Count count, Position currentPosition, double profitFactor, int averageHoldingPeriod) {
         return Strategy.builder()
-                .name(name)
-                .type(type)
-                .rate(rate)
-                .count(count)
-                .currentPosition(currentPosition)
-                .profitFactor(profitFactor)
-                .averageHoldingPeriod(averageHoldingPeriod)
-                .build();
+            .name(name)
+            .type(type)
+            .rate(rate)
+            .count(count)
+            .currentPosition(currentPosition)
+            .profitFactor(profitFactor)
+            .averageHoldingPeriod(averageHoldingPeriod)
+            .build();
     }
 
     public void updateCurrentPosition(Position position) {
@@ -143,10 +156,10 @@ public class Strategy extends AuditTime {
     private double calculateProfitRate(Position position) {
         if (isCurrentPositionLong()) {
             return ((double) (position.getPrice() - this.currentPosition.getPrice()) / this.currentPosition.getPrice())
-                    * 100;
+                * 100;
         }
 
         return ((double) (this.currentPosition.getPrice() - position.getPrice()) / this.currentPosition.getPrice())
-                * 100;
+            * 100;
     }
 }

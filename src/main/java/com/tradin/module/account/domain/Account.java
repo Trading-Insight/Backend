@@ -4,6 +4,7 @@ package com.tradin.module.account.domain;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.tradin.common.jpa.AuditTime;
 import com.tradin.module.balance.domain.Balance;
+import com.tradin.module.subscription.domain.Subscription;
 import com.tradin.module.users.domain.Users;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -32,24 +33,26 @@ public class Account extends AuditTime {
 
     private String name;
 
-    private Boolean deletedYn;
+    private Boolean isDeleted;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", timezone = "UTC")
     private LocalDateTime deletedAt;
 
-    @JoinColumn(name = "user_id", nullable = false)
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
     private Users user;
 
     @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Balance> balances;
 
+    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Subscription> subscriptions;
 
     @Builder
     public Account(String name, Users user) {
         this.name = name;
         this.user = user;
-        this.deletedYn = false;
+        this.isDeleted = false;
     }
 
     public void activateAutoTrade() {

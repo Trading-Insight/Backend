@@ -1,14 +1,19 @@
 package com.tradin.module.users.domain;
 
 import com.tradin.common.jpa.AuditTime;
+import com.tradin.module.account.domain.Account;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -37,6 +42,8 @@ public class Users extends AuditTime implements UserDetails {
     @Embedded
     private SocialInfo socialInfo;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private final List<Account> accounts = new ArrayList<>();
 
     @Builder
     private Users(String name, String sub, String email, String socialId, UserSocialType socialType) {
