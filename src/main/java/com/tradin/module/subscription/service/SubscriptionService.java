@@ -6,6 +6,7 @@ import static com.tradin.common.exception.ExceptionType.ALREADY_SUBSCRIBED_EXCEP
 import com.tradin.common.exception.TradinException;
 import com.tradin.module.account.domain.Account;
 import com.tradin.module.account.implement.AccountReader;
+import com.tradin.module.strategy.domain.CoinType;
 import com.tradin.module.strategy.domain.Strategy;
 import com.tradin.module.strategy.implement.StrategyReader;
 import com.tradin.module.subscription.controller.dto.FindSubscriptionsResponseDto;
@@ -39,6 +40,7 @@ public class SubscriptionService {
         //validateExistPosition() TODO - 오픈 포지션이 있는지 체크
         Account account = validateExistAccount(userId, accountId);
         Strategy strategy = validateExistStrategy(strategyId);
+        validateExistSameCoinTypeSubscription(accountId, strategy.getType().getCoinType());
         activateSubscription(account, strategy);
     }
 
@@ -89,8 +91,14 @@ public class SubscriptionService {
         activateSubscription(subscription);
     }
 
-    private static boolean isAlreadyActivatedSubscription(Subscription subscription) {
+    private boolean isAlreadyActivatedSubscription(Subscription subscription) {
         return subscription.isActivated();
+    }
+
+    private void validateExistSameCoinTypeSubscription(Long accountId, CoinType coinType) {
+        if (subscriptionReader.isExistCoinTypeSubscriptionByAccountIdAndCoinType(accountId, coinType)) {
+            throw new TradinException(ALREADY_SUBSCRIBED_EXCEPTION);
+        }
     }
 
     private void activateSubscription(Subscription subscription) {

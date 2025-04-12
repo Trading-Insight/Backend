@@ -39,6 +39,7 @@ public enum ExceptionType {
     NOT_FOUND_ACCOUNT_EXCEPTION(NOT_FOUND, "존재하지 않는 계좌입니다."),
     NOT_FOUND_ANY_ACCOUNT_EXCEPTION(NOT_FOUND, "활성 계좌가 존재하지 않습니다."),
     NOT_SUBSCRIBED_STRATEGY_EXCEPTION(BAD_REQUEST, "구독하지 않은 전략입니다."),
+    CANNOT_SUBSCRIBE_SAME_COIN_TYPE_EXCEPTION(BAD_REQUEST, "코인 타입 하나당 하나의 전략만 구독 가능합니다."),
 
     //405 Method Not Allowed
 

@@ -3,6 +3,7 @@ package com.tradin.module.subscription.domain.repository.impl;
 import static com.tradin.module.subscription.domain.QSubscription.subscription;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.tradin.module.strategy.domain.CoinType;
 import com.tradin.module.subscription.domain.Subscription;
 import com.tradin.module.subscription.domain.repository.SubscriptionQueryRepository;
 import com.tradin.module.subscription.domain.repository.dao.QSubscriptionsDao;
@@ -41,5 +42,13 @@ public class SubscriptionQueryRepositoryImpl implements SubscriptionQueryReposit
                     .and(subscription.strategy.id.eq(strategyId)))
                 .fetchOne()
         );
+    }
+
+    @Override
+    public Boolean isExistCoinTypeSubscriptionByAccountIdAndCoinType(Long accountId, CoinType coinType) {
+        return jpaQueryFactory.selectFrom(subscription)
+            .where(subscription.account.id.eq(accountId)
+                .and(subscription.strategy.type.coinType.eq(coinType)))
+            .fetchOne() != null;
     }
 }
