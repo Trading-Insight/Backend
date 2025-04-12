@@ -21,12 +21,4 @@ public class AccountProcessor {
 
         accountRepository.save(account);
     }
-
-    public void activateAutoTrading(Account account) {
-        account.activateAutoTrade();
-    }
-
-    public void deactivateAutoTrading(Account account) {
-        account.deactivateAutoTrade();
-    }
 }

@@ -21,7 +21,7 @@ public class AccountReader {
             .orElseThrow(() -> new TradinException(NOT_FOUND_ANY_ACCOUNT_EXCEPTION));
     }
 
-    public Account readAccountByIdAndUserId(Long id, Long userId) {
+    public Account findAccountByIdAndUserId(Long id, Long userId) {
         return accountRepository.findByIdAndUserId(id, userId)
             .orElseThrow(() -> new TradinException(NOT_FOUND_ACCOUNT_EXCEPTION));
     }

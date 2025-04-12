@@ -27,16 +27,4 @@ public class AccountController implements AccountApi {
     public TradinResponse<AccountsResponseDto> getAccounts(@AuthenticationPrincipal Long userId) {
         return TradinResponse.success(accountService.getAccounts(userId));
     }
-
-    @PostMapping("/auto-trading/activate")
-    public TradinResponse<String> activateAutoTrading(@AuthenticationPrincipal Long userId, Long accountId) {
-        accountService.activateAutoTrading(userId, accountId);
-        return TradinResponse.success();
-    }
-
-    @PostMapping("/auto-trading/deactivate")
-    public TradinResponse<String> deactivateAutoTrading(@AuthenticationPrincipal Long userId, Long accountId) {
-        accountService.deactivateAutoTrading(userId, accountId);
-        return TradinResponse.success();
-    }
 }

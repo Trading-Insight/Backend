@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@Transactional
+@Transactional(readOnly = true)
 @Slf4j
 @RequiredArgsConstructor
 public class StrategyService {
@@ -29,12 +29,12 @@ public class StrategyService {
     private final StrategyReader strategyReader;
 
     public FindStrategiesInfoResponseDto findFutureStrategiesInfo() {
-        List<StrategyInfoDao> strategiesInfo = strategyReader.readFutureStrategyInfoDaos();
+        List<StrategyInfoDao> strategiesInfo = strategyReader.findFutureStrategyInfoDaos();
         return FindStrategiesInfoResponseDto.of(strategiesInfo);
     }
 
     public FindStrategiesInfoResponseDto findSpotStrategiesInfo() {
-        List<StrategyInfoDao> strategiesInfo = strategyReader.readSpotStrategyInfoDaos();
+        List<StrategyInfoDao> strategiesInfo = strategyReader.findSpotStrategyInfoDaos();
         return FindStrategiesInfoResponseDto.of(strategiesInfo);
     }
 

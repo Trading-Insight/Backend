@@ -2,6 +2,7 @@ package com.tradin.module.strategy.implement;
 
 import com.tradin.common.exception.ExceptionType;
 import com.tradin.common.exception.TradinException;
+import com.tradin.module.strategy.domain.Strategy;
 import com.tradin.module.strategy.domain.repository.StrategyRepository;
 import com.tradin.module.strategy.domain.repository.dao.StrategyInfoDao;
 import java.util.List;
@@ -14,20 +15,21 @@ public class StrategyReader {
 
     private final StrategyRepository strategyRepository;
 
-    public List<StrategyInfoDao> readFutureStrategyInfoDaos() {
+    public List<StrategyInfoDao> findFutureStrategyInfoDaos() {
         return strategyRepository.findAllFutureStrategiesInfoDao();
     }
 
-    public List<StrategyInfoDao> readSpotStrategyInfoDaos() {
+    public List<StrategyInfoDao> findSpotStrategyInfoDaos() {
         return strategyRepository.findAllSpotStrategiesInfoDao();
     }
 
-    public StrategyInfoDao readStrategyInfoDaoById(Long id) {
-        return findStrategyInfoDaoById(id);
+    public StrategyInfoDao findStrategyInfoDaoById(Long id) {
+        return strategyRepository.findStrategyInfoDaoById(id)
+            .orElseThrow(() -> new TradinException(ExceptionType.NOT_FOUND_STRATEGY_EXCEPTION));
     }
 
-    private StrategyInfoDao findStrategyInfoDaoById(Long id) {
-        return strategyRepository.findStrategyInfoDaoById(id)
+    public Strategy findStrategyById(Long id) {
+        return strategyRepository.findById(id)
             .orElseThrow(() -> new TradinException(ExceptionType.NOT_FOUND_STRATEGY_EXCEPTION));
     }
 
@@ -41,8 +43,4 @@ public class StrategyReader {
 //            .orElseThrow(() -> new TradinException(ExceptionType.NOT_FOUND_STRATEGY_EXCEPTION));
 //    }
 //
-//    public Strategy findById(Long id) {
-//        return strategyRepository.findById(id)
-//            .orElseThrow(() -> new TradinException(ExceptionType.NOT_FOUND_STRATEGY_EXCEPTION));
-//    }
 }

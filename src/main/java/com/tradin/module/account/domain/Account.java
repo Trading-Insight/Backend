@@ -3,9 +3,10 @@ package com.tradin.module.account.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.tradin.common.jpa.AuditTime;
-import com.tradin.module.strategy.domain.Strategy;
+import com.tradin.module.balance.domain.Balance;
+import com.tradin.module.subscription.domain.Subscription;
 import com.tradin.module.users.domain.Users;
-import jakarta.persistence.Embedded;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -13,8 +14,10 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.OneToMany;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -31,37 +34,25 @@ public class Account extends AuditTime {
 
     private String name;
 
-    @Embedded
-    private Balance balance;
-
-    private Boolean autoTradeActivatedYn;
-
-    private Boolean deletedYn;
+    private Boolean isDeleted;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", timezone = "UTC")
     private LocalDateTime deletedAt;
 
-    @JoinColumn(name = "user_id", nullable = false)
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
     private Users user;
 
-    @JoinColumn(name = "strategy_id")
-    @OneToOne(fetch = FetchType.LAZY)
-    private Strategy strategy;
+    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
+    private final List<Balance> balances = new ArrayList<>();
+
+    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
+    private final List<Subscription> subscriptions = new ArrayList<>();
 
     @Builder
     public Account(String name, Users user) {
         this.name = name;
-        this.autoTradeActivatedYn = false;
         this.user = user;
-        this.deletedYn = false;
-    }
-
-    public void activateAutoTrade() {
-        this.autoTradeActivatedYn = true;
-    }
-
-    public void deactivateAutoTrade() {
-        this.autoTradeActivatedYn = false;
+        this.isDeleted = false;
     }
 }
