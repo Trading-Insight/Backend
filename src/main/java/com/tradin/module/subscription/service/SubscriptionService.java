@@ -10,7 +10,6 @@ import com.tradin.module.strategy.domain.Strategy;
 import com.tradin.module.strategy.implement.StrategyReader;
 import com.tradin.module.subscription.controller.dto.FindSubscriptionsResponseDto;
 import com.tradin.module.subscription.domain.Subscription;
-import com.tradin.module.subscription.domain.repository.SubscriptionRepository;
 import com.tradin.module.subscription.implement.SubscriptionProcessor;
 import com.tradin.module.subscription.implement.SubscriptionReader;
 import java.util.Optional;
@@ -29,7 +28,6 @@ public class SubscriptionService {
     private final SubscriptionProcessor subscriptionProcessor;
     private final AccountReader accountReader;
     private final StrategyReader strategyReader;
-    private final SubscriptionRepository subscriptionRepository;
 
     public FindSubscriptionsResponseDto findSubscriptions(Long userId, Long accountId) {
         validateExistAccount(userId, accountId);
