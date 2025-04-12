@@ -16,6 +16,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -43,23 +44,15 @@ public class Account extends AuditTime {
     private Users user;
 
     @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Balance> balances;
+    private final List<Balance> balances = new ArrayList<>();
 
     @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Subscription> subscriptions;
+    private final List<Subscription> subscriptions = new ArrayList<>();
 
     @Builder
     public Account(String name, Users user) {
         this.name = name;
         this.user = user;
         this.isDeleted = false;
-    }
-
-    public void activateAutoTrade() {
-        //this.autoTradeActivatedYn = true;
-    }
-
-    public void deactivateAutoTrade() {
-        //this.autoTradeActivatedYn = false;
     }
 }
