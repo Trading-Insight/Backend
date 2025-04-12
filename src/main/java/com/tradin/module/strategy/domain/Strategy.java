@@ -46,7 +46,6 @@ public class Strategy extends AuditTime {
     @Column(nullable = false)
     private int averageHoldingPeriod;
 
-    //TODO
     @OneToMany(mappedBy = "strategy", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Subscription> subscriptions;
 

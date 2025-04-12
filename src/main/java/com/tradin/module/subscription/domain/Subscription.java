@@ -1,6 +1,7 @@
 package com.tradin.module.subscription.domain;
 
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.tradin.module.account.domain.Account;
 import com.tradin.module.strategy.domain.Strategy;
 import jakarta.persistence.Entity;
@@ -9,6 +10,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -31,12 +33,19 @@ public class Subscription {
     @JoinColumn(name = "strategy_id", nullable = false)
     private Strategy strategy;
 
-    private Boolean isActivated;
+    private SubscriptionStatus status;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", timezone = "UTC")
+    private LocalDateTime startDate;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", timezone = "UTC")
+    private LocalDateTime endDate;
 
     @Builder
     public Subscription(Account account, Strategy strategy) {
         this.account = account;
         this.strategy = strategy;
-        this.isActivated = false;
+        this.status = SubscriptionStatus.ACTIVE;
+        this.startDate = LocalDateTime.now();
     }
 }
