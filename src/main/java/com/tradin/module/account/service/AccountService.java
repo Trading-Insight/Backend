@@ -31,17 +31,6 @@ public class AccountService {
         return readAccountsByUserId(userId);
     }
 
-    @Transactional
-    public void activateAutoTrading(Long userId, Long accountId) {
-        Account account = readAccountByIdAndUserId(accountId, userId);
-        activateAutoTrading(account);
-    }
-
-    @Transactional
-    public void deactivateAutoTrading(Long userId, Long accountId) {
-        Account account = readAccountByIdAndUserId(accountId, userId);
-        deactivateAutoTrade(account);
-    }
 
     private AccountsResponseDto readAccountsByUserId(Long userId) {
         Account account = accountReader.readAccountByUserId(userId);
@@ -49,15 +38,7 @@ public class AccountService {
     }
 
     private Account readAccountByIdAndUserId(Long id, Long userId) {
-        return accountReader.readAccountByIdAndUserId(id, userId);
-    }
-
-    private void activateAutoTrading(Account account) {
-        accountProcessor.activateAutoTrading(account);
-    }
-
-    private void deactivateAutoTrade(Account account) {
-        accountProcessor.deactivateAutoTrading(account);
+        return accountReader.findAccountByIdAndUserId(id, userId);
     }
 
     private void createAccountByUserId(Long userId) {

@@ -1,8 +1,12 @@
 package com.tradin.module.subscription.implement;
 
-import com.tradin.module.account.implement.AccountReader;
+import static com.tradin.common.exception.ExceptionType.NOT_SUBSCRIBED_STRATEGY_EXCEPTION;
+
+import com.tradin.common.exception.TradinException;
 import com.tradin.module.subscription.controller.dto.FindSubscriptionsResponseDto;
+import com.tradin.module.subscription.domain.Subscription;
 import com.tradin.module.subscription.domain.repository.SubscriptionRepository;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -10,15 +14,19 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class SubscriptionReader {
 
-    private final AccountReader accountReader;
     private final SubscriptionRepository subscriptionRepository;
 
-    public FindSubscriptionsResponseDto findSubscriptions(Long userId, Long accountId) {
-        validateExistAccount(userId, accountId);
+    public FindSubscriptionsResponseDto findSubscriptions(Long accountId) {
         return FindSubscriptionsResponseDto.of(subscriptionRepository.findAllByUserIdAndAccountId(accountId));
     }
 
-    private void validateExistAccount(Long userId, Long accountId) {
-        accountReader.readAccountByIdAndUserId(accountId, userId);
+    public Optional<Subscription> findByAccountIdAndStrategyIdOptional(Long accountId, Long strategyId) {
+        return subscriptionRepository.findByAccountIdAndStrategyId(accountId, strategyId);
     }
+
+    public Subscription findByAccountIdAndStrategyId(Long accountId, Long strategyId) {
+        return subscriptionRepository.findByAccountIdAndStrategyId(accountId, strategyId)
+            .orElseThrow(() -> new TradinException(NOT_SUBSCRIBED_STRATEGY_EXCEPTION));
+    }
+
 }

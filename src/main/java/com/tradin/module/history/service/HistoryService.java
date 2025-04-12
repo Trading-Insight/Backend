@@ -39,7 +39,7 @@ public class HistoryService {
     }
 
     private StrategyInfoDao readStrategyInfoDaoById(BackTestDto request) {
-        return strategyReader.readStrategyInfoDaoById(request.getId());
+        return strategyReader.findStrategyInfoDaoById(request.getId());
     }
 
 //    private BackTestResponseDto calculateHistoryDaos(List<HistoryDao> historyDaos,

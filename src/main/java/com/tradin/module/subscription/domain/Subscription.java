@@ -48,4 +48,21 @@ public class Subscription {
         this.status = SubscriptionStatus.ACTIVE;
         this.startDate = LocalDateTime.now();
     }
+
+    public Boolean isActivated() {
+        return status.isActivated();
+    }
+
+
+    public Boolean isDeActivated() {
+        return status.isDeActivated();
+    }
+
+    public void activate() {
+        this.status = SubscriptionStatus.ACTIVE;
+    }
+
+    public void deActivate() {
+        this.status = SubscriptionStatus.INACTIVE;
+    }
 }

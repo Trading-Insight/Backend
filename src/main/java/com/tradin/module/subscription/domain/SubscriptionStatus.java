@@ -13,4 +13,16 @@ public enum SubscriptionStatus {
 
     private final String code;
     private final String name;
+
+    public Boolean isActivated() {
+        return this == ACTIVE;
+    }
+
+    public Boolean isDeActivated() {
+        return this == INACTIVE;
+    }
+
+    public Boolean isPaused() {
+        return this == PAUSED;
+    }
 }

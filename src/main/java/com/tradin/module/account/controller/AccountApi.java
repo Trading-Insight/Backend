@@ -14,10 +14,4 @@ public interface AccountApi {
 
     @Operation(summary = "계좌 목록 조회")
     public TradinResponse<AccountsResponseDto> getAccounts(@AuthenticationPrincipal Long userId);
-
-    @Operation(summary = "자동매매 상태 활성화")
-    public TradinResponse<String> activateAutoTrading(@AuthenticationPrincipal Long userId, Long id);
-
-    @Operation(summary = "자동매매 상태 비활성화")
-    public TradinResponse<String> deactivateAutoTrading(@AuthenticationPrincipal Long userId, Long id);
 }
