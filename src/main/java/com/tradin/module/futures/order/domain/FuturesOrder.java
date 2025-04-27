@@ -46,6 +46,9 @@ public class FuturesOrder extends AuditTime {
     @Column(nullable = false)
     private OrderStatus orderStatus;
 
+    @Column(nullable = false)
+    private BigDecimal pnl;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "account_id", nullable = false)
     private Account account;
@@ -62,6 +65,7 @@ public class FuturesOrder extends AuditTime {
         this.amount = amount;
         this.leverage = leverage;
         this.orderStatus = orderStatus;
+        this.pnl = BigDecimal.ZERO;
         this.account = account;
         this.strategy = strategy;
     }
