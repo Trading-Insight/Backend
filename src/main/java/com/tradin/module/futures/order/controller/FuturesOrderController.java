@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/v1/trade")
+@RequestMapping("/v1/futures/orders")
 public class FuturesOrderController {
 
     private final FuturesOrderService futuresOrderService;

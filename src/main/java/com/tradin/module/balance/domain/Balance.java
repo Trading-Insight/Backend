@@ -38,4 +38,12 @@ public class Balance {
         this.account = account;
     }
 
+    public static Balance of(CoinType coinType, Double amount, Account account) {
+        return Balance.builder()
+            .coinType(coinType)
+            .amount(amount)
+            .account(account)
+            .build();
+    }
+
 }
