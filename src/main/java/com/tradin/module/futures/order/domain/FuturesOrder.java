@@ -42,12 +42,15 @@ public class FuturesOrder extends AuditTime {
     @Column(nullable = false)
     private Integer leverage;
 
+    @Column(nullable = false)
+    private BigDecimal pnl;
+
+    @Column(nullable = false, precision = 20, scale = 8)
+    private BigDecimal margin;
+    
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private OrderStatus orderStatus;
-
-    @Column(nullable = false)
-    private BigDecimal pnl;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "account_id", nullable = false)
@@ -59,27 +62,51 @@ public class FuturesOrder extends AuditTime {
 
 
     @Builder
-    public FuturesOrder(TradingType tradingType, BigDecimal price, BigDecimal amount, Integer leverage, OrderStatus orderStatus, Account account, Strategy strategy) {
+    private FuturesOrder(
+        TradingType tradingType,
+        BigDecimal price,
+        BigDecimal amount,
+        Integer leverage,
+        OrderStatus orderStatus,
+        BigDecimal pnl,
+        BigDecimal margin,
+        Account account,
+        Strategy strategy
+    ) {
         this.tradingType = tradingType;
         this.price = price;
         this.amount = amount;
         this.leverage = leverage;
         this.orderStatus = orderStatus;
-        this.pnl = BigDecimal.ZERO;
+        this.pnl = pnl;
+        this.margin = margin;
         this.account = account;
         this.strategy = strategy;
     }
 
-    public static FuturesOrder of(TradingType tradingType, BigDecimal price, BigDecimal amount, Integer leverage, OrderStatus orderStatus, Account account, Strategy strategy) {
+    public static FuturesOrder of(
+        TradingType tradingType,
+        BigDecimal price,
+        BigDecimal amount,
+        Integer leverage,
+        OrderStatus orderStatus,
+        BigDecimal pnl,
+        BigDecimal margin,
+        Account account,
+        Strategy strategy
+    ) {
         return FuturesOrder.builder()
             .tradingType(tradingType)
             .price(price)
             .amount(amount)
             .leverage(leverage)
             .orderStatus(orderStatus)
+            .pnl(pnl)
+            .margin(margin)
             .account(account)
             .strategy(strategy)
             .build();
     }
+
 
 }
