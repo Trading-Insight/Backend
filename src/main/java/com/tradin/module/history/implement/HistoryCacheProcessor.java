@@ -19,12 +19,13 @@ public class HistoryCacheProcessor {
 
     @Async
     public void addHistoryCache(String cacheKey, List<HistoryDao> histories) {
-        historyRedisTemplate.executePipelined(new SessionCallback<Object>() {
+        historyRedisTemplate.executePipelined(new SessionCallback<Void>() {
             @Override
-            public <K, V> Object execute(RedisOperations<K, V> operations) {
-                ZSetOperations<K, V> ops = operations.opsForZSet();
+            public Void execute(RedisOperations operations) {
+                ZSetOperations<String, HistoryDao> zSetOperations = operations.opsForZSet();
                 for (HistoryDao history : histories) {
-                    ops.add((K) cacheKey, (V) history, history.entryPosition().getTime().toEpochSecond(ZoneOffset.UTC));
+                    double score = history.entryPosition().getTime().toInstant(ZoneOffset.UTC).toEpochMilli();
+                    zSetOperations.add(cacheKey, history, score);
                 }
                 return null;
             }

@@ -2,12 +2,12 @@ package com.tradin.module.strategy.service;
 
 import com.tradin.common.utils.AESUtils;
 import com.tradin.module.feign.service.BinanceFeignService;
+import com.tradin.module.futures.order.service.FuturesOrderService;
 import com.tradin.module.history.service.HistoryService;
 import com.tradin.module.strategy.controller.dto.response.FindStrategiesInfoResponseDto;
 import com.tradin.module.strategy.domain.TradingType;
 import com.tradin.module.strategy.domain.repository.dao.StrategyInfoDao;
 import com.tradin.module.strategy.implement.StrategyReader;
-import com.tradin.module.trade.service.TradeService;
 import com.tradin.module.users.service.UsersService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +24,7 @@ public class StrategyService {
     private final HistoryService historyService;
     private final BinanceFeignService binanceFeignService;
     private final UsersService userService;
-    private final TradeService tradeService;
+    private final FuturesOrderService futuresOrderService;
     private final AESUtils aesUtils;
     private final StrategyReader strategyReader;
 

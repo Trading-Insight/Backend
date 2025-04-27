@@ -42,7 +42,7 @@ public class Strategy extends AuditTime {
     private Position currentPosition;
 
     @Column(nullable = false)
-    private double profitFactor;
+    private double profitFactor; //TODO - BigDecimal로 변경
 
     @Column(nullable = false)
     private int averageHoldingPeriod;
@@ -78,7 +78,7 @@ public class Strategy extends AuditTime {
     }
 
     public void updateMetaData(Position position) {
-        double profitRate = calculateProfitRate(position);
+        double profitRate = 0; //calculateProfitRate(position);
 
         if (isWin(profitRate)) {
             increaseWinCount();
@@ -153,13 +153,13 @@ public class Strategy extends AuditTime {
         this.rate.updateAverageProfitRate(this.count.getTotalTradeCount());
     }
 
-    private double calculateProfitRate(Position position) {
-        if (isCurrentPositionLong()) {
-            return ((double) (position.getPrice() - this.currentPosition.getPrice()) / this.currentPosition.getPrice())
-                * 100;
-        }
-
-        return ((double) (this.currentPosition.getPrice() - position.getPrice()) / this.currentPosition.getPrice())
-            * 100;
-    }
+//    private double calculateProfitRate(Position position) {
+//        if (isCurrentPositionLong()) {
+//            return ((double) (position.getPrice() - this.currentPosition.getPrice()) / this.currentPosition.getPrice())
+//                * 100;
+//        }
+//
+//        return ((double) (this.currentPosition.getPrice() - position.getPrice()) / this.currentPosition.getPrice())
+//            * 100;
+//    }
 }

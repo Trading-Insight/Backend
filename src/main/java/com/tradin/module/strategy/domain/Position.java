@@ -4,21 +4,22 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Embeddable;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import java.time.LocalDateTime;
-
 @Embeddable
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class Position {
+
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private TradingType tradingType;
@@ -29,20 +30,20 @@ public class Position {
     private LocalDateTime time;
 
     @Column(nullable = false)
-    private int price;
+    private BigDecimal price;
 
     @Builder
-    private Position(TradingType tradingType, LocalDateTime time, int price) {
+    private Position(TradingType tradingType, LocalDateTime time, BigDecimal price) {
         this.tradingType = tradingType;
         this.time = time;
         this.price = price;
     }
 
-    public static Position of(TradingType tradingType, LocalDateTime time, int price) {
+    public static Position of(TradingType tradingType, LocalDateTime time, BigDecimal price) {
         return Position.builder()
-                .tradingType(tradingType)
-                .time(time)
-                .price(price)
-                .build();
+            .tradingType(tradingType)
+            .time(time)
+            .price(price)
+            .build();
     }
 }

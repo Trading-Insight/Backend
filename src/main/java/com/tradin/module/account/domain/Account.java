@@ -4,6 +4,7 @@ package com.tradin.module.account.domain;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.tradin.common.jpa.AuditTime;
 import com.tradin.module.balance.domain.Balance;
+import com.tradin.module.futures.order.domain.FuturesOrder;
 import com.tradin.module.subscription.domain.Subscription;
 import com.tradin.module.users.domain.Users;
 import jakarta.persistence.CascadeType;
@@ -48,6 +49,9 @@ public class Account extends AuditTime {
 
     @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
     private final List<Subscription> subscriptions = new ArrayList<>();
+
+    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
+    private final List<FuturesOrder> futuresOrders = new ArrayList<>();
 
     @Builder
     public Account(String name, Users user) {
