@@ -1,15 +1,14 @@
-package com.tradin.module.feign.service;
+package com.tradin.module.futures.order.feign.service;
 
 import com.tradin.common.generator.SignatureGenerator;
-import com.tradin.module.feign.client.BinanceClient;
-import com.tradin.module.feign.client.dto.binance.CurrentPositionInfoDto;
-import com.tradin.module.feign.client.dto.binance.FutureAccountBalanceDto;
+import com.tradin.module.futures.order.feign.client.BinanceClient;
+import com.tradin.module.futures.order.feign.client.dto.binance.CurrentPositionInfoDto;
+import com.tradin.module.futures.order.feign.client.dto.binance.FutureAccountBalanceDto;
+import java.time.Instant;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.Instant;
-import java.util.List;
 
 @Service
 @Transactional
@@ -23,7 +22,8 @@ public class BinanceFeignService {
         Long timestamp = Instant.now().toEpochMilli();
         double quantity = Math.abs(getBtcusdtPositionQuantity(apiKey, secretKey)) + orderQuantity;
 
-        String queryString = "quantity=" + quantity + "&side=" + side + "&symbol=BTCUSDT" + "&timestamp=" + timestamp + "&type=MARKET";
+        String queryString =
+            "quantity=" + quantity + "&side=" + side + "&symbol=BTCUSDT" + "&timestamp=" + timestamp + "&type=MARKET";
 
         String signature = SignatureGenerator.generateSignature(queryString, secretKey);
 
@@ -35,7 +35,7 @@ public class BinanceFeignService {
         double quantity = Math.abs(getBtcusdtPositionQuantity(apiKey, secretKey));
 
         String queryString =
-                "quantity=" + quantity + "&side=" + side + "&symbol=BTCUSDT" + "&timestamp=" + timestamp + "&type=MARKEY";
+            "quantity=" + quantity + "&side=" + side + "&symbol=BTCUSDT" + "&timestamp=" + timestamp + "&type=MARKEY";
 
         String signature = SignatureGenerator.generateSignature(queryString, secretKey);
 
@@ -47,7 +47,12 @@ public class BinanceFeignService {
         String queryString = "symbol=BTCUSDT" + "&timestamp=" + timestamp;
         String signature = SignatureGenerator.generateSignature(queryString, secretKey);
 
-        List<CurrentPositionInfoDto> currentPositionInfoDtos = binanceFeignClient.getCurrentPositionInfo("BTCUSDT", timestamp, apiKey, signature);
+        List<CurrentPositionInfoDto> currentPositionInfoDtos = binanceFeignClient.getCurrentPositionInfo(
+            "BTCUSDT",
+            timestamp,
+            apiKey,
+            signature
+        );
 
         return extractBtcusdtPositionQuantity(currentPositionInfoDtos);
     }
@@ -65,7 +70,11 @@ public class BinanceFeignService {
         String queryString = "timestamp=" + timestamp;
         String signature = SignatureGenerator.generateSignature(queryString, secretKey);
 
-        List<FutureAccountBalanceDto> futureAccountBalanceDtos = binanceFeignClient.getFutureAccountBalance(apiKey, timestamp, signature);
+        List<FutureAccountBalanceDto> futureAccountBalanceDtos = binanceFeignClient.getFutureAccountBalance(
+            apiKey,
+            timestamp,
+            signature
+        );
 
         return extractUsdtBalance(futureAccountBalanceDtos);
     }

@@ -1,7 +1,7 @@
 package com.tradin.module.strategy.service;
 
 import com.tradin.common.utils.AESUtils;
-import com.tradin.module.feign.service.BinanceFeignService;
+import com.tradin.module.futures.order.feign.service.BinanceFeignService;
 import com.tradin.module.futures.order.service.FuturesOrderService;
 import com.tradin.module.history.service.HistoryService;
 import com.tradin.module.strategy.controller.dto.response.FindStrategiesInfoResponseDto;

@@ -8,7 +8,6 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -30,16 +29,16 @@ public class Position {
     private LocalDateTime time;
 
     @Column(nullable = false)
-    private BigDecimal price;
+    private int price;
 
     @Builder
-    private Position(TradingType tradingType, LocalDateTime time, BigDecimal price) {
+    private Position(TradingType tradingType, LocalDateTime time, int price) {
         this.tradingType = tradingType;
         this.time = time;
         this.price = price;
     }
 
-    public static Position of(TradingType tradingType, LocalDateTime time, BigDecimal price) {
+    public static Position of(TradingType tradingType, LocalDateTime time, int price) {
         return Position.builder()
             .tradingType(tradingType)
             .time(time)

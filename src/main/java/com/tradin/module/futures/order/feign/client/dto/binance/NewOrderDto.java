@@ -1,4 +1,4 @@
-package com.tradin.module.feign.client.dto.binance;
+package com.tradin.module.futures.order.feign.client.dto.binance;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class NewOrderDto {
+
     private String clientOrderId;
     private String cumQty;
     private String cumQuote;
