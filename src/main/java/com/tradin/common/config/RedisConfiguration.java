@@ -1,6 +1,6 @@
 package com.tradin.common.config;
 
-import com.tradin.module.history.domain.repository.dao.HistoryDao;
+import com.tradin.module.strategy.history.domain.repository.dao.HistoryDao;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.context.annotation.Bean;

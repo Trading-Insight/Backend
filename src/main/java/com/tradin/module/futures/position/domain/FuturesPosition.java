@@ -1,8 +1,8 @@
 package com.tradin.module.futures.position.domain;
 
-import com.tradin.module.account.domain.Account;
-import com.tradin.module.strategy.domain.CoinType;
-import com.tradin.module.strategy.domain.TradingType;
+import com.tradin.module.users.account.domain.Account;
+import com.tradin.module.strategy.strategy.domain.CoinType;
+import com.tradin.module.strategy.strategy.domain.TradingType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
