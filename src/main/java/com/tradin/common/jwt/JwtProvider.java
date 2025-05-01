@@ -1,6 +1,6 @@
 package com.tradin.common.jwt;
 
-import com.tradin.module.auth.controller.dto.response.TokenResponseDto;
+import com.tradin.module.users.auth.controller.dto.response.TokenResponseDto;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import java.util.Date;

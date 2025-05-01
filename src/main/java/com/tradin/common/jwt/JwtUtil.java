@@ -10,8 +10,8 @@ import static com.tradin.common.exception.ExceptionType.NOT_FOUND_REFRESH_TOKEN_
 import static com.tradin.common.exception.ExceptionType.UNSUPPORTED_JWT_TOKEN_EXCEPTION;
 
 import com.tradin.common.exception.TradinException;
-import com.tradin.module.users.domain.Users;
-import com.tradin.module.users.implement.UsersReader;
+import com.tradin.module.users.users.domain.Users;
+import com.tradin.module.users.users.implement.UsersReader;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
