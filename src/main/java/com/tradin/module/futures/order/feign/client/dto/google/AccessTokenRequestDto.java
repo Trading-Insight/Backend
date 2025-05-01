@@ -1,4 +1,4 @@
-package com.tradin.module.feign.client.dto.google;
+package com.tradin.module.futures.order.feign.client.dto.google;
 
 public record AccessTokenRequestDto(
     String clientId,
