@@ -18,7 +18,7 @@ public enum OrderStatus {
         return this == OPEN;
     }
 
-    public Boolean isClose() {
+    public Boolean isFilled() {
         return this == FILLED;
     }
 
