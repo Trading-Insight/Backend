@@ -65,7 +65,7 @@ public class History {
             .build();
     }
 
-    public void closeOpenPosition(Position position) {
+    public void closeHistory(Position position) {
         this.exitPosition = position;
     }
 

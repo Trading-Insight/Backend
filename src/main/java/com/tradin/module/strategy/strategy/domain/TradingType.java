@@ -11,4 +11,12 @@ public enum TradingType {
     BOTH("매수&매도");
 
     private final String value;
+
+    public boolean isLong() {
+        return this == LONG;
+    }
+
+    public boolean isShort() {
+        return this == SHORT;
+    }
 }

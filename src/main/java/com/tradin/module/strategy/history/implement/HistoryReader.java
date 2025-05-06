@@ -1,5 +1,9 @@
 package com.tradin.module.strategy.history.implement;
 
+import static com.tradin.common.exception.ExceptionType.NOT_FOUND_HISTORY_EXCEPTION;
+
+import com.tradin.common.exception.TradinException;
+import com.tradin.module.strategy.history.domain.History;
 import com.tradin.module.strategy.history.domain.repository.HistoryRepository;
 import com.tradin.module.strategy.history.domain.repository.dao.HistoryDao;
 import com.tradin.module.strategy.strategy.domain.TradingType;
@@ -28,6 +32,11 @@ public class HistoryReader {
         }
 
         return filterByPeriodAndTradingType(cachedHistories, startDate, endDate, tradingType);
+    }
+
+    public History findOpenHistoryByStrategyId(Long strategyId) {
+        return historyRepository.findOpenHistoryByStrategyId(strategyId)
+            .orElseThrow(() -> new TradinException(NOT_FOUND_HISTORY_EXCEPTION));
     }
 
     private List<HistoryDao> readCachedHistories(LocalDate startDate, LocalDate endDate, Pageable pageable, String cacheKey) {

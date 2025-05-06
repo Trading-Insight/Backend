@@ -1,12 +1,18 @@
 package com.tradin.module.users.account.service;
 
 
+import com.tradin.module.strategy.strategy.domain.CoinType;
 import com.tradin.module.users.account.controller.dto.response.AccountsResponseDto;
 import com.tradin.module.users.account.domain.Account;
 import com.tradin.module.users.account.implement.AccountProcessor;
 import com.tradin.module.users.account.implement.AccountReader;
+import com.tradin.module.users.account.service.dto.AccountDto;
+import com.tradin.module.users.balance.domain.Balance;
+import com.tradin.module.users.balance.implement.BalanceProcessor;
 import com.tradin.module.users.users.domain.Users;
 import com.tradin.module.users.users.implement.UsersReader;
+import java.math.BigDecimal;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -19,8 +25,9 @@ import org.springframework.transaction.annotation.Transactional;
 public class AccountService {
 
     private final AccountReader accountReader;
-    private final AccountProcessor accountProcessor;
     private final UsersReader usersReader;
+    private final AccountProcessor accountProcessor;
+    private final BalanceProcessor balanceProcessor;
 
     @Transactional
     public void createAccount(Long userId) {
@@ -31,14 +38,16 @@ public class AccountService {
         return readAccountsByUserId(userId);
     }
 
-
-    private AccountsResponseDto readAccountsByUserId(Long userId) {
-        Account account = accountReader.readAccountByUserId(userId);
-        return AccountsResponseDto.of(account.getId(), account.getName());
+    @Transactional
+    public void faucet(Long userId, Long accountId) {
+        Account account = accountReader.fetchAccountByIdAndUserId(accountId, userId);
+        Balance usdtBalance = accountReader.getBalanceByAccountAndCoinType(account, CoinType.USDT);
+        balanceProcessor.updateBalance(usdtBalance, BigDecimal.valueOf(10000));
     }
 
-    private Account readAccountByIdAndUserId(Long id, Long userId) {
-        return accountReader.findAccountByIdAndUserId(id, userId);
+    private AccountsResponseDto readAccountsByUserId(Long userId) {
+        List<AccountDto> accounts = accountReader.findAccountDtosByUserId(userId);
+        return AccountsResponseDto.of(accounts);
     }
 
     private void createAccountByUserId(Long userId) {
@@ -47,7 +56,7 @@ public class AccountService {
     }
 
     private void createAccount(Users user) {
-        accountProcessor.createAccount(user);
+        accountProcessor.createAccountAndUsdtBalance(user);
     }
 
     private Users readUserById(Long userId) {

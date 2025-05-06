@@ -18,12 +18,12 @@ public class HistoryQueryRepositoryImpl implements HistoryQueryRepository {
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public Optional<History> findLastHistoryByStrategyId(Long id) {
+    public Optional<History> findOpenHistoryByStrategyId(Long id) {
         return Optional.ofNullable(
             jpaQueryFactory
                 .selectFrom(history)
-                .where(history.strategy.id.eq(id))
-                .orderBy(history.entryPosition.time.desc())
+                .where(history.strategy.id.eq(id)
+                    .and(history.exitPosition.isNull()))
                 .fetchFirst()
         );
     }

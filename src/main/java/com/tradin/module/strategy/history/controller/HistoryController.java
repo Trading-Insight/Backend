@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -24,4 +25,10 @@ public class HistoryController implements HistoryApi {
         @Valid @ModelAttribute BackTestRequestDto request, Pageable pageable) {
         return TradinResponse.success(historyService.backTest(request.toServiceDto(), pageable));
     }
+
+    @GetMapping("/test/{strategyId}") //TODO
+    public void test(@PathVariable Long strategyId) {
+        historyService.createHistory(strategyId);
+    }
+
 }

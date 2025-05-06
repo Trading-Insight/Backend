@@ -20,17 +20,4 @@ public class UsersController implements UsersApi {
     public TradinResponse<FindUserInfoResponseDto> findUserInfo(@AuthenticationPrincipal Long userId) {
         return TradinResponse.success(usersService.findUserInfo(userId));
     }
-
-//    @Operation(summary = "Api&Secret Key 유효성 검사")
-//    @PostMapping("/binance/ping")
-//    public ResponseEntity<String> ping(@Valid @RequestBody PingRequestDto request) {
-//        return ResponseEntity.ok(usersService.ping(request.toServiceDto()));
-//    }
-//
-//    @Operation(summary = "레버리지, 수량, 포지션 타입 변경")
-//    @PostMapping("/binance/metadata")
-//    public ResponseEntity<String> changeMetaData(@Valid @RequestBody ChangeMetadataRequestDto request) {
-//        return ResponseEntity.ok(usersService.changeMetaData(request.toServiceDto()));
-//    }
-
 }

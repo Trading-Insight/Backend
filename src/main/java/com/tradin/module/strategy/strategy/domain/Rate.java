@@ -1,17 +1,17 @@
 package com.tradin.module.strategy.strategy.domain;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Embeddable;
-
 @Embeddable
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class Rate {
+
     @Column(nullable = false)
     private double winningRate;
 
@@ -38,6 +38,17 @@ public class Rate {
         this.totalProfitRate = totalProfitRate;
         this.totalLossRate = totalLossRate;
         this.averageProfitRate = averageProfitRate;
+    }
+
+    public static Rate of(double winningRate, double simpleProfitRate, double compoundProfitRate, double totalProfitRate, double totalLossRate, double averageProfitRate) {
+        return Rate.builder()
+            .winningRate(winningRate)
+            .simpleProfitRate(simpleProfitRate)
+            .compoundProfitRate(compoundProfitRate)
+            .totalProfitRate(totalProfitRate)
+            .totalLossRate(totalLossRate)
+            .averageProfitRate(averageProfitRate)
+            .build();
     }
 
     public void updateTotalProfitRate(double profitRate) {

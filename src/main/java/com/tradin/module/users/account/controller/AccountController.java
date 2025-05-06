@@ -6,6 +6,7 @@ import com.tradin.module.users.account.service.AccountService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,5 +27,10 @@ public class AccountController implements AccountApi {
     @GetMapping()
     public TradinResponse<AccountsResponseDto> getAccounts(@AuthenticationPrincipal Long userId) {
         return TradinResponse.success(accountService.getAccounts(userId));
+    }
+
+    @PostMapping("/faucet/{accountId}")
+    public void faucet(@AuthenticationPrincipal Long userId, @PathVariable Long accountId) {
+        accountService.faucet(userId, accountId);
     }
 }

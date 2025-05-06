@@ -1,9 +1,9 @@
 package com.tradin.module.futures.order.domain;
 
 import com.tradin.common.jpa.AuditTime;
-import com.tradin.module.users.account.domain.Account;
 import com.tradin.module.strategy.strategy.domain.Strategy;
 import com.tradin.module.strategy.strategy.domain.TradingType;
+import com.tradin.module.users.account.domain.Account;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -15,6 +15,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -33,19 +34,16 @@ public class FuturesOrder extends AuditTime {
     @Enumerated(EnumType.STRING)
     private TradingType tradingType;
 
-    @Column(nullable = false)
+    @Column(nullable = false, precision = 20, scale = 2)
     private BigDecimal price;
 
-    @Column(nullable = false)
+    @Column(nullable = false, precision = 20, scale = 4)
     private BigDecimal amount;
 
     @Column(nullable = false)
     private Integer leverage;
 
-    @Column(nullable = false)
-    private BigDecimal pnl;
-
-    @Column(nullable = false, precision = 20, scale = 8)
+    @Column(nullable = false, precision = 20, scale = 4)
     private BigDecimal margin;
 
     @Enumerated(EnumType.STRING)
@@ -60,49 +58,24 @@ public class FuturesOrder extends AuditTime {
     @JoinColumn(name = "strategy_id", nullable = false)
     private Strategy strategy;
 
-
     @Builder
-    private FuturesOrder(
-        TradingType tradingType,
-        BigDecimal price,
-        BigDecimal amount,
-        Integer leverage,
-        OrderStatus orderStatus,
-        BigDecimal pnl,
-        BigDecimal margin,
-        Account account,
-        Strategy strategy
-    ) {
+    public FuturesOrder(TradingType tradingType, BigDecimal price, BigDecimal amount, OrderStatus orderStatus, Account account, Strategy strategy) {
         this.tradingType = tradingType;
         this.price = price;
         this.amount = amount;
-        this.leverage = leverage;
+        this.leverage = 1;
+        this.margin = amount.divide(BigDecimal.valueOf(leverage), 2, RoundingMode.CEILING);
         this.orderStatus = orderStatus;
-        this.pnl = pnl;
-        this.margin = margin;
         this.account = account;
         this.strategy = strategy;
     }
 
-    public static FuturesOrder of(
-        TradingType tradingType,
-        BigDecimal price,
-        BigDecimal amount,
-        Integer leverage,
-        OrderStatus orderStatus,
-        BigDecimal pnl,
-        BigDecimal margin,
-        Account account,
-        Strategy strategy
-    ) {
+    public static FuturesOrder of(TradingType tradingType, BigDecimal price, BigDecimal amount, OrderStatus orderStatus, Account account, Strategy strategy) {
         return FuturesOrder.builder()
             .tradingType(tradingType)
             .price(price)
             .amount(amount)
-            .leverage(leverage)
             .orderStatus(orderStatus)
-            .pnl(pnl)
-            .margin(margin)
             .account(account)
             .strategy(strategy)
             .build();

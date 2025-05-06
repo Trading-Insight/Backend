@@ -34,12 +34,13 @@ public class UsersService {
 
     private Users createUserAndAccount(UserDataDto userDataDto, UserSocialType socialType) {
         Users user = usersProcessor.createUser(
-            userDataDto.getEmail(),
+            userDataDto.getName(),
             userDataDto.getSub(),
+            userDataDto.getEmail(),
             userDataDto.getSocialId(),
             socialType
         );
-        accountProcessor.createAccount(user);
+        accountProcessor.createAccountAndUsdtBalance(user);
         return user;
     }
 
@@ -50,35 +51,4 @@ public class UsersService {
     private boolean isUserExist(String email) {
         return usersReader.isUserExist(email);
     }
-
-//    public Users getUserFromSecurityContext() {
-//        Long userId = SecurityUtils.getUserId();
-//        return findById(userId);
-//    }
-//
-//    public String ping(PingDto request) {
-//        binanceFeignService.getBtcusdtPositionQuantity(request.getBinanceApiKey(), request.getBinanceSecretKey());
-//        return "pong";
-//    }
-//    public String changeMetaData(ChangeMetadataDto request) {
-//        Users user = getUserFromSecurityContext();
-//        int changedLeverage = getChangedLeverage(request, user);
-//
-//        user.changeLeverage(changedLeverage);
-//        user.changeQuantityRate(request.getQuantityRate());
-//        user.changeTradingType(request.getTradingTypes());
-//
-//        return "success";
-//    }
-//    private int getChangedLeverage(ChangeMetadataDto request, Users user) {
-//        return binanceFeignService.changeLeverage(user.getBinanceApiKey(), user.getBinanceSecretKey(), request.getLeverage());
-//    }
-//    public List<Users> findAutoTradingSubscriberByStrategyName(String name) {
-//        return usersRepository.findByAutoTradingSubscriber(name);
-//    }
-//    private boolean isUserExist(String email) {
-//        return findByEmail(email).isPresent();
-//    }
-
-
 }

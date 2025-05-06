@@ -1,10 +1,13 @@
 package com.tradin.module.strategy.strategy.controller;
 
 import com.tradin.common.response.TradinResponse;
+import com.tradin.module.strategy.strategy.controller.dto.request.WebHookRequestDto;
 import com.tradin.module.strategy.strategy.controller.dto.response.FindStrategiesInfoResponseDto;
 import com.tradin.module.strategy.strategy.service.StrategyService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -25,4 +28,13 @@ public class StrategyController implements StrategyApi {
         return strategyService.findSpotStrategiesInfo();
     }
 
+    @GetMapping("/test") //TODO
+    public void createStrategy() {
+        strategyService.createStrategy();
+    }
+
+    @PostMapping("/webhook/futures/short-term")
+    public void handleFutureShortTermV1WebHook(@RequestBody WebHookRequestDto request) {
+        strategyService.handleFutureWebHook(request.toServiceDto());
+    }
 }

@@ -36,4 +36,15 @@ public class SubscriptionController {
         return TradinResponse.success();
     }
 
+    @PostMapping("/activate/accounts/strategies/{strategyId}") //TODO
+    public TradinResponse<String> activateAutoTradingTest(@AuthenticationPrincipal Long userId, @PathVariable Long strategyId) {
+        subscriptionService.activateSubscriptionTest(userId, strategyId);
+        return TradinResponse.success();
+    }
+
+    @PostMapping("/deactivate/accounts/strategies/{strategyId}") //TODO
+    public TradinResponse<String> deactivateAutoTradingTest(@AuthenticationPrincipal Long userId, @PathVariable Long strategyId) {
+        subscriptionService.deActivateSubscriptionTest(userId, strategyId);
+        return TradinResponse.success();
+    }
 }

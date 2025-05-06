@@ -29,7 +29,7 @@ public class Position {
     private LocalDateTime time;
 
     @Column(nullable = false)
-    private int price;
+    private int price;  //TODO - BigDecimal로 변경
 
     @Builder
     private Position(TradingType tradingType, LocalDateTime time, int price) {
@@ -44,5 +44,13 @@ public class Position {
             .time(time)
             .price(price)
             .build();
+    }
+
+    public boolean isLong() {
+        return tradingType == TradingType.LONG;
+    }
+
+    public boolean isShort() {
+        return tradingType == TradingType.SHORT;
     }
 }

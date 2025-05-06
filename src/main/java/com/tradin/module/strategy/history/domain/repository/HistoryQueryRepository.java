@@ -7,7 +7,7 @@ import java.util.Optional;
 
 public interface HistoryQueryRepository {
 
-    Optional<History> findLastHistoryByStrategyId(Long id);
+    Optional<History> findOpenHistoryByStrategyId(Long id);
 
     List<HistoryDao> findHistoryByStrategyId(Long id);
 }

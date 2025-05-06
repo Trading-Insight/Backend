@@ -3,6 +3,7 @@ package com.tradin.module.strategy.subscription.domain.repository;
 import com.tradin.module.strategy.strategy.domain.CoinType;
 import com.tradin.module.strategy.subscription.domain.Subscription;
 import com.tradin.module.strategy.subscription.domain.repository.dao.SubscriptionsDao;
+import com.tradin.module.users.account.domain.Account;
 import java.util.List;
 import java.util.Optional;
 
@@ -12,5 +13,7 @@ public interface SubscriptionQueryRepository {
 
     Optional<Subscription> findByAccountIdAndStrategyId(Long accountId, Long strategyId);
 
-    Boolean isExistCoinTypeSubscriptionByAccountIdAndCoinType(Long accountId, CoinType coinType);
+    Optional<Subscription> findSubscriptionByAccountIdAndCoinType(Long accountId, CoinType coinType);
+
+    List<Account> findSubscribedAccountsByStrategyId(Long strategyId);
 }

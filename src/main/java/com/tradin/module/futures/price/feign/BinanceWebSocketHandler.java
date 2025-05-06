@@ -3,6 +3,7 @@ package com.tradin.module.futures.price.feign;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.tradin.module.futures.price.domain.PriceCache;
+import com.tradin.module.strategy.strategy.domain.CoinType;
 import jakarta.annotation.PostConstruct;
 import java.math.BigDecimal;
 import lombok.RequiredArgsConstructor;
@@ -39,8 +40,10 @@ public class BinanceWebSocketHandler {
 
                         String symbol = data.get("s").getAsString();
                         BigDecimal price = new BigDecimal(data.get("p").getAsString());
-
-                        priceCache.updatePrice(symbol, price);
+                        //log.info("[WebSocket 수신] {}: {}", symbol, price);
+                        CoinType.fromSymbol(symbol).ifPresent(coinType -> {
+                            priceCache.updatePrice(coinType, price);
+                        });
 
                         //priceCache.getAllPrices().forEach((sym, prc) -> log.info("[현재 시세] {}: {}", sym, prc));
                     } catch (Exception e) {

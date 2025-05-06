@@ -1,14 +1,22 @@
 package com.tradin.module.strategy.strategy.service;
 
-import com.tradin.common.utils.AESUtils;
-import com.tradin.module.futures.order.feign.service.BinanceFeignService;
-import com.tradin.module.futures.order.service.FuturesOrderService;
-import com.tradin.module.strategy.history.service.HistoryService;
+import com.tradin.module.futures.order.implement.FuturesOrderProcessor;
+import com.tradin.module.futures.position.implement.FuturesPositionProcessor;
+import com.tradin.module.strategy.history.domain.History;
+import com.tradin.module.strategy.history.implement.HistoryProcessor;
+import com.tradin.module.strategy.history.implement.HistoryReader;
 import com.tradin.module.strategy.strategy.controller.dto.response.FindStrategiesInfoResponseDto;
-import com.tradin.module.strategy.strategy.domain.TradingType;
+import com.tradin.module.strategy.strategy.domain.Position;
+import com.tradin.module.strategy.strategy.domain.Strategy;
 import com.tradin.module.strategy.strategy.domain.repository.dao.StrategyInfoDao;
+import com.tradin.module.strategy.strategy.implement.StrategyProcessor;
 import com.tradin.module.strategy.strategy.implement.StrategyReader;
-import com.tradin.module.users.users.service.UsersService;
+import com.tradin.module.strategy.strategy.service.dto.WebHookDto;
+import com.tradin.module.strategy.subscription.implement.SubscriptionReader;
+import com.tradin.module.users.account.domain.Account;
+import com.tradin.module.users.account.implement.AccountReader;
+import com.tradin.module.users.balance.implement.BalanceProcessor;
+import com.tradin.module.users.balance.implement.BalanceReader;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,12 +29,21 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class StrategyService {
 
-    private final HistoryService historyService;
-    private final BinanceFeignService binanceFeignService;
-    private final UsersService userService;
-    private final FuturesOrderService futuresOrderService;
-    private final AESUtils aesUtils;
+    private final AccountReader accountReader;
+    private final BalanceReader balanceReader;
     private final StrategyReader strategyReader;
+    private final HistoryReader historyReader;
+    private final SubscriptionReader subscriptionReader;
+    private final StrategyProcessor strategyProcessor;
+    private final HistoryProcessor historyProcessor;
+    private final FuturesOrderProcessor futuresOrderProcessor;
+    private final FuturesPositionProcessor futuresPositionProcessor;
+    private final BalanceProcessor balanceProcessor;
+
+    @Transactional
+    public void createStrategy() {
+        strategyProcessor.createStrategy();
+    }
 
     public FindStrategiesInfoResponseDto findFutureStrategiesInfo() {
         List<StrategyInfoDao> strategiesInfo = strategyReader.findFutureStrategyInfoDaos();
@@ -38,114 +55,51 @@ public class StrategyService {
         return FindStrategiesInfoResponseDto.of(strategiesInfo);
     }
 
-//    private static TradingType webHookTradingType(WebHookDto request) {
-//        return request.getPosition().getTradingType();
-//    }
-//
-//    public FindSubscriptionStrategiesInfoResponseDto findSubscriptionStrategiesInfo() {
-//        List<SubscriptionStrategyInfoDao> subscriptionStrategyInfo = strategyReader.findSubscriptionStrategyInfoDaos();
-//        return new FindSubscriptionStrategiesInfoResponseDto(subscriptionStrategyInfo);
-//    }
-//
-//
-//    public void subscribeStrategy(SubscribeStrategyDto request) {
-//        Users savedUser = getUserFromSecurityContext();
-//        Strategy strategy = strategyReader.findById(request.getId());
-//        String encryptedApiKey = getEncryptedKey(request.getBinanceApiKey());
-//        String encryptedSecretKey = getEncryptedKey(request.getBinanceSecretKey());
-//
-//        savedUser.subscribeStrategy(strategy, encryptedApiKey, encryptedSecretKey, request.getLeverage(), request.getQuantityRate(), request.getTradingType());
-//    }
-//
-//    public void unsubscribeStrategy(UnSubscribeStrategyDto request) {
-//        Users savedUser = getUserFromSecurityContext();
-//        Strategy strategy = strategyReader.findById(request.getId());
-//
-//        isUserSubscribedStrategy(savedUser, strategy);
-//
-//        if (request.isPositionClose() && isUserPositionExist(savedUser.getCurrentPositionType())) {
-//            String side = getSideFromUserCurrentPosition(savedUser);
-//            closePosition(savedUser.getBinanceApiKey(), savedUser.getBinanceSecretKey(), side);
-//        }
-//
-//        savedUser.unsubscribeStrategy();
-//    }
-//
-//    private static void isUserSubscribedStrategy(Users users, Strategy strategy) {
-//        if (!users.getStrategy().getId().equals(strategy.getId())) {
-//            throw new TradinException(NOT_SUBSCRIBED_STRATEGY_EXCEPTION);
-//        }
-//    }
-//
-//    private void autoTrading(String name, TradingType tradingType) {
-//        tradeService.autoTrading(name, tradingType);
-//    }
-//
-//    private String getSideFromUserCurrentPosition(Users savedUser) {
-//        return savedUser.getCurrentPositionType().equals(LONG) ? "SELL" : "BUY";
-//    }
-//
-//    private void closePosition(String apiKey, String secretKey, String side) {
-//        binanceFeignService.closePosition(apiKey, secretKey, side);
-//    }
-//
-//    private String getEncryptedKey(String key) {
-//        return aesUtils.encrypt(key);
-//    }
-//
-//    private Users getUserFromSecurityContext() {
-//        return userService.getUserFromSecurityContext();
-//    }
-//
-//
-//    private void closeOngoingHistory(Strategy strategy, Position exitPosition) {
-//        historyService.closeOngoingHistory(strategy, exitPosition);
-//    }
-//
-//    private void createNewHistory(Strategy strategy, Position position) {
-//        historyService.createNewHistory(strategy, position);
-//    }
-//
-//    private void evictHistoryCache(Long strategyId) {
-//        historyService.evictHistoryCache(strategyId);
-//    }
-//
-//    private void updateStrategyMetaData(Strategy strategy, Position position) {
-//        strategy.updateMetaData(position);
-//    }
+    /**
+     * 1. 전략 검증  2. 기존 거래내역에 종료 거래 업데이트 3. 전략 업데이트 (수익률, 매매 횟수 등) 4. 거래내역 생성 5. 구독 계좌 자동매매
+     */
+    @Transactional
+    public void handleFutureWebHook(WebHookDto request) {
+        //TODO - 현재 롱인데 다시 롱 시그널 오는거 막기
+        Strategy strategy = validateExistStrategy(request.getId());
+        Position position = request.getPosition();
 
-//    private List<SubscriptionStrategyInfoDao> findSubscriptionStrategyInfoDaos() {
-//        return strategyRepository.findSubscriptionStrategiesInfoDao()
-//                .orElse(Collections.emptyList());
-//    }
-
-
-    private boolean isUserPositionExist(TradingType tradingType) {
-        return tradingType != TradingType.NONE;
+        closeOpenHistory(strategy, position);
+        updateStrategy(strategy, position);
+        createHistory(strategy, position);
+        autoTrading(strategy, position);
     }
 
-//    public void handleFutureWebHook(WebHookDto request) {
-//        Strategy strategy = findByName(request.getName());
-//        String strategyName = strategy.getName();
-//        TradingType strategyCurrentPosition = strategy.getCurrentPosition().getTradingType();
-//
-////      autoTrading(strategyName, strategyCurrentPosition);
-//        closeOngoingHistory(strategy, request.getPosition());
-//        createNewHistory(strategy, request.getPosition());
-//        evictHistoryCache(strategy.getId());
-//        updateStrategyMetaData(strategy, request.getPosition());
-//    }
-//
-//    public void handleSpotWebHook(WebHookDto request) {
-//        Strategy strategy = findByName(request.getName());
-//
-//        if (webHookTradingType(request) == LONG) {
-//            createNewHistory(strategy, request.getPosition());
-//            return;
-//        }
-//
-//        closeOngoingHistory(strategy, request.getPosition());
-//        evictHistoryCache(strategy.getId());
-//        updateStrategyMetaData(strategy, request.getPosition());
-//    }
+    private Strategy validateExistStrategy(Long id) {
+        return strategyReader.findStrategyById(id);
+    }
+
+    private void updateStrategy(Strategy strategy, Position strategyPosition) {
+        strategyProcessor.updateRateAndCount(strategy, strategyPosition);
+        strategyProcessor.updateCurrentPosition(strategy, strategyPosition); //TODO - 안되네
+    }
+
+    private void closeOpenHistory(Strategy strategy, Position strategyPosition) {
+        History history = historyReader.findOpenHistoryByStrategyId(strategy.getId());
+        historyProcessor.closeHistory(history, strategyPosition);
+    }
+
+    private void createHistory(Strategy strategy, Position stratgeyPosition) {
+        historyProcessor.createHistory(strategy, stratgeyPosition);
+    }
+
+    private void autoTrading(Strategy strategy, Position strategyPosition) {
+        List<Account> accounts = subscriptionReader.findSubscribedAccountsByStrategyId(strategy.getId());
+
+        for (Account account : accounts) {
+//            try {
+//                futuresOrderProcessor.closeExistPosition(strategy, account);
+//                futuresOrderProcessor.openNewPosition(strategy, account, strategyPosition);
+//            } catch (Exception e) {
+//                log.warn("[자동매매 실패] accountId={}, reason={}", account.getId(), e.getMessage());
+//            }
+            futuresOrderProcessor.closeExistPosition(strategy, account);
+            futuresOrderProcessor.openNewPosition(strategy, account, strategyPosition);
+        }
+    }
 }

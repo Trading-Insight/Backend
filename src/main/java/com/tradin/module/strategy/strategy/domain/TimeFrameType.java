@@ -7,11 +7,13 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public enum TimeFrameType {
-    ONE_HOUR("1시간"),
-    FOUR_HOUR("4시간"),
-    SIX_HOUR("6시간"),
-    TWELVE_HOUR("12시간"),
-    ONE_DAY("1일");
+    ONE_HOUR(60),
+    FOUR_HOUR(2400),
+    SIX_HOUR(3600),
+    TWELVE_HOUR(7200),
+    ONE_DAY(14400);
 
-    private final String value;
+    private final int value;
+
+
 }

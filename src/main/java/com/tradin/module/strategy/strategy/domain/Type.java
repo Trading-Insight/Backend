@@ -29,7 +29,15 @@ public class Type {
     @Builder
     private Type(StrategyType strategyType, CoinType coinType, TimeFrameType timeFrameType) {
         this.strategyType = strategyType;
-        this.timeFrameType = timeFrameType;
         this.coinType = coinType;
+        this.timeFrameType = timeFrameType;
+    }
+
+    public static Type of(StrategyType strategyType, CoinType coinType, TimeFrameType timeFrameType) {
+        return Type.builder()
+            .strategyType(strategyType)
+            .coinType(coinType)
+            .timeFrameType(timeFrameType)
+            .build();
     }
 }

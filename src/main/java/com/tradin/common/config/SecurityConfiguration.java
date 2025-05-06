@@ -39,7 +39,7 @@ public class SecurityConfiguration {
                 session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             ).authorizeHttpRequests(authorizeRequest ->
                 authorizeRequest
-                    .requestMatchers("/v1/auth/test/token").permitAll()
+                    .requestMatchers("/v1/auth/test/**").permitAll() //TODO
                     .anyRequest().authenticated()
             )
             .headers(headers -> headers

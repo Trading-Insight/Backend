@@ -53,6 +53,16 @@ public class Users extends AuditTime implements UserDetails {
         this.socialInfo = SocialInfo.of(socialId, socialType);
     }
 
+    public static Users of(String name, String sub, String email, String socialId, UserSocialType socialType) {
+        return Users.builder()
+            .name(name)
+            .sub(sub)
+            .email(email)
+            .socialId(socialId)
+            .socialType(socialType)
+            .build();
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Collections.emptyList();
@@ -86,5 +96,10 @@ public class Users extends AuditTime implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    public void addAccount(Account account) {
+        this.accounts.add(account);
+        account.setUser(this);
     }
 }

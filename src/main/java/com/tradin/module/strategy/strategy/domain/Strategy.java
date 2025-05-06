@@ -1,17 +1,14 @@
 package com.tradin.module.strategy.strategy.domain;
 
 import com.tradin.common.jpa.AuditTime;
-import com.tradin.module.strategy.subscription.domain.Subscription;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import java.util.ArrayList;
-import java.util.List;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -30,6 +27,7 @@ public class Strategy extends AuditTime {
     private String name;
 
     @Embedded
+    @Column(nullable = false)
     private Type type;
 
     @Embedded
@@ -41,14 +39,11 @@ public class Strategy extends AuditTime {
     @Embedded
     private Position currentPosition;
 
-    @Column(nullable = false)
+    @Column
     private double profitFactor; //TODO - BigDecimal로 변경
 
-    @Column(nullable = false)
+    @Column
     private int averageHoldingPeriod;
-
-    @OneToMany(mappedBy = "strategy", cascade = CascadeType.ALL, orphanRemoval = true)
-    private final List<Subscription> subscriptions = new ArrayList<>();
 
     @Builder
     private Strategy(String name, Type type, Rate rate, Count count, Position currentPosition, double profitFactor, int averageHoldingPeriod) {
@@ -77,8 +72,8 @@ public class Strategy extends AuditTime {
         this.currentPosition = position;
     }
 
-    public void updateMetaData(Position position) {
-        double profitRate = 0; //calculateProfitRate(position);
+    public void updateRateAndCount(double entryPrice, LocalDateTime entryTime) {
+        double profitRate = calculateProfitRate(entryPrice);
 
         if (isWin(profitRate)) {
             increaseWinCount();
@@ -88,21 +83,26 @@ public class Strategy extends AuditTime {
             updateTotalLossRate(profitRate);
         }
 
+        updateAverageHoldingPeriod(entryTime);
         increaseTotalTradeCount();
         updateProfitFactor();
         updateWinRate();
         updateSimpleProfitRate();
         updateCompoundProfitRate(profitRate);
-        updateCurrentPosition(position);
         updateAverageProfitRate();
     }
 
-    public boolean isLongPosition() {
-        return this.currentPosition.getTradingType() == TradingType.LONG;
+    private double calculateProfitRate(double price) {
+        if (isCurrentPositionLong()) {
+            return ((price - this.currentPosition.getPrice()) / this.currentPosition.getPrice()) * 100;
+        }
+
+        return ((this.currentPosition.getPrice() - price) / this.currentPosition.getPrice())
+            * 100;
     }
 
-    public boolean isShortPosition() {
-        return this.currentPosition.getTradingType() == TradingType.SHORT;
+    private boolean isCurrentPositionLong() {
+        return this.currentPosition.getTradingType() == TradingType.LONG;
     }
 
     private void increaseTotalTradeCount() {
@@ -110,12 +110,9 @@ public class Strategy extends AuditTime {
     }
 
     private boolean isWin(double profitRate) {
-        return profitRate > 0;
+        return profitRate >= 0;
     }
 
-    private boolean isCurrentPositionLong() {
-        return this.currentPosition.getTradingType() == TradingType.LONG;
-    }
 
     private void increaseWinCount() {
         this.count.increaseWinCount();
@@ -153,13 +150,15 @@ public class Strategy extends AuditTime {
         this.rate.updateAverageProfitRate(this.count.getTotalTradeCount());
     }
 
-//    private double calculateProfitRate(Position position) {
-//        if (isCurrentPositionLong()) {
-//            return ((double) (position.getPrice() - this.currentPosition.getPrice()) / this.currentPosition.getPrice())
-//                * 100;
-//        }
-//
-//        return ((double) (this.currentPosition.getPrice() - position.getPrice()) / this.currentPosition.getPrice())
-//            * 100;
-//    }
+    private void updateAverageHoldingPeriod(LocalDateTime entryTime) {
+        long holdingPeriod = Duration.between(entryTime, this.currentPosition.getTime()).toMinutes();
+
+        this.averageHoldingPeriod =
+            (((int) (holdingPeriod) / this.type.getTimeFrameType().getValue()) + (this.averageHoldingPeriod
+                * this.count.getTotalTradeCount())) / (this.count.getTotalTradeCount() + 1);
+    }
+
+    public CoinType getCoinType() {
+        return this.type.getCoinType();
+    }
 }

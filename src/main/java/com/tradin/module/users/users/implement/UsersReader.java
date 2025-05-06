@@ -35,7 +35,7 @@ public class UsersReader implements UserDetailsService {
     }
 
     @Override
-    public Users loadUserByUsername(String sub) {
-        return findBySub(sub);
+    public Users loadUserByUsername(String userId) {
+        return findById(Long.valueOf(userId));
     }
 }

@@ -33,18 +33,22 @@ public enum ExceptionType {
     //404 Not Found
     NOT_FOUND_USER_EXCEPTION(NOT_FOUND, "존재하지 않는 유저입니다."),
     NOT_FOUND_STRATEGY_EXCEPTION(NOT_FOUND, "존재하지 않는 전략입니다."),
-    NOT_FOUND_OPEN_POSITION_EXCEPTION(NOT_FOUND, "해당 전략은 오픈된 포지션이 없습니다."),
+    NOT_FOUND_OPEN_POSITION_EXCEPTION(NOT_FOUND, "해당 전략에 대해 오픈된 포지션이 없습니다."),
     NOT_FOUND_ANY_STRATEGY_EXCEPTION(NOT_FOUND, "전략이 아무것도 존재하지 않습니다."),
     NOT_FOUND_SECURITY_CONTEXT_EXCEPTION(NOT_FOUND, "Security Context에 유저 정보가 존재하지 않습니다."),
     NOT_FOUND_ACCOUNT_EXCEPTION(NOT_FOUND, "존재하지 않는 계좌입니다."),
     NOT_FOUND_ANY_ACCOUNT_EXCEPTION(NOT_FOUND, "활성 계좌가 존재하지 않습니다."),
     NOT_SUBSCRIBED_STRATEGY_EXCEPTION(BAD_REQUEST, "구독하지 않은 전략입니다."),
     CANNOT_SUBSCRIBE_SAME_COIN_TYPE_EXCEPTION(BAD_REQUEST, "코인 타입 하나당 하나의 전략만 구독 가능합니다."),
+    NOT_FOUND_HISTORY_EXCEPTION(NOT_FOUND, "존재하지 않는 전략 내역입니다."),
+    NOT_FOUND_PRICE_EXCEPTION(NOT_FOUND, "시세가 존재하지 않습니다."),
+    NOT_FOUND_BALANCE_EXCEPTION(NOT_FOUND, "잔고가 존재하지 않습니다."),
 
     //405 Method Not Allowed
 
     //409 Conflict
     ALREADY_SUBSCRIBED_EXCEPTION(BAD_REQUEST, "이미 구독중인 전략입니다."),
+    ALREADY_POSITION_EXIST_EXCEPTION(BAD_REQUEST, "포지션이 존재하는 경우 구독이 불가합니다."),
 
     //429 Too Many Requests
     IP_RATE_LIMIT_EXCEEDED_EXCEPTION(TOO_MANY_REQUESTS, "IP당 최대 요청 횟수를 초과하였습니다."),

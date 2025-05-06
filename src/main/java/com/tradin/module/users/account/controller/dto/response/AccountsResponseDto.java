@@ -1,9 +1,12 @@
 package com.tradin.module.users.account.controller.dto.response;
 
 
-public record AccountsResponseDto(Long id, String name) {
+import com.tradin.module.users.account.service.dto.AccountDto;
+import java.util.List;
 
-    public static AccountsResponseDto of(Long id, String name) {
-        return new AccountsResponseDto(id, name);
+public record AccountsResponseDto(List<AccountDto> accounts) {
+
+    public static AccountsResponseDto of(List<AccountDto> accounts) {
+        return new AccountsResponseDto(accounts);
     }
 }

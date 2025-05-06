@@ -12,13 +12,14 @@ public class UsersProcessor {
 
     private final UsersRepository usersRepository;
 
-    public Users createUser(String sub, String email, String socialId, UserSocialType socialType) {
-        Users user = Users.builder()
-            .sub(sub)
-            .email(email)
-            .socialId(socialId)
-            .socialType(socialType)
-            .build();
+    public Users createUser(String name, String sub, String email, String socialId, UserSocialType socialType) {
+        Users user = Users.of(
+            name,
+            sub,
+            email,
+            socialId,
+            socialType
+        );
         return usersRepository.save(user);
     }
 
