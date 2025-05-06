@@ -127,7 +127,6 @@ public class SubscriptionService {
             });
     }
 
-
     private void deActivateSubscription(Subscription subscription) {
         subscriptionProcessor.deActivateSubscription(subscription);
     }

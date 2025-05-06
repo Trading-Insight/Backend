@@ -28,6 +28,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.BatchSize;
 
+
 @Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -114,4 +115,5 @@ public class Account extends AuditTime {
                 .compareTo(BigDecimal.ZERO) > 0)
             .findAny();
     }
+
 }

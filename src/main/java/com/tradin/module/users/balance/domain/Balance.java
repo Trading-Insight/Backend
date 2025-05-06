@@ -25,6 +25,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = {"account_id", "coin_type"}))
+
 public class Balance {
 
     @Id
@@ -44,6 +45,7 @@ public class Balance {
 
     @Builder
     public Balance(CoinType coinType, BigDecimal amount, Account account) {
+
         this.coinType = coinType;
         this.amount = amount;
         this.account = account;

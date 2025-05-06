@@ -14,6 +14,4 @@ public enum TimeFrameType {
     ONE_DAY(14400);
 
     private final int value;
-
-
 }

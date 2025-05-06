@@ -22,5 +22,6 @@ public class AccountProcessor {
         account.addBalance(usdtBalance);
         user.addAccount(account);
         return accountRepository.save(account);
+
     }
 }

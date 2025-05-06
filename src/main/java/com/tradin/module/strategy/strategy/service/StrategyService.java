@@ -45,6 +45,7 @@ public class StrategyService {
         strategyProcessor.createStrategy();
     }
 
+
     public FindStrategiesInfoResponseDto findFutureStrategiesInfo() {
         List<StrategyInfoDao> strategiesInfo = strategyReader.findFutureStrategyInfoDaos();
         return FindStrategiesInfoResponseDto.of(strategiesInfo);
@@ -92,14 +93,13 @@ public class StrategyService {
         List<Account> accounts = subscriptionReader.findSubscribedAccountsByStrategyId(strategy.getId());
 
         for (Account account : accounts) {
-//            try {
-//                futuresOrderProcessor.closeExistPosition(strategy, account);
-//                futuresOrderProcessor.openNewPosition(strategy, account, strategyPosition);
-//            } catch (Exception e) {
-//                log.warn("[자동매매 실패] accountId={}, reason={}", account.getId(), e.getMessage());
-//            }
-            futuresOrderProcessor.closeExistPosition(strategy, account);
-            futuresOrderProcessor.openNewPosition(strategy, account, strategyPosition);
+            try {
+                futuresOrderProcessor.closeExistPosition(strategy, account);
+                futuresOrderProcessor.openNewPosition(strategy, account, strategyPosition);
+            } catch (Exception e) {
+                log.warn("[자동매매 실패] accountId={}, reason={}", account.getId(), e.getMessage());
+            }
+
         }
     }
 }

@@ -26,5 +26,6 @@ public class UserDataDto {
             .socialId(socialId)
             .socialType(socialType)
             .build();
+
     }
 }

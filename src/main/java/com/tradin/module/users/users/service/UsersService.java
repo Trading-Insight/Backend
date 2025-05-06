@@ -41,6 +41,7 @@ public class UsersService {
             socialType
         );
         accountProcessor.createAccountAndUsdtBalance(user);
+
         return user;
     }
 

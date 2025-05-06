@@ -1,5 +1,6 @@
 package com.tradin.module.strategy.strategy.domain;
 
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import lombok.AccessLevel;

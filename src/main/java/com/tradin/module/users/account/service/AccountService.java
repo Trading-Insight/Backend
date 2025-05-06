@@ -29,6 +29,7 @@ public class AccountService {
     private final AccountProcessor accountProcessor;
     private final BalanceProcessor balanceProcessor;
 
+
     @Transactional
     public void createAccount(Long userId) {
         createAccountByUserId(userId);
@@ -62,5 +63,4 @@ public class AccountService {
     private Users readUserById(Long userId) {
         return usersReader.findById(userId);
     }
-
 }
