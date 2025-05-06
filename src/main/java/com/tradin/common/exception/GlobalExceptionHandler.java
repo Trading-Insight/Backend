@@ -22,6 +22,8 @@ public class GlobalExceptionHandler {
     protected ResponseEntity<TradinResponse<?>> handleAllExceptions(Exception e) {
         log.error("Exception: {}", e.getMessage(), e);
         return new ResponseEntity<>(
-            TradinResponse.error(ExceptionType.INTERNAL_SERVER_ERROR_EXCEPTION, e.getMessage()), ExceptionType.INTERNAL_SERVER_ERROR_EXCEPTION.getHttpStatus());
+            TradinResponse.error(ExceptionType.INTERNAL_SERVER_ERROR_EXCEPTION, e.getMessage()),
+            ExceptionType.INTERNAL_SERVER_ERROR_EXCEPTION.getHttpStatus()
+        );
     }
 }

@@ -13,11 +13,10 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
 
     properties:
       hibernate:
-        show_sql: true
         format_sql: true
 
   redis:
@@ -26,13 +25,13 @@ spring:
 
 logging:
   level:
-    com.tradin.module.feign.client: DEBUG
     org:
       hibernate:
+        SQL: DEBUG
         type:
           descriptor:
-            sql: INFO
-      springframework: INFO
+            sql:
+              BasicBinder: TRACE
 
 springdoc:
   swagger-ui:
