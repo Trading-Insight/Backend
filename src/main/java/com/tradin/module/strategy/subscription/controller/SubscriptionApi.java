@@ -13,9 +13,9 @@ public interface SubscriptionApi {
     @Operation(summary = "구독 목록 조회")
     TradinResponse<FindSubscriptionsResponseDto> findSubscriptions(@AuthenticationPrincipal Long userId, @PathVariable Long accountId);
 
-    @Operation(summary = "자동매매 상태 활성화")
+    @Operation(summary = "전략 구독 활성화")
     public TradinResponse<String> activateAutoTrading(@AuthenticationPrincipal Long userId, @PathVariable Long accountId, @PathVariable Long strategyId);
 
-    @Operation(summary = "자동매매 상태 비활성화")
+    @Operation(summary = "전략 구독 비활성화")
     public TradinResponse<String> deactivateAutoTrading(@AuthenticationPrincipal Long userId, @PathVariable Long accountId, @PathVariable Long strategyId);
 }

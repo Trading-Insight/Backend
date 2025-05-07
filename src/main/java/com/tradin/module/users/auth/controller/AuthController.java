@@ -38,9 +38,9 @@ public class AuthController implements AuthApi {
 
     @Operation(summary = "테스트 토큰 발급")
     @DisableAuthInSwagger
-    @GetMapping("/test/token") //TODO
-    public TradinResponse<TokenResponseDto> issueTestToken() {
-        return TradinResponse.success(authService.issueTestToken());
+    @GetMapping("/test/token/{userId}") //TODO
+    public TradinResponse<TokenResponseDto> issueTestToken(@PathVariable Long userId) {
+        return TradinResponse.success(authService.issueTestToken(userId));
     }
 
     @Operation(summary = "테스트 유저 생성")

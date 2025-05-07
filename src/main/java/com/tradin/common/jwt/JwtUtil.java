@@ -100,6 +100,6 @@ public class JwtUtil {
 
     public Authentication getAuthentication(Long userId) {
         Users user = usersReader.loadUserByUsername(String.valueOf(userId));
-        return new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+        return new UsernamePasswordAuthenticationToken(user.getId(), null, user.getAuthorities());
     }
 }
