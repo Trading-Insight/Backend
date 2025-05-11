@@ -32,7 +32,18 @@ logging:
           descriptor:
             sql:
               BasicBinder: TRACE
-
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    prometheus:
+      enabled: true
+  metrics:
+    export:
+      prometheus:
+        enabled: true
 springdoc:
   swagger-ui:
     groups-order: DESC
