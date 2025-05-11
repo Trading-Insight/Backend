@@ -39,7 +39,17 @@ public class SecurityConfiguration {
                 session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             ).authorizeHttpRequests(authorizeRequest ->
                 authorizeRequest
-                    .requestMatchers("/v1/auth/test/**").permitAll() //TODO
+                    .requestMatchers(
+                        "/v1/auth/test/**",
+                        "/actuator/**",
+                        "/v1/histories/test/**",
+                        "/v1/strategies/test/**",
+                        "/v1/strategies/webhook/futures/short-term",
+                        "/v1/subscriptions/activate/accounts/strategies/**",
+                        "/v1/subscriptions/deactivate/accounts/strategies/**"
+                    )
+                    .permitAll() //TODO
+
                     .anyRequest().authenticated()
             )
             .headers(headers -> headers
