@@ -58,8 +58,8 @@ public class AuthService {
         return googleAuthService.getUserInfo(code);
     }
 
-    public TokenResponseDto issueTestToken() {
-        return jwtProvider.createJwtToken(1100L);
+    public TokenResponseDto issueTestToken(Long userId) {
+        return jwtProvider.createJwtToken(userId);
     }
 
     private TokenResponseDto createJwtToken(Long userId) {

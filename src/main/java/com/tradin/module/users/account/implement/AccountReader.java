@@ -20,7 +20,6 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-
 public class AccountReader {
 
     private final AccountRepository accountRepository;

@@ -17,7 +17,4 @@ public interface AuthApi {
 
     @Operation(summary = "엑세스 토큰 재발급")
     TradinResponse<TokenResponseDto> reissueToken(@Valid @RequestBody TokenReissueRequestDto request);
-
-    @Operation(summary = "테스트 토큰 발급")
-    TradinResponse<TokenResponseDto> issueTestToken();
 }
