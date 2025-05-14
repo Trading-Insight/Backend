@@ -13,7 +13,7 @@ public class FuturesPositionReader {
 
     private final FuturesPositionRepository futuresPositionRepository;
 
-    public Optional<FuturesPosition> findOpenFuturesPositionByAccountAndCoinTypeForUpdate(Long accountId, CoinType coinType) {
-        return futuresPositionRepository.findOpenFuturesPositionByAccountAndCoinTypeForUpdate(accountId, coinType);
+    public Optional<FuturesPosition> findOpenFuturesPositionByAccountAndCoinType(Long accountId, CoinType coinType) {
+        return futuresPositionRepository.findOpenFuturesPositionByAccountAndCoinType(accountId, coinType);
     }
 }

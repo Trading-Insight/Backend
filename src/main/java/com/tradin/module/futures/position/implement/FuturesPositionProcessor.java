@@ -5,15 +5,19 @@ import com.tradin.module.futures.position.domain.repository.FuturesPositionRepos
 import com.tradin.module.strategy.strategy.domain.CoinType;
 import com.tradin.module.strategy.strategy.domain.TradingType;
 import com.tradin.module.users.account.domain.Account;
+import jakarta.persistence.EntityManager;
 import java.math.BigDecimal;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class FuturesPositionProcessor {
 
     private final FuturesPositionRepository futuresPositionRepository;
+    private final EntityManager entityManager;
 
     public void closePosition(Account account, FuturesPosition futuresPosition) {
         account.removeFuturesPosition(futuresPosition);
@@ -24,7 +28,7 @@ public class FuturesPositionProcessor {
 
     public FuturesPosition openPosition(CoinType coinType, TradingType tradingType, BigDecimal amount, BigDecimal price, Account account) {
         FuturesPosition futuresPosition = FuturesPosition.of(coinType, tradingType, price, amount, account);
-        account.addFuturesPosition(futuresPosition);
+        //account.addFuturesPosition(futuresPosition); //TODO - 연관관계 끊기
         return futuresPositionRepository.save(futuresPosition);
     }
 

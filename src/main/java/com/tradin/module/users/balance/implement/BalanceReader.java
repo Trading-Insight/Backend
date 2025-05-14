@@ -15,8 +15,8 @@ public class BalanceReader {
 
     private final BalanceRepository balanceRepository;
 
-    public Balance findByAccountIdAndCoinTypeForUpdate(Long accountId, CoinType coinType) {
-        return balanceRepository.findByAccountIdAndCoinTypeForUpdate(accountId, coinType)
+    public Balance findByAccountIdAndCoinType(Long accountId, CoinType coinType) {
+        return balanceRepository.findByAccountIdAndCoinType(accountId, coinType)
             .orElseThrow(() -> new TradinException(ExceptionType.NOT_FOUND_BALANCE_EXCEPTION));
     }
 

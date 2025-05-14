@@ -64,6 +64,6 @@ public class Balance {
     }
 
     public void updateAmount(BigDecimal amount) {
-        this.amount = this.amount.add(amount).setScale(2, RoundingMode.DOWN);
+        this.amount = this.amount.add(amount).setScale(4, RoundingMode.DOWN);
     }
 }

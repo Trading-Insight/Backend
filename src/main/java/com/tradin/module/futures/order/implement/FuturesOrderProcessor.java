@@ -1,5 +1,6 @@
 package com.tradin.module.futures.order.implement;
 
+import com.tradin.common.annotation.DistributedLock;
 import com.tradin.module.futures.order.domain.FuturesOrder;
 import com.tradin.module.futures.order.domain.OrderStatus;
 import com.tradin.module.futures.order.domain.repository.FuturesOrderRepository;
@@ -19,10 +20,12 @@ import com.tradin.module.users.balance.implement.BalanceReader;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class FuturesOrderProcessor {
 
     private final PriceCache priceCache;
@@ -35,27 +38,35 @@ public class FuturesOrderProcessor {
     private final FuturesOrderRepository futuresOrderRepository;
 
     /**
-     * 1. 기존 포지션 조회 (신규 주문인 경우 SKIP) 2. 반대 매매 주문 3. 포지션 청산 (시장가) 4. USDT 수익 정산
+     * 기존 포지션 정리 - 1. 기존 포지션 조회 (신규 주문인 경우 SKIP) 2. 반대 매매 주문 3. 포지션 청산 (시장가) 4. USDT 수익 정산
      */
+    @DistributedLock(
+        key = "'balance:' + #account.id + ':USDT'",
+        fallbackMethod = "handleLockFailure"
+    )
     public void closeExistPosition(Strategy strategy, Account account) {
-        futuresPositionReader.findOpenFuturesPositionByAccountAndCoinTypeForUpdate(account.getId(), strategy.getCoinType())
+        futuresPositionReader.findOpenFuturesPositionByAccountAndCoinType(account.getId(), strategy.getCoinType())
             .ifPresent(futuresPosition -> {
                 BigDecimal currentPrice = getCurrentPrice(strategy.getCoinType());
-                
+
                 orderReversePosition(strategy, account, futuresPosition, currentPrice);
                 closeExistPosition(account, futuresPosition);
                 settleUsdtProfit(
-                    balanceReader.findByAccountIdAndCoinTypeForUpdate(account.getId(), CoinType.USDT),
+                    balanceReader.findByAccountIdAndCoinType(account.getId(), CoinType.USDT),
                     calculateProfitAmount(futuresPosition, currentPrice)
                 );
             });
     }
 
     /**
-     * 1. USDT 잔고 조회 2. 마진 차감 3. 신규 포지션 주문 4. 포지션 오픈
+     * 신규 포지션 생성 - 1. USDT 잔고 조회 2. 마진 차감 3. 신규 포지션 주문 4. 포지션 오픈
      */
+    @DistributedLock(
+        key = "'balance:' + #account.id + ':USDT'",
+        fallbackMethod = "handleLockFailure"
+    )
     public void openNewPosition(Strategy strategy, Account account, Position strategyPosition) {
-        Balance balance = balanceReader.findByAccountIdAndCoinTypeForUpdate(account.getId(), CoinType.USDT);
+        Balance balance = balanceReader.findByAccountIdAndCoinType(account.getId(), CoinType.USDT);
         BigDecimal orderAmount = balanceReader.getUsdtAmount(balance);
         BigDecimal currentPrice = getCurrentPrice(strategy.getCoinType());
 
@@ -121,4 +132,8 @@ public class FuturesOrderProcessor {
         return priceCache.getPrice(coinType);
     }
 
+    public void handleLockFailure(Strategy strategy, Account account, Position strategyPosition) {
+        log.warn("🚫 잔고 락 획득 실패 - accountId={}, strategyId={}", account.getId(), strategy.getId());
+        // TODO - 락 획득 실패 처리
+    }
 }
