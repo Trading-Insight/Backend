@@ -134,6 +134,5 @@ public class FuturesOrderProcessor {
 
     public void handleLockFailure(Strategy strategy, Account account, Position strategyPosition) {
         log.warn("🚫 잔고 락 획득 실패 - accountId={}, strategyId={}", account.getId(), strategy.getId());
-        // TODO - 락 획득 실패 처리
     }
 }

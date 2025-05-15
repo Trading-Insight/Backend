@@ -9,6 +9,7 @@ import com.tradin.module.users.account.implement.AccountReader;
 import com.tradin.module.users.account.service.dto.AccountDto;
 import com.tradin.module.users.balance.domain.Balance;
 import com.tradin.module.users.balance.implement.BalanceProcessor;
+import com.tradin.module.users.balance.implement.BalanceReader;
 import com.tradin.module.users.users.domain.Users;
 import com.tradin.module.users.users.implement.UsersReader;
 import java.math.BigDecimal;
@@ -26,6 +27,7 @@ public class AccountService {
 
     private final AccountReader accountReader;
     private final UsersReader usersReader;
+    private final BalanceReader balanceReader;
     private final AccountProcessor accountProcessor;
     private final BalanceProcessor balanceProcessor;
 
@@ -41,8 +43,8 @@ public class AccountService {
 
     @Transactional
     public void faucet(Long userId, Long accountId) {
-        Account account = accountReader.fetchAccountByIdAndUserId(accountId, userId);
-        Balance usdtBalance = accountReader.getBalanceByAccountAndCoinType(account, CoinType.USDT);
+        Account account = accountReader.findAccountByIdAndUserId(accountId, userId);
+        Balance usdtBalance = balanceReader.findByAccountIdAndCoinType(account.getId(), CoinType.USDT);
         balanceProcessor.updateBalance(usdtBalance, BigDecimal.valueOf(10000));
     }
 

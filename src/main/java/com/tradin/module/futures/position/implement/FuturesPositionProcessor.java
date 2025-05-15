@@ -20,7 +20,6 @@ public class FuturesPositionProcessor {
     private final EntityManager entityManager;
 
     public void closePosition(Account account, FuturesPosition futuresPosition) {
-        account.removeFuturesPosition(futuresPosition);
         futuresPositionRepository.delete(futuresPosition);
         futuresPositionRepository.flush(); //TODO - 추후 구조 개선을 통해 삭제
 
@@ -28,7 +27,6 @@ public class FuturesPositionProcessor {
 
     public FuturesPosition openPosition(CoinType coinType, TradingType tradingType, BigDecimal amount, BigDecimal price, Account account) {
         FuturesPosition futuresPosition = FuturesPosition.of(coinType, tradingType, price, amount, account);
-        //account.addFuturesPosition(futuresPosition); //TODO - 연관관계 끊기
         return futuresPositionRepository.save(futuresPosition);
     }
 
