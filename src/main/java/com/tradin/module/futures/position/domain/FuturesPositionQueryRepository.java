@@ -5,6 +5,6 @@ import java.util.Optional;
 
 public interface FuturesPositionQueryRepository {
 
-    Optional<FuturesPosition> findOpenFuturesPositionByAccountAndCoinTypeForUpdate(Long accountId, CoinType coinType);
+    Optional<FuturesPosition> findOpenFuturesPositionByAccountAndCoinType(Long accountId, CoinType coinType);
 
 }

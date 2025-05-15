@@ -121,7 +121,7 @@ public class SubscriptionService {
 
 
     private void validateExistPosition(Long accountId, CoinType coinType) {
-        futuresPositionReader.findOpenFuturesPositionByAccountAndCoinTypeForUpdate(accountId, coinType)
+        futuresPositionReader.findOpenFuturesPositionByAccountAndCoinType(accountId, coinType)
             .ifPresent(futuresPosition -> {
                 throw new TradinException(ALREADY_POSITION_EXIST_EXCEPTION);
             });

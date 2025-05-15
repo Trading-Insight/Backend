@@ -63,14 +63,12 @@ public class SubscriptionQueryRepositoryImpl implements SubscriptionQueryReposit
     public List<Account> findSubscribedAccountsByStrategyId(Long strategyId) {
         return jpaQueryFactory
             .select(account)
-            .from(account)
-            .innerJoin(account.subscriptions, subscription)
-            .on(subscription.account.id.eq(account.id))
-            .where(
-                subscription.strategy.id.eq(strategyId)
-                    .and(account.isDeleted.isFalse())
-                    .and(subscription.status.eq(ACTIVE))
-            )
+            .from(subscription)
+            .join(subscription.account, account)
+            .where(subscription.strategy.id.eq(strategyId)
+                .and(account.isDeleted.isFalse())
+                .and(subscription.status.eq(ACTIVE)))
             .fetch();
+
     }
 }

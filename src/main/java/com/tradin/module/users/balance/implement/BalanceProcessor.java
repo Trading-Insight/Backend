@@ -20,7 +20,6 @@ public class BalanceProcessor {
 
     public Balance createCoinBalance(Account account, CoinType coinType) {
         Balance balance = Balance.of(coinType, BigDecimal.ZERO, account);
-        account.addBalance(balance);
         return balanceRepository.save(balance);
     }
 
