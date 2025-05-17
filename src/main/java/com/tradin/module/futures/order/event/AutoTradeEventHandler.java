@@ -17,7 +17,7 @@ public class AutoTradeEventHandler {
 
     private final FuturesOrderProcessor futuresOrderProcessor;
 
-    @Async
+    @Async("tradeExecutor")
     @EventListener(AutoTradeEvent.class)
     public void handleAutoTradeEvent(AutoTradeEvent event) {
         Strategy strategy = event.getStrategy();
