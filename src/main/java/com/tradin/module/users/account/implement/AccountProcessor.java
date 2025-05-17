@@ -16,9 +16,9 @@ public class AccountProcessor {
     private final AccountRepository accountRepository;
 
     public Account createAccountAndUsdtBalance(Users user) {
-        Account account = Account.of(user);
+        Account account = accountRepository.save(Account.of(user));
         balanceProcessor.createUsdtBalance(account);
-        return accountRepository.save(account);
+        return account;
 
     }
 }
