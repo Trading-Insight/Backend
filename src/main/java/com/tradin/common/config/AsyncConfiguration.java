@@ -12,10 +12,10 @@ public class AsyncConfiguration {
 
     @Bean(name = "tradeExecutor")
     public Executor tradeExecutor() {
-        return new ThreadPoolTaskExecutor() {{
-            setCorePoolSize(16);
-            setThreadNamePrefix("AutoTrade-");
-            initialize();
-        }};
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(16);
+        executor.setThreadNamePrefix("AutoTrade-");
+        executor.initialize();
+        return executor;
     }
 }
