@@ -3,6 +3,7 @@ package com.tradin.module.strategy.strategy.service;
 import static com.tradin.common.exception.ExceptionType.SAME_POSITION_REQUEST_EXCEPTION;
 
 import com.tradin.common.exception.TradinException;
+import com.tradin.module.futures.order.event.AutoTradeEvent;
 import com.tradin.module.futures.order.implement.FuturesOrderProcessor;
 import com.tradin.module.futures.position.implement.FuturesPositionProcessor;
 import com.tradin.module.strategy.history.domain.History;
@@ -23,6 +24,7 @@ import com.tradin.module.users.balance.implement.BalanceReader;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,6 +44,7 @@ public class StrategyService {
     private final FuturesOrderProcessor futuresOrderProcessor;
     private final FuturesPositionProcessor futuresPositionProcessor;
     private final BalanceProcessor balanceProcessor;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public void createStrategy() {
@@ -103,14 +106,7 @@ public class StrategyService {
         List<Account> accounts = subscriptionReader.findSubscribedAccountsByStrategyId(strategy.getId());
 
         for (Account account : accounts) {
-            try {
-                futuresOrderProcessor.closeExistPosition(strategy, account);
-                futuresOrderProcessor.openNewPosition(strategy, account, strategyPosition);
-            } catch (Exception e) {
-
-                log.warn("[자동매매 실패] accountId={}, reason={}", account.getId(), e.getMessage());
-            }
-
+            eventPublisher.publishEvent(new AutoTradeEvent(this, strategy, account, strategyPosition));
         }
     }
 
