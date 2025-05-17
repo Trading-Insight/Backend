@@ -19,7 +19,6 @@ public class SubscriptionProcessor {
 
     public Subscription createSubscription(Account account, Strategy strategy) {
         Subscription subscription = Subscription.of(account, strategy);
-        account.addSubscription(subscription);
         return subscriptionRepository.save(subscription);
     }
 

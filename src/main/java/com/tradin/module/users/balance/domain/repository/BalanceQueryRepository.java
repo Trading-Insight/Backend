@@ -6,5 +6,5 @@ import java.util.Optional;
 
 public interface BalanceQueryRepository {
 
-    Optional<Balance> findByAccountIdAndCoinTypeForUpdate(Long accountId, CoinType coinType);
+    Optional<Balance> findByAccountIdAndCoinType(Long accountId, CoinType coinType);
 }

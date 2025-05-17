@@ -15,12 +15,11 @@ public class BalanceProcessor {
     private final BalanceRepository balanceRepository;
 
     public Balance createUsdtBalance(Account account) {
-        return Balance.of(CoinType.USDT, BigDecimal.valueOf(10000), account);
+        return createCoinBalance(account, CoinType.USDT);
     }
 
     public Balance createCoinBalance(Account account, CoinType coinType) {
         Balance balance = Balance.of(coinType, BigDecimal.ZERO, account);
-        account.addBalance(balance);
         return balanceRepository.save(balance);
     }
 

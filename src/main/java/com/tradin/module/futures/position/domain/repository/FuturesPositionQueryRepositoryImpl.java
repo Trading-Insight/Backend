@@ -6,7 +6,6 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.tradin.module.futures.position.domain.FuturesPosition;
 import com.tradin.module.futures.position.domain.FuturesPositionQueryRepository;
 import com.tradin.module.strategy.strategy.domain.CoinType;
-import jakarta.persistence.LockModeType;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 
@@ -15,7 +14,7 @@ public class FuturesPositionQueryRepositoryImpl implements FuturesPositionQueryR
 
     private final JPAQueryFactory jpaQueryFactory;
 
-    public Optional<FuturesPosition> findOpenFuturesPositionByAccountAndCoinTypeForUpdate(Long accountId, CoinType coinType) {
+    public Optional<FuturesPosition> findOpenFuturesPositionByAccountAndCoinType(Long accountId, CoinType coinType) {
         return Optional.ofNullable(
             jpaQueryFactory
                 .selectFrom(futuresPosition)
@@ -23,7 +22,6 @@ public class FuturesPositionQueryRepositoryImpl implements FuturesPositionQueryR
                     futuresPosition.account.id.eq(accountId),
                     futuresPosition.coinType.eq(coinType)
                 )
-                .setLockMode(LockModeType.PESSIMISTIC_WRITE)
                 .fetchOne());
     }
 }

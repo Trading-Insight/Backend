@@ -43,12 +43,15 @@ public enum ExceptionType {
     NOT_FOUND_HISTORY_EXCEPTION(NOT_FOUND, "존재하지 않는 전략 내역입니다."),
     NOT_FOUND_PRICE_EXCEPTION(NOT_FOUND, "시세가 존재하지 않습니다."),
     NOT_FOUND_BALANCE_EXCEPTION(NOT_FOUND, "잔고가 존재하지 않습니다."),
+    NOT_FOUND_SUCH_METHOD_EXCEPTION(NOT_FOUND, "존재하지 않는 메소드입니다."),
 
     //405 Method Not Allowed
+    LOCK_ACQUISITION_FAILED_EXCEPTION(BAD_REQUEST, "락을 획득하지 못했습니다."),
 
     //409 Conflict
     ALREADY_SUBSCRIBED_EXCEPTION(BAD_REQUEST, "이미 구독중인 전략입니다."),
     ALREADY_POSITION_EXIST_EXCEPTION(BAD_REQUEST, "포지션이 존재하는 경우 구독이 불가합니다."),
+    SAME_POSITION_REQUEST_EXCEPTION(BAD_REQUEST, "동일한 포지션 요청입니다."),
 
     //429 Too Many Requests
     IP_RATE_LIMIT_EXCEEDED_EXCEPTION(TOO_MANY_REQUESTS, "IP당 최대 요청 횟수를 초과하였습니다."),
