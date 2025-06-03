@@ -1,8 +1,9 @@
-package com.tradin.common.test;
+package com.tradin.common.utils;
 
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
+
 @DataJpaTest
-public class BaseRepositoryTest {
+public abstract class BaseRepositoryTest {
 
 }

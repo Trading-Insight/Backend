@@ -23,7 +23,7 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@Table(indexes = {@Index(name = "index_strategy_id", columnList = "strategy_id")})
+@Table(indexes = {@Index(name = "index_strategy_id", columnList = "strategy_id")}) //TODO
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class History {
 

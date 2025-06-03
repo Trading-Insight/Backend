@@ -1,6 +1,6 @@
 package com.tradin.module.strategy.subscription.controller;
 
-import com.tradin.common.test.BaseControllerTest;
+import com.tradin.common.utils.BaseControllerTest;
 import com.tradin.module.strategy.subscription.service.SubscriptionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;

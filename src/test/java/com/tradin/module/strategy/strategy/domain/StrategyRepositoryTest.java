@@ -1,6 +1,6 @@
 package com.tradin.module.strategy.strategy.domain;
 
-import com.tradin.common.test.BaseRepositoryTest;
+import com.tradin.common.utils.BaseRepositoryTest;
 
 class StrategyRepositoryTest extends BaseRepositoryTest {
 

@@ -1,141 +1,122 @@
 package com.tradin.module.strategy.strategy.service;
 
-import com.tradin.common.test.BaseServiceTest;
+import static com.tradin.common.exception.ExceptionType.NOT_FOUND_HISTORY_EXCEPTION;
+import static com.tradin.common.exception.ExceptionType.SAME_POSITION_REQUEST_EXCEPTION;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.when;
+
+import com.tradin.common.exception.ExceptionType;
+import com.tradin.common.exception.TradinException;
+import com.tradin.common.fixture.StrategyFixture;
+import com.tradin.common.utils.BaseServiceTest;
+import com.tradin.module.futures.position.fixture.PositionFixture;
+import com.tradin.module.strategy.history.implement.HistoryProcessor;
+import com.tradin.module.strategy.history.implement.HistoryReader;
+import com.tradin.module.strategy.strategy.domain.Position;
+import com.tradin.module.strategy.strategy.domain.Strategy;
+import com.tradin.module.strategy.strategy.implement.StrategyProcessor;
+import com.tradin.module.strategy.strategy.implement.StrategyReader;
+import com.tradin.module.strategy.strategy.service.dto.WebHookDto;
+import com.tradin.module.strategy.subscription.implement.SubscriptionReader;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 
 class StrategyServiceTest extends BaseServiceTest {
 
-//    @Mock
-//    private StrategyReader strategyReader;
-//
-//    @Mock
-//    private StrategyProcessor strategyProcessor;
-//
-//    @InjectMocks
-//    private StrategyService strategyService;
-//
-//    private Strategy testStrategy;
-//
-//    @BeforeEach
-//    void setUp() {
-//        testStrategy = Strategy.builder()
-//            .id(1L)
-//            .name("Test Strategy")
-//            .strategyType(StrategyType.MOMENTUM)
-//            .tradingType(TradingType.FUTURES)
-//            .coinType(CoinType.BTC)
-//            .timeFrameType(TimeFrameType.MINUTE_5)
-//            .position(Position.LONG)
-//            .rate(new Rate(10.0))
-//            .count(new Count(100L))
-//            .build();
-//    }
-//
-//    @Test
-//    @DisplayName("전략 목록 조회 - 성공")
-//    void findAllStrategies_Success() {
-//        // given
-//        List<Strategy> strategies = List.of(testStrategy);
-//        given(strategyReader.findAll()).willReturn(strategies);
-//
-//        // when
-//        var result = strategyService.findAllStrategies();
-//
-//        // then
-//        assertThat(result).hasSize(1);
-//        assertThat(result.get(0).getName()).isEqualTo(testStrategy.getName());
-//
-//        then(strategyReader).should(times(1)).findAll();
-//    }
-//
-//    @Test
-//    @DisplayName("전략 상세 조회 - 성공")
-//    void findStrategyById_Success() {
-//        // given
-//        given(strategyReader.findById(1L)).willReturn(testStrategy);
-//
-//        // when
-//        var result = strategyService.findStrategyById(1L);
-//
-//        // then
-//        assertThat(result).isNotNull();
-//        assertThat(result.getId()).isEqualTo(testStrategy.getId());
-//        assertThat(result.getName()).isEqualTo(testStrategy.getName());
-//
-//        then(strategyReader).should(times(1)).findById(1L);
-//    }
-//
-//    @Test
-//    @DisplayName("전략 상세 조회 - 전략 없음")
-//    void findStrategyById_NotFound() {
-//        // given
-//        given(strategyReader.findById(anyLong())).willThrow(new TradinException("전략을 찾을 수 없습니다"));
-//
-//        // when & then
-//        assertThatThrownBy(() -> strategyService.findStrategyById(99L))
-//            .isInstanceOf(TradinException.class)
-//            .hasMessageContaining("전략을 찾을 수 없습니다");
-//
-//        then(strategyReader).should(times(1)).findById(99L);
-//    }
-//
-//    @Test
-//    @DisplayName("웹훅 실행 - 성공")
-//    void executeWebhook_Success() {
-//        // given
-//        WebHookDto webhookDto = WebHookDto.builder()
-//            .action("BUY")
-//            .symbol("BTCUSDT")
-//            .price(50000.0)
-//            .build();
-//
-//        willDoNothing().given(strategyProcessor).processWebhook(any(WebHookDto.class));
-//
-//        // when
-//        strategyService.executeWebhook(webhookDto);
-//
-//        // then
-//        then(strategyProcessor).should(times(1)).processWebhook(webhookDto);
-//    }
-//
-//    @Test
-//    @DisplayName("전략 생성 - 성공")
-//    void createStrategy_Success() {
-//        // given
-//        Strategy newStrategy = Strategy.builder()
-//            .name("New Strategy")
-//            .strategyType(StrategyType.ARBITRAGE)
-//            .tradingType(TradingType.SPOT)
-//            .coinType(CoinType.ETH)
-//            .timeFrameType(TimeFrameType.HOUR_1)
-//            .position(Position.SHORT)
-//            .rate(new Rate(5.0))
-//            .count(new Count(50L))
-//            .build();
-//
-//        given(strategyProcessor.create(any(Strategy.class))).willReturn(newStrategy);
-//
-//        // when
-//        var result = strategyService.createStrategy(newStrategy);
-//
-//        // then
-//        assertThat(result).isNotNull();
-//        assertThat(result.getName()).isEqualTo(newStrategy.getName());
-//
-//        then(strategyProcessor).should(times(1)).create(any(Strategy.class));
-//    }
-//
-//    @Test
-//    @DisplayName("전략 삭제 - 성공")
-//    void deleteStrategy_Success() {
-//        // given
-//        given(strategyReader.findById(1L)).willReturn(testStrategy);
-//        willDoNothing().given(strategyProcessor).delete(any(Strategy.class));
-//
-//        // when
-//        strategyService.deleteStrategy(1L);
-//
-//        // then
-//        then(strategyReader).should(times(1)).findById(1L);
-//        then(strategyProcessor).should(times(1)).delete(testStrategy);
-//    }
+
+    @InjectMocks
+    private StrategyService strategyService;
+
+    @Mock
+    private StrategyReader strategyReader;
+
+    @Mock
+    private HistoryReader historyReader;
+
+    @Mock
+    private SubscriptionReader subscriptionReader;
+
+    @Mock
+    private StrategyProcessor strategyProcessor;
+
+    @Mock
+    private HistoryProcessor historyProcessor;
+
+    @Test
+    @DisplayName("웹훅_처리_정상_동작")
+    void 웹훅_처리_정상_동작() throws Exception {
+        //given
+        Strategy strategy = StrategyFixture.get();
+        Position position = PositionFixture.get();
+
+        //when & then
+        assertDoesNotThrow(() -> strategyService.handleFutureWebHook(WebHookDto.of(strategy.getId(), position)));
+    }
+
+    @Test
+    @DisplayName("웹훅_처리시_존재하지_않는_전략이면_예외_발생")
+    void 웹훅_처리시_존재하지_않는_전략이면_예외_발생() throws Exception {
+        //given
+        Position position = PositionFixture.get();
+
+        when(strategyReader.findStrategyById(anyLong()))
+            .thenThrow(new TradinException(ExceptionType.NOT_FOUND_STRATEGY_EXCEPTION));
+
+        //when & then
+        assertThatThrownBy(() ->
+            strategyService.handleFutureWebHook(WebHookDto.of(anyLong(), position)))
+            .isInstanceOf(TradinException.class)
+            .satisfies(e -> {
+                TradinException te = (TradinException) e;
+                assertThat(te.getErrorType()).isEqualTo(ExceptionType.NOT_FOUND_STRATEGY_EXCEPTION);
+            });
+    }
+
+    @Test
+    void 웹훅_처리시_동일_포지션_요청이_오면_예외_발생() throws Exception {
+        // given
+        long strategyId = 1L;
+        Position position = PositionFixture.get();
+        Strategy strategy = StrategyFixture.get();
+        strategy.updateCurrentPosition(position);
+
+        when(strategyReader.findStrategyById(strategyId))
+            .thenReturn(strategy);
+
+        WebHookDto dto = WebHookDto.of(strategyId, position);
+
+        // when & then
+        assertThatThrownBy(() -> strategyService.handleFutureWebHook(dto))
+            .isInstanceOf(TradinException.class)
+            .satisfies(e -> {
+                TradinException te = (TradinException) e;
+                assertThat(te.getErrorType()).isEqualTo(SAME_POSITION_REQUEST_EXCEPTION);
+            });
+    }
+
+    @Test
+    @DisplayName("웹훅_처리시_오픈된_히스토리가_없으면_예외_발생")
+    void 웹훅_처리시_오픈된_히스토리가_없으면_예외_발생() throws Exception {
+        // given
+        Strategy strategy = StrategyFixture.get();
+        Position position = PositionFixture.getDifferent(strategy.getCurrentPosition()); // 다른 포지션 가정
+        WebHookDto dto = WebHookDto.of(strategy.getId(), position);
+
+        when(strategyReader.findStrategyById(anyLong())).thenReturn(strategy);
+        when(historyReader.findOpenHistoryByStrategyId(anyLong()))
+            .thenThrow(new TradinException(NOT_FOUND_HISTORY_EXCEPTION));
+
+        // when & then
+        assertThatThrownBy(() -> strategyService.handleFutureWebHook(dto))
+            .isInstanceOf(TradinException.class)
+            .satisfies(e -> {
+                TradinException te = (TradinException) e;
+                assertThat(te.getErrorType()).isEqualTo(NOT_FOUND_HISTORY_EXCEPTION);
+            });
+    }
 }

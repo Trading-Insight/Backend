@@ -1,10 +1,11 @@
-package com.tradin.common.test;
+package com.tradin.common.utils;
 
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
 @Transactional
-public class BaseServiceTest {
+
+public class BaseImplementTest {
 
 }

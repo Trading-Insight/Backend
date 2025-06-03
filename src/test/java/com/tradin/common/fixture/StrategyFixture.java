@@ -1,4 +1,4 @@
-package com.tradin.module.strategy.fixture;
+package com.tradin.common.fixture;
 
 import com.tradin.module.strategy.strategy.domain.CoinType;
 import com.tradin.module.strategy.strategy.domain.Count;
@@ -12,6 +12,10 @@ import com.tradin.module.strategy.strategy.domain.Type;
 import java.time.LocalDateTime;
 
 public class StrategyFixture {
+
+    public static Strategy get() {
+        return createDefaultStrategy();
+    }
 
     /**
      * 기본 Strategy 생성

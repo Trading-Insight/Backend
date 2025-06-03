@@ -1,4 +1,4 @@
-package com.tradin.common.test;
+package com.tradin.common.utils;
 
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -9,7 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @Transactional
 @AutoConfigureMockMvc
-public class BaseControllerTest {
+public abstract class BaseControllerTest {
 
 
 }
