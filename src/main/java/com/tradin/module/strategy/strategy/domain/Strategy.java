@@ -73,7 +73,7 @@ public class Strategy extends AuditTime {
     }
 
     public void updateRateAndCount(double entryPrice, LocalDateTime entryTime) {
-        double profitRate = calculateProfitRate(entryPrice);
+        double profitRate = calculateProfitRate(entryPrice); //TODO - processor로 이동
 
         if (isWin(profitRate)) {
             increaseWinCount();

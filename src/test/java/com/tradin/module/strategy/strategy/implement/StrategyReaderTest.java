@@ -1,8 +1,12 @@
 package com.tradin.module.strategy.strategy.implement;
 
-import org.springframework.boot.test.context.SpringBootTest;
+import com.tradin.common.utils.BaseImplementTest;
+import org.junit.Test;
 
-@SpringBootTest
-public class StrategyReaderTest {
+public class StrategyReaderTest extends BaseImplementTest {
 
+    @Test
+    void 전략_조회_정상() {
+
+    }
 }
