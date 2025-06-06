@@ -47,7 +47,9 @@ public class SecurityConfiguration {
                         "/v1/strategies/webhook/futures/short-term",
                         "/v1/subscriptions/activate/accounts/strategies/**",
                         "/v1/subscriptions/deactivate/accounts/strategies/**",
-                        "/v1/strategies/future"
+                        "/v1/strategies/future",
+                        "/swagger-ui/**",
+                        "/api-docs/**"
                     )
                     .permitAll() //TODO
 

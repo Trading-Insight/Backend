@@ -5,7 +5,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.tradin.common.utils.BaseControllerTest;
+import com.tradin.common.utils.BaseControllerUnitTest;
 import com.tradin.module.strategy.strategy.service.StrategyService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-class StrategyControllerTest extends BaseControllerTest {
+class StrategyControllerUnitTest extends BaseControllerUnitTest {
 
     @Autowired
     private MockMvc mockMvc;

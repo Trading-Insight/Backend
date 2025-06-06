@@ -1,12 +1,12 @@
 package com.tradin.module.strategy.subscription.controller;
 
-import com.tradin.common.utils.BaseControllerTest;
+import com.tradin.common.utils.BaseControllerUnitTest;
 import com.tradin.module.strategy.subscription.service.SubscriptionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-class SubscriptionControllerTest extends BaseControllerTest {
+class SubscriptionControllerUnitTest extends BaseControllerUnitTest {
 
     @Autowired
     private MockMvc mockMvc;

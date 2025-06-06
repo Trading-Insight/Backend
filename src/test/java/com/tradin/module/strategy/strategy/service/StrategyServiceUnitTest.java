@@ -11,7 +11,7 @@ import static org.mockito.Mockito.when;
 import com.tradin.common.exception.ExceptionType;
 import com.tradin.common.exception.TradinException;
 import com.tradin.common.fixture.StrategyFixture;
-import com.tradin.common.utils.BaseServiceTest;
+import com.tradin.common.utils.BaseServiceUnitTest;
 import com.tradin.module.futures.position.fixture.PositionFixture;
 import com.tradin.module.strategy.history.implement.HistoryProcessor;
 import com.tradin.module.strategy.history.implement.HistoryReader;
@@ -21,12 +21,11 @@ import com.tradin.module.strategy.strategy.implement.StrategyProcessor;
 import com.tradin.module.strategy.strategy.implement.StrategyReader;
 import com.tradin.module.strategy.strategy.service.dto.WebHookDto;
 import com.tradin.module.strategy.subscription.implement.SubscriptionReader;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
-class StrategyServiceTest extends BaseServiceTest {
+class StrategyServiceUnitTest extends BaseServiceUnitTest {
 
 
     @InjectMocks
@@ -48,7 +47,6 @@ class StrategyServiceTest extends BaseServiceTest {
     private HistoryProcessor historyProcessor;
 
     @Test
-    @DisplayName("웹훅_처리_정상_동작")
     void 웹훅_처리_정상_동작() throws Exception {
         //given
         Strategy strategy = StrategyFixture.get();
@@ -59,7 +57,6 @@ class StrategyServiceTest extends BaseServiceTest {
     }
 
     @Test
-    @DisplayName("웹훅_처리시_존재하지_않는_전략이면_예외_발생")
     void 웹훅_처리시_존재하지_않는_전략이면_예외_발생() throws Exception {
         //given
         Position position = PositionFixture.get();
@@ -100,7 +97,6 @@ class StrategyServiceTest extends BaseServiceTest {
     }
 
     @Test
-    @DisplayName("웹훅_처리시_오픈된_히스토리가_없으면_예외_발생")
     void 웹훅_처리시_오픈된_히스토리가_없으면_예외_발생() throws Exception {
         // given
         Strategy strategy = StrategyFixture.get();
