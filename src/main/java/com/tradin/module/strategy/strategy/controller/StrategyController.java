@@ -4,6 +4,7 @@ import com.tradin.common.response.TradinResponse;
 import com.tradin.module.strategy.strategy.controller.dto.request.WebHookRequestDto;
 import com.tradin.module.strategy.strategy.controller.dto.response.FindStrategiesInfoResponseDto;
 import com.tradin.module.strategy.strategy.service.StrategyService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -34,7 +35,7 @@ public class StrategyController implements StrategyApi {
     }
 
     @PostMapping("/webhook/futures/short-term")
-    public void handleFutureShortTermV1WebHook(@RequestBody WebHookRequestDto request) {
+    public void handleFutureShortTermV1WebHook(@RequestBody @Valid WebHookRequestDto request) {
         strategyService.handleFutureWebHook(request.toServiceDto());
     }
 }

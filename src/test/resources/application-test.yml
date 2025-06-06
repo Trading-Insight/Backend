@@ -1,16 +1,66 @@
 spring:
-  config:
-    activate:
-      on-profile: test
+  datasource:
+    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+    url: jdbc:tc:postgresql:17.5:///test-database
+    maximum-pool-size: 50
+    minimum-idle: 20
+
   jpa:
     hibernate:
       ddl-auto: create-drop
     show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+
+  redis:
+    host: localhost
+    port: 6379
+
+logging:
+  level:
+    org:
+      hibernate:
+        SQL: DEBUG
+        type:
+          descriptor:
+            sql:
+              BasicBinder: DEBUG
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+
+springdoc:
+  swagger-ui:
+    enabled: false
+
+feign:
+  okhttp:
+    enabled: true
+  client:
+    config:
+      default:
+        connectTimeout: 500
+        readTimeout: 1000
+        loggerLevel: full
 
 secret:
-  aes-secret: hwlnrtkelvehk
-  cognito-client-id: 511tjlb7ejhcv4a6r8u2vudfhc
-  cognito-auth-redirect-uri: http://localhost:80/v1/auth/cognito
-  cognito-issuer: https://cognito-idp.ap-northeast-2.amazonaws.com/ap-northeast-2_45OUbYhf2
-  swagger-username: test
-  swagger-password: test
+  aes-secret: RAND1Xeed8ODJq09UCMSEYPr05gcxsn1Fobe3gTo2zA/MCdJ/DuQi6ceFc6tZUj8
+  swagger-username: user
+  swagger-password: pass
+  jwt-secret: rand823399822517092789023feb60b1fe45debefb406ca5f4eaf05e0014ea63
+
+google:
+  login:
+    client_id: GOOGLE_CLIENT_ID
+    code_uri: GOOGLE_CODE_URI
+    token_uri: GOOGLE_TOKEN_URI
+    client_secret: GOOGLE_CLIENT_SECRET
+    redirect_uri: GOOGLE_REDIRECT_URI
+    code_redirect_uri: GOOGLE_CODE_REDIRECT_URI

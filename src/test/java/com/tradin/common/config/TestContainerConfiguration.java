@@ -12,7 +12,7 @@ public class TestContainerConfiguration implements BeforeAllCallback {
     private static final String REDIS_IMAGE = "redis:7.0.8-alpine";
     private static final int REDIS_PORT = 6379;
 
-    private static final DockerImageName POSTGRES_IMAGE = DockerImageName.parse("postgres:13.2");
+    private static final DockerImageName POSTGRES_IMAGE = DockerImageName.parse("postgres:latest");
     private static final String POSTGRES_USERNAME = "test";
     private static final String POSTGRES_PASSWORD = "test";
     private static final String POSTGRES_DB = "test";
@@ -34,11 +34,12 @@ public class TestContainerConfiguration implements BeforeAllCallback {
     }
 
     private void startPostgresql() {
-        PostgreSQLContainer<?> postgresql = new PostgreSQLContainer<>(POSTGRES_IMAGE).withUsername(POSTGRES_USERNAME).withPassword(POSTGRES_PASSWORD).withDatabaseName(POSTGRES_DB);
+        PostgreSQLContainer<?> postgresql = new PostgreSQLContainer<>(POSTGRES_IMAGE).withUsername(POSTGRES_USERNAME)
+            .withPassword(POSTGRES_PASSWORD).withExposedPorts(POSTGRES_PORT).withDatabaseName(POSTGRES_DB);
         postgresql.start();
         System.setProperty("spring.datasource.url", postgresql.getJdbcUrl());
-        System.setProperty("spring.datasource.username", POSTGRES_USERNAME);
-        System.setProperty("spring.datasource.password", POSTGRES_PASSWORD);
+        System.setProperty("spring.datasource.username", postgresql.getUsername());
+        System.setProperty("spring.datasource.password", postgresql.getPassword());
     }
 
     private void startRedis() {
