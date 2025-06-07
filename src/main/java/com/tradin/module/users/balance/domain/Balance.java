@@ -1,5 +1,6 @@
 package com.tradin.module.users.balance.domain;
 
+import com.tradin.common.jpa.AuditTime;
 import com.tradin.module.strategy.strategy.domain.CoinType;
 import com.tradin.module.users.account.domain.Account;
 import jakarta.persistence.Column;
@@ -25,8 +26,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = {"account_id", "coin_type"}))
-
-public class Balance {
+public class Balance extends AuditTime {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
