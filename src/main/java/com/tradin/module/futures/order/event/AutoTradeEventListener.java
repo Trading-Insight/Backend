@@ -1,11 +1,11 @@
 package com.tradin.module.futures.order.event;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tradin.module.futures.order.event.dto.PositionDto;
 import com.tradin.module.futures.order.implement.FuturesOrderProcessor;
 import com.tradin.module.outbox.domain.OutboxEvent;
 import com.tradin.module.outbox.implement.OutboxEventProcessor;
 import com.tradin.module.outbox.implement.OutboxEventReader;
-import com.tradin.module.strategy.strategy.domain.Position;
 import com.tradin.module.strategy.strategy.domain.Strategy;
 import com.tradin.module.strategy.strategy.implement.StrategyReader;
 import com.tradin.module.users.account.domain.Account;
@@ -50,10 +50,10 @@ public class AutoTradeEventListener {
             OutboxEvent outboxEvent = outboxEventReader.findByEventId(event.getEventId());
             Strategy strategy = strategyReader.findStrategyById(event.getStrategyId());
             Account account = accountReader.findAccountById(event.getAccountId());
-            Position position = event.getPosition();
+            PositionDto positionDto = event.getPosition();
 
             futuresOrderProcessor.closeExistPosition(strategy, account);
-            futuresOrderProcessor.openNewPosition(strategy, account, position);
+            futuresOrderProcessor.openNewPosition(strategy, account, positionDto.toPosition());
 
             outboxEventProcessor.markAsCompleted(outboxEvent);
 

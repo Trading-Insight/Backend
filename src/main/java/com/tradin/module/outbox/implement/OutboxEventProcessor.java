@@ -5,10 +5,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tradin.common.exception.ExceptionType;
 import com.tradin.common.exception.TradinException;
 import com.tradin.module.futures.order.event.AutoTradeEventDto;
+import com.tradin.module.futures.order.event.dto.PositionDto;
 import com.tradin.module.outbox.domain.OutboxEvent;
 import com.tradin.module.outbox.domain.OutboxEventType;
 import com.tradin.module.outbox.domain.repository.OutboxEventRepository;
-import com.tradin.module.strategy.strategy.domain.Position;
 import com.tradin.module.strategy.strategy.domain.Strategy;
 import com.tradin.module.users.account.domain.Account;
 import java.util.UUID;
@@ -29,9 +29,10 @@ public class OutboxEventProcessor {
 
     @Async("autoTradeExecutor") //TODO - 스레드풀 관리
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void publishAutoTradingEvent(Strategy strategy, Account account, Position position) {
+    public void publishAutoTradingEvent(Strategy strategy, Account account, PositionDto position) {
         String eventId = UUID.randomUUID().toString();
-        AutoTradeEventDto event = new AutoTradeEventDto(
+        
+        AutoTradeEventDto event = AutoTradeEventDto.of(
             strategy.getId(),
             account.getId(),
             position,

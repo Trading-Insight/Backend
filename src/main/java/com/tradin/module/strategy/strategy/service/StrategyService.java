@@ -3,6 +3,7 @@ package com.tradin.module.strategy.strategy.service;
 import static com.tradin.common.exception.ExceptionType.SAME_POSITION_REQUEST_EXCEPTION;
 
 import com.tradin.common.exception.TradinException;
+import com.tradin.module.futures.order.event.dto.PositionDto;
 import com.tradin.module.futures.order.implement.FuturesOrderProcessor;
 import com.tradin.module.futures.position.implement.FuturesPositionProcessor;
 import com.tradin.module.outbox.implement.OutboxEventProcessor;
@@ -105,7 +106,7 @@ public class StrategyService {
         List<Account> accounts = subscriptionReader.findSubscribedAccountsByStrategyId(strategy.getId());
 
         for (Account account : accounts) {
-            outboxEventProcessor.publishAutoTradingEvent(strategy, account, strategyPosition);
+            outboxEventProcessor.publishAutoTradingEvent(strategy, account, PositionDto.from(strategyPosition));
         }
     }
 
