@@ -28,6 +28,11 @@ public class AccountReader {
             .orElseThrow(() -> new TradinException(NOT_FOUND_ACCOUNT_EXCEPTION));
     }
 
+    public Account findAccountById(Long id) {
+        return accountRepository.findById(id)
+            .orElseThrow(() -> new TradinException(NOT_FOUND_ACCOUNT_EXCEPTION));
+    }
+
     public List<Account> findAll() {
         return accountRepository.findAll();
     }
