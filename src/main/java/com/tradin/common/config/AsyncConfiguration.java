@@ -10,8 +10,13 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @EnableAsync
 public class AsyncConfiguration {
 
-    @Bean(name = "tradeExecutor")
+    @Bean(name = "autoTradeExecutor")
     public Executor tradeExecutor() {
+        return Executors.newVirtualThreadPerTaskExecutor();
+    }
+
+    @Bean(name = "outboxExecutor")
+    public Executor outboxExecutor() {
         return Executors.newVirtualThreadPerTaskExecutor();
     }
 }

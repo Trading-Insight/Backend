@@ -23,7 +23,7 @@ public class AopForTransaction {
             );
             throw throwable;
         } finally {
-            log.info("🔓 트랜잭션 종료 - method: {}", joinPoint.getSignature().getName());
+//            log.info("🔓 트랜잭션 종료 - method: {}", joinPoint.getSignature().getName());
         }
     }
 }

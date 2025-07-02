@@ -2,6 +2,7 @@ package com.tradin.module.strategy.subscription.domain;
 
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.tradin.common.jpa.AuditTime;
 import com.tradin.module.strategy.strategy.domain.Strategy;
 import com.tradin.module.users.account.domain.Account;
 import jakarta.persistence.Column;
@@ -25,7 +26,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = {"account_id", "strategy_id"}))
-public class Subscription {
+public class Subscription extends AuditTime {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

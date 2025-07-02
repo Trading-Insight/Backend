@@ -3,9 +3,10 @@ package com.tradin.module.strategy.strategy.service;
 import static com.tradin.common.exception.ExceptionType.SAME_POSITION_REQUEST_EXCEPTION;
 
 import com.tradin.common.exception.TradinException;
-import com.tradin.module.futures.order.event.AutoTradeEvent;
+import com.tradin.module.futures.order.event.dto.PositionDto;
 import com.tradin.module.futures.order.implement.FuturesOrderProcessor;
 import com.tradin.module.futures.position.implement.FuturesPositionProcessor;
+import com.tradin.module.outbox.implement.OutboxEventProcessor;
 import com.tradin.module.strategy.history.domain.History;
 import com.tradin.module.strategy.history.implement.HistoryProcessor;
 import com.tradin.module.strategy.history.implement.HistoryReader;
@@ -24,7 +25,6 @@ import com.tradin.module.users.balance.implement.BalanceReader;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,7 +44,7 @@ public class StrategyService {
     private final FuturesOrderProcessor futuresOrderProcessor;
     private final FuturesPositionProcessor futuresPositionProcessor;
     private final BalanceProcessor balanceProcessor;
-    private final ApplicationEventPublisher eventPublisher;
+    private final OutboxEventProcessor outboxEventProcessor;
 
     @Transactional
     public void createStrategy() {
@@ -102,12 +102,9 @@ public class StrategyService {
         historyProcessor.createHistory(strategy, stratgeyPosition);
     }
 
-    private void autoTrading(Strategy strategy, Position strategyPosition) {
+    public void autoTrading(Strategy strategy, Position strategyPosition) {
         List<Account> accounts = subscriptionReader.findSubscribedAccountsByStrategyId(strategy.getId());
-
-        for (Account account : accounts) {
-            eventPublisher.publishEvent(new AutoTradeEvent(this, strategy, account, strategyPosition));
-        }
+        outboxEventProcessor.publishAutoTradingEvents(strategy, accounts, PositionDto.from(strategyPosition));
     }
 
 }
