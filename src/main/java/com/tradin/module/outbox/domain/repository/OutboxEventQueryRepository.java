@@ -5,5 +5,6 @@ import com.tradin.module.outbox.domain.OutboxStatus;
 import java.util.List;
 
 public interface OutboxEventQueryRepository {
-    List<OutboxEvent> findAllByStatusOrderByCreatedAtAsc(OutboxStatus status);
+
+    List<OutboxEvent> findAllByStatus(OutboxStatus status);
 } 

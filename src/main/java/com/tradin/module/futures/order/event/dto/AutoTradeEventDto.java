@@ -1,6 +1,5 @@
-package com.tradin.module.futures.order.event;
+package com.tradin.module.futures.order.event.dto;
 
-import com.tradin.module.futures.order.event.dto.PositionDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

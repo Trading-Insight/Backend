@@ -15,11 +15,10 @@ public class OutboxEventQueryRepositoryImpl implements OutboxEventQueryRepositor
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public List<OutboxEvent> findAllByStatusOrderByCreatedAtAsc(OutboxStatus status) {
+    public List<OutboxEvent> findAllByStatus(OutboxStatus status) {
         return jpaQueryFactory
             .selectFrom(outboxEvent)
             .where(outboxEvent.status.eq(status))
-            .orderBy(outboxEvent.createdAt.asc())
             .fetch();
     }
 } 

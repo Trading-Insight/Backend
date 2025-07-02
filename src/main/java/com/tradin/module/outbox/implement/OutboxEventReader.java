@@ -16,7 +16,7 @@ public class OutboxEventReader {
     private final OutboxEventRepository outboxEventRepository;
 
     public List<OutboxEvent> findAllPendingEvents() {
-        return outboxEventRepository.findAllByStatusOrderByCreatedAtAsc(OutboxStatus.PENDING);
+        return outboxEventRepository.findAllByStatus(OutboxStatus.PENDING);
     }
 
     public OutboxEvent findByEventId(String eventId) {

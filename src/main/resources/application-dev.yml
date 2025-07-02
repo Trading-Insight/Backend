@@ -32,6 +32,9 @@ spring:
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
       acks: all
       retries: 3
+      linger-ms: 10
+      batch-size: 32768
+
     consumer:
       group-id: auto-trade-group
       auto-offset-reset: earliest

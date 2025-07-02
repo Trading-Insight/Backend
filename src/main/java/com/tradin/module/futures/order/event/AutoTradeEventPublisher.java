@@ -2,10 +2,13 @@ package com.tradin.module.futures.order.event;
 
 import com.tradin.module.outbox.domain.OutboxEvent;
 import com.tradin.module.outbox.implement.OutboxEventProcessor;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,17 +19,23 @@ import org.springframework.transaction.annotation.Transactional;
 public class AutoTradeEventPublisher {
 
     private final KafkaTemplate<String, String> kafkaTemplate;
-
     private final OutboxEventProcessor outboxEventProcessor;
 
-    @Async("autoTradeExecutor") //TODO - 스레드풀 관리
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void publishToKafka(OutboxEvent event) {
-        try {
-            kafkaTemplate.send(event.getEventType().getTopic(), event.getEventId(), event.getPayload());
-            outboxEventProcessor.markAsPublished(event);
-        } catch (Exception e) {
-            outboxEventProcessor.markAsFailed(event, e.getMessage());
+    public void publishToKafka(List<OutboxEvent> outboxEvents) {
+        List<OutboxEvent> successEvents = new ArrayList<>(100);
+        Map<OutboxEvent, String> failedEvents = new HashMap<>(100);
+
+        for (OutboxEvent event : outboxEvents) {
+            try {
+                kafkaTemplate.send(event.getEventType().getTopic(), event.getEventId(), event.getPayload());
+                successEvents.add(event);
+            } catch (Exception e) {
+                failedEvents.put(event, e.getMessage());
+            }
         }
+
+        outboxEventProcessor.markAllAsPublished(successEvents);
+        outboxEventProcessor.markAllAsPublishingFailed(failedEvents);
     }
 } 

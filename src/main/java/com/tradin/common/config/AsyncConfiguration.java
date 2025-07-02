@@ -14,4 +14,9 @@ public class AsyncConfiguration {
     public Executor tradeExecutor() {
         return Executors.newVirtualThreadPerTaskExecutor();
     }
+
+    @Bean(name = "outboxExecutor")
+    public Executor outboxExecutor() {
+        return Executors.newVirtualThreadPerTaskExecutor();
+    }
 }

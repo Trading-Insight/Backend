@@ -104,10 +104,7 @@ public class StrategyService {
 
     public void autoTrading(Strategy strategy, Position strategyPosition) {
         List<Account> accounts = subscriptionReader.findSubscribedAccountsByStrategyId(strategy.getId());
-
-        for (Account account : accounts) {
-            outboxEventProcessor.publishAutoTradingEvent(strategy, account, PositionDto.from(strategyPosition));
-        }
+        outboxEventProcessor.publishAutoTradingEvents(strategy, accounts, PositionDto.from(strategyPosition));
     }
 
 }

@@ -1,6 +1,10 @@
 package com.tradin.module.futures.order.event;
 
+import static com.tradin.common.exception.ExceptionType.DESERIALIZATION_FAIL_EXCEPTION;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tradin.common.exception.TradinException;
+import com.tradin.module.futures.order.event.dto.AutoTradeEventDto;
 import com.tradin.module.futures.order.event.dto.PositionDto;
 import com.tradin.module.futures.order.implement.FuturesOrderProcessor;
 import com.tradin.module.outbox.domain.OutboxEvent;
@@ -45,27 +49,34 @@ public class AutoTradeEventListener {
     )
     @Transactional
     public void listen(String message) {
+        AutoTradeEventDto event;
         try {
-            AutoTradeEventDto event = objectMapper.readValue(message, AutoTradeEventDto.class);
-            OutboxEvent outboxEvent = outboxEventReader.findByEventId(event.getEventId());
-            Strategy strategy = strategyReader.findStrategyById(event.getStrategyId());
-            Account account = accountReader.findAccountById(event.getAccountId());
-            PositionDto positionDto = event.getPosition();
-
-            futuresOrderProcessor.closeExistPosition(strategy, account);
-            futuresOrderProcessor.openNewPosition(strategy, account, positionDto.toPosition());
-
-            outboxEventProcessor.markAsCompleted(outboxEvent);
-
-
+            event = objectMapper.readValue(message, AutoTradeEventDto.class);
         } catch (Exception e) {
-            //outboxEventProcessor.markAsFailed(outboxEvent, e.getMessage());
-            log.error("Failed to process auto trade event - message: {}", message, e);
+            throw new TradinException(DESERIALIZATION_FAIL_EXCEPTION, e.getMessage());
         }
+
+        OutboxEvent outboxEvent = outboxEventReader.findByEventId(event.getEventId());
+        Strategy strategy = strategyReader.findStrategyById(event.getStrategyId());
+        Account account = accountReader.findAccountById(event.getAccountId());
+        PositionDto positionDto = event.getPosition();
+
+        futuresOrderProcessor.closeExistPosition(strategy, account);
+        futuresOrderProcessor.openNewPosition(strategy, account, positionDto.toPosition());
+
+        outboxEventProcessor.markAsCompleted(outboxEvent);
     }
 
     @DltHandler
-    public void handleDlq(String message) {
-        log.error("Event moved to DLQ - message: {}", message);
+    public void handleDlq(String message, Exception exception) {
+        AutoTradeEventDto event;
+        try {
+            event = objectMapper.readValue(message, AutoTradeEventDto.class);
+        } catch (Exception e) {
+            throw new TradinException(DESERIALIZATION_FAIL_EXCEPTION, e.getMessage());
+        }
+
+        OutboxEvent outboxEvent = outboxEventReader.findByEventId(event.getEventId());
+        outboxEventProcessor.markAsProcessingFailed(outboxEvent, exception.getMessage());
     }
 } 

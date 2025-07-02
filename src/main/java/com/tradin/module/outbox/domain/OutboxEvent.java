@@ -65,12 +65,25 @@ public class OutboxEvent extends AuditTime {
             .build();
     }
 
+    public void markAsPending() {
+        this.status = OutboxStatus.PENDING;
+    }
+
+    public void markAsPublishing() {
+        this.status = OutboxStatus.PUBLISHING;
+    }
+
     public void markAsPublished() {
         this.status = OutboxStatus.PUBLISHED;
     }
 
-    public void markAsFailed(String errorMessage) {
-        this.status = OutboxStatus.FAILED;
+    public void markAsPublishingFailed(String errorMessage) {
+        this.status = OutboxStatus.PUBLISHING_FAILED;
+        this.errorMessage = errorMessage;
+    }
+
+    public void markAsProcessingFailed(String errorMessage) {
+        this.status = OutboxStatus.PROCESSING_FAILED;
         this.errorMessage = errorMessage;
     }
 

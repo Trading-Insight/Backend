@@ -63,7 +63,10 @@ public enum ExceptionType {
     SIGNATURE_GENERATION_FAIL_EXCEPTION(INTERNAL_SERVER_ERROR, "JWT 서명 생성에 실패하였습니다."),
     PUBLIC_KEY_GENERATE_FAIL_EXCEPTION(INTERNAL_SERVER_ERROR, "공개키 생성에 실패하였습니다."),
     INTERNAL_SERVER_ERROR_EXCEPTION(INTERNAL_SERVER_ERROR, "서버 내부 오류입니다."),
-    SERIALIZATION_FAIL_EXCEPTION(INTERNAL_SERVER_ERROR, "직렬화에 실패하였습니다.");
+    SERIALIZATION_FAIL_EXCEPTION(INTERNAL_SERVER_ERROR, "직렬화에 실패하였습니다."),
+    DESERIALIZATION_FAIL_EXCEPTION(INTERNAL_SERVER_ERROR, "역직렬화에 실패하였습니다."),
+
+    ;
 
     private final HttpStatus httpStatus;
     private final String message;
