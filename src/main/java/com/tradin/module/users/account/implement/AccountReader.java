@@ -36,4 +36,8 @@ public class AccountReader {
     public List<Account> findAll() {
         return accountRepository.findAll();
     }
+
+    public List<Account> findSubscribedAccountsByStrategyId(Long strategyId) {
+        return accountRepository.findSubscribedAccountsByStrategyId(strategyId);
+    }
 }

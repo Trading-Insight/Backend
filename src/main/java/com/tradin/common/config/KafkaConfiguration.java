@@ -29,7 +29,7 @@ public class KafkaConfiguration {
     @Bean
     public NewTopic autoTradeTopic() {
         return TopicBuilder.name(AUTO_TRADE_TOPIC)
-            .partitions(3)
+            .partitions(5)
             .replicas(1)
             .build();
     }

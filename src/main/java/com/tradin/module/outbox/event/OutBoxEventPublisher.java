@@ -1,4 +1,4 @@
-package com.tradin.module.futures.order.event;
+package com.tradin.module.outbox.event;
 
 import com.tradin.module.outbox.domain.OutboxEvent;
 import com.tradin.module.outbox.implement.OutboxEventProcessor;
@@ -16,15 +16,15 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class AutoTradeEventPublisher {
+public class OutBoxEventPublisher {
 
     private final KafkaTemplate<String, String> kafkaTemplate;
     private final OutboxEventProcessor outboxEventProcessor;
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void publishToKafka(List<OutboxEvent> outboxEvents) {
-        List<OutboxEvent> successEvents = new ArrayList<>(100);
-        Map<OutboxEvent, String> failedEvents = new HashMap<>(100);
+        List<OutboxEvent> successEvents = new ArrayList<>();
+        Map<OutboxEvent, String> failedEvents = new HashMap<>();
 
         for (OutboxEvent event : outboxEvents) {
             try {
