@@ -10,9 +10,12 @@ spring:
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
-    maximum-pool-size: 50
-    minimum-idle: 20
-
+    maximum-pool-size: 100
+    minimum-idle: 100
+    hikari:
+      maximum-pool-size: 100
+      minimum-idle: 100
+  
   jpa:
     hibernate:
       ddl-auto: update
@@ -42,6 +45,9 @@ spring:
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:
         spring.json.trusted.packages: com.tradin.*
+      max-poll-records: 20
+      fetch-min-bytes: 1024 * 5 #5KB
+      fetch-max-wait-ms: 100
     listener:
       ack-mode: MANUAL_IMMEDIATE
       missing-topics-fatal: false

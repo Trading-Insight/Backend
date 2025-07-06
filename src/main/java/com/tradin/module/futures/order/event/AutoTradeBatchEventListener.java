@@ -4,8 +4,7 @@ import static com.tradin.common.exception.ExceptionType.DESERIALIZATION_FAIL_EXC
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tradin.common.exception.TradinException;
-import com.tradin.module.futures.order.event.dto.AutoTradeBatchEventDto;
-import com.tradin.module.futures.order.event.dto.PositionDto;
+import com.tradin.module.futures.order.event.dto.AutoTradeEventDto;
 import com.tradin.module.futures.order.service.FuturesOrderService;
 import com.tradin.module.outbox.domain.OutboxEvent;
 import com.tradin.module.outbox.implement.OutboxEventProcessor;
@@ -19,11 +18,9 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.kafka.annotation.DltHandler;
 import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.kafka.annotation.RetryableTopic;
-import org.springframework.kafka.retrytopic.DltStrategy;
-import org.springframework.retry.annotation.Backoff;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,53 +36,67 @@ public class AutoTradeBatchEventListener {
     private final OutboxEventProcessor outboxEventProcessor;
     private final ObjectMapper objectMapper;
 
-    @RetryableTopic(
-        attempts = "3",
-        backoff = @Backoff(delay = 1000, multiplier = 2.0),
-        dltStrategy = DltStrategy.ALWAYS_RETRY_ON_ERROR,
-        dltTopicSuffix = "-dlt"
-    )
     @KafkaListener(
         topics = "auto-trade-topic",
-        groupId = "auto-trade-batch-group",
-        concurrency = "5"
+        groupId = "auto-trade-group",
+        concurrency = "5",
+        batch = "true"
     )
     @Transactional
-    public void listenBatch(String message) {
-        AutoTradeBatchEventDto event;
-        try {
-            event = objectMapper.readValue(message, AutoTradeBatchEventDto.class);
-        } catch (Exception e) {
-            throw new TradinException(DESERIALIZATION_FAIL_EXCEPTION, e.getMessage());
+    public void listenBatch(List<ConsumerRecord<String, String>> records) {
+        List<AutoTradeEventDto> events = new ArrayList<>();
+        List<OutboxEvent> outboxEvents = new ArrayList<>();
+
+        for (ConsumerRecord<String, String> record : records) {
+            try {
+                AutoTradeEventDto event = objectMapper.readValue(record.value(), AutoTradeEventDto.class);
+                events.add(event);
+
+                OutboxEvent outboxEvent = outboxEventReader.findByEventId(event.getEventId());
+                outboxEvents.add(outboxEvent);
+
+            } catch (Exception e) {
+                log.error("이벤트 파싱 실패: record={}, error={}", record.value(), e.getMessage());
+                throw new TradinException(DESERIALIZATION_FAIL_EXCEPTION, e.getMessage());
+            }
         }
 
-        OutboxEvent outboxEvent = outboxEventReader.findByEventId(event.getEventId());
-        Strategy strategy = strategyReader.findStrategyById(event.getStrategyId());
-        PositionDto positionDto = event.getPosition();
+        // 배치 처리
+        processBatchAsync(events, outboxEvents);
+    }
+
+    private void processBatchAsync(List<AutoTradeEventDto> events, List<OutboxEvent> outboxEvents) {
+        Strategy strategy = strategyReader.findStrategyById(events.get(0).getStrategyId());
 
         List<CompletableFuture<Void>> futures = new ArrayList<>();
 
-        for (Long accountId : event.getAccountIds()) {
-            Account account = accountReader.findAccountById(accountId);
-
-            CompletableFuture<Void> future = futuresOrderService.autoTradeAsync(strategy, account, positionDto.toPosition());
+        for (int i = 0; i < events.size(); i++) {
+            AutoTradeEventDto event = events.get(i);
+            CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
+                Account account = accountReader.findAccountById(event.getAccountId());
+                futuresOrderService.autoTrade(strategy, account, event.getPosition().toPosition());
+            });
             futures.add(future);
         }
 
         CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
-        outboxEventProcessor.markAsCompleted(outboxEvent);
     }
 
     @DltHandler
     public void handleDlq(String message, Exception exception) {
-        AutoTradeBatchEventDto event;
+        AutoTradeEventDto event;
         try {
-            event = objectMapper.readValue(message, AutoTradeBatchEventDto.class);
+            event = objectMapper.readValue(message, AutoTradeEventDto.class);
         } catch (Exception e) {
             throw new TradinException(DESERIALIZATION_FAIL_EXCEPTION, e.getMessage());
         }
 
         OutboxEvent outboxEvent = outboxEventReader.findByEventId(event.getEventId());
         outboxEventProcessor.markAsProcessingFailed(outboxEvent, exception.getMessage());
+
+        log.error(
+            "DLQ 처리: accountId={}, eventId={}, error={}",
+            event.getAccountId(), event.getEventId(), exception.getMessage()
+        );
     }
 }
