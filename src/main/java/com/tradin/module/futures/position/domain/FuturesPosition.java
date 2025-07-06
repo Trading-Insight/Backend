@@ -2,6 +2,7 @@ package com.tradin.module.futures.position.domain;
 
 import static java.math.BigDecimal.ONE;
 
+import com.tradin.common.jpa.AuditTime;
 import com.tradin.module.strategy.strategy.domain.CoinType;
 import com.tradin.module.strategy.strategy.domain.TradingType;
 import com.tradin.module.users.account.domain.Account;
@@ -28,7 +29,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = {"account_id", "coinType"}))
-public class FuturesPosition {
+public class FuturesPosition extends AuditTime {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

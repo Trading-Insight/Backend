@@ -43,7 +43,8 @@ public enum ExceptionType {
     NOT_FOUND_HISTORY_EXCEPTION(NOT_FOUND, "존재하지 않는 전략 내역입니다."),
     NOT_FOUND_PRICE_EXCEPTION(NOT_FOUND, "시세가 존재하지 않습니다."),
     NOT_FOUND_BALANCE_EXCEPTION(NOT_FOUND, "잔고가 존재하지 않습니다."),
-    NOT_FOUND_SUCH_METHOD_EXCEPTION(NOT_FOUND, "존재하지 않는 메소드입니다."),
+    NOT_FOUND_SUCH_METHOD_EXCEPTION(NOT_FOUND, "존재하지 않는 메서드입니다."),
+    NOT_FOUND_OUTBOX_EVENT_EXCEPTION(NOT_FOUND, "존재하지 않는 Outbox Event입니다."),
 
     //405 Method Not Allowed
     LOCK_ACQUISITION_FAILED_EXCEPTION(BAD_REQUEST, "락을 획득하지 못했습니다."),
@@ -61,7 +62,11 @@ public enum ExceptionType {
     DECRYPT_FAIL_EXCEPTION(INTERNAL_SERVER_ERROR, "복호화에 실패하였습니다."),
     SIGNATURE_GENERATION_FAIL_EXCEPTION(INTERNAL_SERVER_ERROR, "JWT 서명 생성에 실패하였습니다."),
     PUBLIC_KEY_GENERATE_FAIL_EXCEPTION(INTERNAL_SERVER_ERROR, "공개키 생성에 실패하였습니다."),
-    INTERNAL_SERVER_ERROR_EXCEPTION(INTERNAL_SERVER_ERROR, "서버 내부 오류입니다.");;
+    INTERNAL_SERVER_ERROR_EXCEPTION(INTERNAL_SERVER_ERROR, "서버 내부 오류입니다."),
+    SERIALIZATION_FAIL_EXCEPTION(INTERNAL_SERVER_ERROR, "직렬화에 실패하였습니다."),
+    DESERIALIZATION_FAIL_EXCEPTION(INTERNAL_SERVER_ERROR, "역직렬화에 실패하였습니다."),
+
+    ;
 
     private final HttpStatus httpStatus;
     private final String message;
