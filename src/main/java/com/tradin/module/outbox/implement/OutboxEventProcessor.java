@@ -13,7 +13,6 @@ import com.tradin.module.strategy.strategy.domain.Strategy;
 import com.tradin.module.users.account.domain.Account;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -33,6 +32,7 @@ public class OutboxEventProcessor {
     public void publishAutoTradingEvents(Strategy strategy, List<Account> accounts, PositionDto position) {
         List<OutboxEvent> events = new ArrayList<>();
 
+        //TODO
         for (Account account : accounts) {
             OutboxEvent event = createOutboxEvent(strategy, account, position);
             events.add(event);
@@ -43,6 +43,7 @@ public class OutboxEventProcessor {
 
     private void batchInsert(List<OutboxEvent> events) {
         String sql = "INSERT INTO outbox_events (event_type, event_id, payload, status, error_message, created_at, updated_at) VALUES (?, ?, ?::jsonb, ?, ?, now(), now())";
+
         jdbcTemplate.batchUpdate(
             sql,
             events,
@@ -99,27 +100,22 @@ public class OutboxEventProcessor {
     }
 
     public void markAllAsPublished(List<OutboxEvent> outboxEvents) {
-        outboxEvents.forEach(OutboxEvent::markAsPublished);
+        List<Long> ids = outboxEvents.stream()
+            .map(OutboxEvent::getId)
+            .toList();
 
-        String sql = "UPDATE outbox_events SET status = ?, updated_at = now() WHERE event_id = ?";
-        jdbcTemplate.batchUpdate(
-            sql,
-            outboxEvents,
-            100,
-            (ps, event) -> {
-                ps.setString(1, event.getStatus().name());
-                ps.setString(2, event.getEventId());
-            }
-        );
+        outboxEventRepository.markAllAsPublished(ids);
     }
 
-    public void markAllAsPublishingFailed(Map<OutboxEvent, String> failedEvents) {
-        failedEvents.forEach(OutboxEvent::markAsProcessingFailed);
+    public void markAllAsCompleted(List<Long> ids) {
+        outboxEventRepository.markAllAsCompleted(ids);
+    }
 
+    public void markAllAsPublishingFailed(List<OutboxEvent> outboxEvents) {
         String sql = "UPDATE outbox_events SET status = ?, error_message = ?, updated_at = now() WHERE event_id = ?";
         jdbcTemplate.batchUpdate(
             sql,
-            failedEvents.keySet(),
+            outboxEvents,
             100,
             (ps, event) -> {
                 ps.setString(1, event.getStatus().name());

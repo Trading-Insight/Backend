@@ -23,4 +23,8 @@ public class OutboxEventReader {
         return outboxEventRepository.findByEventId(eventId)
             .orElseThrow(() -> new TradinException(ExceptionType.NOT_FOUND_OUTBOX_EVENT_EXCEPTION));
     }
+
+    public List<OutboxEvent> findByEventUuids(List<String> eventUuids) {
+        return outboxEventRepository.findAllByEventIdIn(eventUuids);
+    }
 }

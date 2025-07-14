@@ -3,9 +3,7 @@ package com.tradin.module.outbox.event;
 import com.tradin.module.outbox.domain.OutboxEvent;
 import com.tradin.module.outbox.implement.OutboxEventProcessor;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -24,17 +22,20 @@ public class OutBoxEventPublisher {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void publishToKafka(List<OutboxEvent> outboxEvents) {
         List<OutboxEvent> successEvents = new ArrayList<>();
-        Map<OutboxEvent, String> failedEvents = new HashMap<>();
+        List<OutboxEvent> failedEvents = new ArrayList<>();
 
+        //TODO
         for (OutboxEvent event : outboxEvents) {
             try {
-                kafkaTemplate.send(event.getEventType().getTopic(), event.getEventId(), event.getPayload());
+                kafkaTemplate.send(event.getEventType().getTopic(), null, event.getPayload());
                 successEvents.add(event);
             } catch (Exception e) {
-                failedEvents.put(event, e.getMessage());
+                event.markAsPublishingFailed(e.getMessage());
+                failedEvents.add(event);
             }
         }
 
+        //TODO
         outboxEventProcessor.markAllAsPublished(successEvents);
         outboxEventProcessor.markAllAsPublishingFailed(failedEvents);
     }

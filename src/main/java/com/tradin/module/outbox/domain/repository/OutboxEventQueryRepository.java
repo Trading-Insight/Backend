@@ -7,4 +7,10 @@ import java.util.List;
 public interface OutboxEventQueryRepository {
 
     List<OutboxEvent> findAllByStatus(OutboxStatus status);
+
+    List<OutboxEvent> findAllByEventIdIn(List<String> eventIds);
+
+    void markAllAsCompleted(List<Long> ids);
+
+    void markAllAsPublished(List<Long> ids);
 } 

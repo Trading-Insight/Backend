@@ -21,4 +21,32 @@ public class OutboxEventQueryRepositoryImpl implements OutboxEventQueryRepositor
             .where(outboxEvent.status.eq(status))
             .fetch();
     }
+
+    @Override
+    public List<OutboxEvent> findAllByEventIdIn(List<String> eventIds) {
+        return jpaQueryFactory
+            .selectFrom(outboxEvent)
+            .where(outboxEvent.eventId.in(eventIds))
+            .fetch();
+    }
+
+    @Override
+    public void markAllAsCompleted(List<Long> ids) {
+        jpaQueryFactory
+            .update(outboxEvent)
+            .set(outboxEvent.status, OutboxStatus.COMPLETED)
+            .where(outboxEvent.id.in(ids))
+            .execute();
+    }
+
+
+    @Override
+    public void markAllAsPublished(List<Long> ids) {
+        jpaQueryFactory
+            .update(outboxEvent)
+            .set(outboxEvent.status, OutboxStatus.PUBLISHED)
+            .where(outboxEvent.id.in(ids))
+            .execute();
+    }
+
 } 

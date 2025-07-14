@@ -9,8 +9,6 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Index;
-import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -19,11 +17,6 @@ import org.hibernate.annotations.Type;
 
 @Entity
 @Getter
-@Table(name = "outbox_events", indexes = {
-    @Index(name = "idx_outbox_events_status_created_at", columnList = "status, created_at"),
-    @Index(name = "idx_outbox_events_event_id", columnList = "event_id", unique = true),
-    @Index(name = "idx_outbox_events_event_type", columnList = "event_type")
-})
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class OutboxEvent extends AuditTime {
 

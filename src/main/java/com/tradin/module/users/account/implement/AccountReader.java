@@ -40,4 +40,8 @@ public class AccountReader {
     public List<Account> findSubscribedAccountsByStrategyId(Long strategyId) {
         return accountRepository.findSubscribedAccountsByStrategyId(strategyId);
     }
+
+    public List<Account> findAccountsByIds(List<Long> accountIds) {
+        return accountRepository.findAllById(accountIds);
+    }
 }
