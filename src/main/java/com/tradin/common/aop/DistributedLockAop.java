@@ -45,7 +45,7 @@ public class DistributedLockAop {
                 return invokeFallback(joinPoint, distributedLock.fallbackMethod());
             }
 
-            log.info("🔐 락 획득 성공 - key: {}", key);
+//            log.info("🔐 락 획득 성공 - key: {}", key);
             return aopForTransaction.proceed(joinPoint);
 
         } catch (InterruptedException e) {
@@ -56,9 +56,9 @@ public class DistributedLockAop {
             if (isLocked && lock.isHeldByCurrentThread()) {
                 try {
                     lock.unlock();
-                    log.info("🔓 락 해제 - key: {}", key);
+//                    log.info("🔓 락 해제 - key: {}", key);
                 } catch (IllegalMonitorStateException e) {
-                    log.warn("⚠️ 락 이미 해제됨 - method: {}, key: {}", method.getName(), key);
+//                    log.warn("⚠️ 락 이미 해제됨 - method: {}, key: {}", method.getName(), key);
                 }
             }
         }

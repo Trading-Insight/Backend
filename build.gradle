@@ -89,6 +89,9 @@ dependencies {
     // redisson
     implementation 'org.redisson:redisson-spring-boot-starter:3.46.0'
 
+    // hibernate types
+    implementation 'com.vladmihalcea:hibernate-types-60:2.21.1'
+
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
     annotationProcessor 'org.projectlombok:lombok'

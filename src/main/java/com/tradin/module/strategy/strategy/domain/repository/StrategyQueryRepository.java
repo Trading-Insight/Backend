@@ -1,5 +1,6 @@
 package com.tradin.module.strategy.strategy.domain.repository;
 
+import com.tradin.module.strategy.strategy.domain.Strategy;
 import com.tradin.module.strategy.strategy.domain.repository.dao.StrategyInfoDao;
 import com.tradin.module.strategy.strategy.domain.repository.dao.SubscriptionStrategyInfoDao;
 import java.util.List;
@@ -14,4 +15,6 @@ public interface StrategyQueryRepository {
     List<StrategyInfoDao> findAllSpotStrategiesInfoDao();
 
     Optional<StrategyInfoDao> findStrategyInfoDaoById(Long id);
+
+    List<Strategy> findAllByIds(List<Long> ids);
 }

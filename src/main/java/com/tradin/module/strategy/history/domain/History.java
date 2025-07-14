@@ -2,6 +2,7 @@ package com.tradin.module.strategy.history.domain;
 
 import static com.tradin.module.strategy.strategy.domain.TradingType.LONG;
 
+import com.tradin.common.jpa.AuditTime;
 import com.tradin.module.strategy.strategy.domain.Position;
 import com.tradin.module.strategy.strategy.domain.Strategy;
 import jakarta.persistence.AttributeOverride;
@@ -25,7 +26,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @Table(indexes = {@Index(name = "index_strategy_id", columnList = "strategy_id")}) //TODO
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class History {
+public class History extends AuditTime {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

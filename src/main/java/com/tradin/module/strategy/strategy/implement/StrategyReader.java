@@ -33,14 +33,7 @@ public class StrategyReader {
             .orElseThrow(() -> new TradinException(ExceptionType.NOT_FOUND_STRATEGY_EXCEPTION));
     }
 
-//    public List<SubscriptionStrategyInfoDao> findSubscriptionStrategyInfoDaos() {
-//        return strategyRepository.findSubscriptionStrategiesInfoDao()
-//            .orElse(Collections.emptyList());
-//    }
-//
-//    public Strategy findByName(String name) {
-//        return strategyRepository.findByName(name)
-//            .orElseThrow(() -> new TradinException(ExceptionType.NOT_FOUND_STRATEGY_EXCEPTION));
-//    }
-//
+    public List<Strategy> findStrategiesByIds(List<Long> ids) {
+        return strategyRepository.findAllByIds(ids);
+    }
 }

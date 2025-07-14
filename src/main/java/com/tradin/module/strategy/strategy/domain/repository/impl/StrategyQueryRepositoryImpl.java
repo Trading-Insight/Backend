@@ -5,6 +5,7 @@ import static com.tradin.module.strategy.strategy.domain.StrategyType.FUTURE;
 import static com.tradin.module.strategy.strategy.domain.StrategyType.SPOT;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.tradin.module.strategy.strategy.domain.Strategy;
 import com.tradin.module.strategy.strategy.domain.StrategyType;
 import com.tradin.module.strategy.strategy.domain.repository.StrategyQueryRepository;
 import com.tradin.module.strategy.strategy.domain.repository.dao.QStrategyInfoDao;
@@ -106,5 +107,13 @@ public class StrategyQueryRepositoryImpl implements StrategyQueryRepository {
 
         return subscriptionStrategyInfoDaos.isEmpty() ? Optional.empty()
             : Optional.of(subscriptionStrategyInfoDaos);
+    }
+
+    @Override
+    public List<Strategy> findAllByIds(List<Long> ids) {
+        return jpaQueryFactory
+            .selectFrom(strategy)
+            .where(strategy.id.in(ids))
+            .fetch();
     }
 }
