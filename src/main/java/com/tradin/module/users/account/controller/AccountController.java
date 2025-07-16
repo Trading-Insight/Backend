@@ -18,7 +18,7 @@ public class AccountController implements AccountApi {
 
     private final AccountService accountService;
 
-    @PostMapping("/new")
+    @PostMapping("")
     public TradinResponse<String> createAccount(@AuthenticationPrincipal Long userId) {
         accountService.createAccount(userId);
         return TradinResponse.success();
@@ -29,7 +29,7 @@ public class AccountController implements AccountApi {
         return TradinResponse.success(accountService.getAccounts(userId));
     }
 
-    @PostMapping("/faucet/{accountId}")
+    @PostMapping("/{accountId}/faucet")
     public void faucet(@AuthenticationPrincipal Long userId, @PathVariable Long accountId) {
         accountService.faucet(userId, accountId);
     }

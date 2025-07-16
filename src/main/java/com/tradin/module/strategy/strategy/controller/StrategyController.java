@@ -19,22 +19,23 @@ public class StrategyController implements StrategyApi {
 
     private final StrategyService strategyService;
 
-    @GetMapping("/future")
+    @GetMapping("/futures")
     public TradinResponse<FindStrategiesInfoResponseDto> findFutureStrategiesInfos() {
         return TradinResponse.success(strategyService.findFutureStrategiesInfo());
     }
 
-    @GetMapping("/spot")
+    @GetMapping("/spots")
     public FindStrategiesInfoResponseDto findSpotStrategiesInfos() {
         return strategyService.findSpotStrategiesInfo();
     }
 
-    @GetMapping("/test") //TODO
+    //Test API
+    @PostMapping("")
     public void createStrategy() {
         strategyService.createStrategy();
     }
 
-    @PostMapping("/webhook/futures/short-term")
+    @PostMapping("/futures/short-term/webhook")
     public void handleFutureShortTermV1WebHook(@RequestBody @Valid WebHookRequestDto request) {
         strategyService.handleFutureWebHook(request.toServiceDto());
     }
