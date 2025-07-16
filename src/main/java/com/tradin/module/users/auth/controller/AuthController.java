@@ -38,15 +38,15 @@ public class AuthController implements AuthApi {
 
     @Operation(summary = "테스트 토큰 발급")
     @DisableAuthInSwagger
-    @GetMapping("/test/token/{userId}") //TODO
+    @GetMapping("/token/{userId}")
     public TradinResponse<TokenResponseDto> issueTestToken(@PathVariable Long userId) {
         return TradinResponse.success(authService.issueTestToken(userId));
     }
 
     @Operation(summary = "테스트 유저 생성")
     @DisableAuthInSwagger
-    @PostMapping("/test/user/{count}") //TODO
-    public TradinResponse<TokenResponseDto> issueTestAccount(@PathVariable Long count) {
+    @PostMapping("/users?count={count}")
+    public TradinResponse<TokenResponseDto> issueTestAccount(@RequestParam Long count) {
         for (int i = 0; i < count; i++) {
             authService.testAuth();
         }

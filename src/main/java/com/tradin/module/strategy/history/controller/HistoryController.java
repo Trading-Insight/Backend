@@ -4,12 +4,14 @@ import com.tradin.common.response.TradinResponse;
 import com.tradin.module.strategy.history.controller.dto.request.BackTestRequestDto;
 import com.tradin.module.strategy.history.controller.dto.response.BackTestResponseDto;
 import com.tradin.module.strategy.history.service.HistoryService;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -26,8 +28,9 @@ public class HistoryController implements HistoryApi {
         return TradinResponse.success(historyService.backTest(request.toServiceDto(), pageable));
     }
 
-    @GetMapping("/test/{strategyId}") //TODO
-    public void test(@PathVariable Long strategyId) {
+    @Operation(summary = "테스트 히스토리 생성")
+    @PostMapping("/{strategyId}")
+    public void createHistory(@PathVariable Long strategyId) {
         historyService.createHistory(strategyId);
     }
 
