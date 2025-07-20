@@ -1,0 +1,116 @@
+server:
+  port: 80
+
+spring:
+  config:
+    activate:
+      on-profile: dev
+  datasource:
+    hikari:
+      maximum-pool-size: 100
+      minimum-idle: 100
+      jdbc-url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_SCHEMA}?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+      username: ${DB_USERNAME}
+      password: ${DB_PASSWORD}
+      driver-class-name: org.postgresql.Driver
+
+  jpa:
+    #show-sql: true
+    hibernate:
+      ddl-auto: update
+
+    properties:
+      hibernate:
+        format_sql: true
+
+  redis:
+    host: ${REDIS_HOST}
+    port: ${REDIS_PORT}
+
+  kafka:
+    bootstrap-servers: ${KAFKA_HOST}:${KAFKA_PORT}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      acks: all
+      retries: 3
+      linger-ms: 10
+      batch-size: 32768
+
+    consumer:
+      group-id: auto-trade-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: com.tradin.*
+      max-poll-records: 5
+      fetch-min-bytes: 1024 #5KB
+      fetch-max-wait-ms: 100
+    listener:
+      ack-mode: MANUAL_IMMEDIATE
+      missing-topics-fatal: false
+
+logging:
+  level:
+    org:
+      hibernate:
+        SQL: WARN
+        type:
+          descriptor:
+            sql:
+              BasicBinder: WARN
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    prometheus:
+      enabled: true
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+springdoc:
+  swagger-ui:
+    groups-order: DESC
+    tags-sorter: alpha
+    operations-sorter: method
+    disable-swagger-default-url: true
+    display-request-duration: true
+    defaultModelsExpandDepth: 2
+    defaultModelExpandDepth: 2
+  api-docs:
+    path: /api-docs
+  show-actuator: true
+  default-consumes-media-type: application/json
+  default-produces-media-type: application/json
+  writer-with-default-pretty-printer: true
+  model-and-view-allowed: true
+  paths-to-match:
+    - /v1/**
+
+feign:
+  okhttp:
+    enabled: true
+  client:
+    config:
+      default:
+        connectTimeout: 1000
+        readTimeout: 3000
+
+secret:
+  aes-secret: ${AES_SECRET_KEY}
+  swagger-username: ${SWAGGER_USERNAME}
+  swagger-password: ${SWAGGER_PASSWORD}
+  jwt-secret: ${JWT_SECRET_KEY}
+
+google:
+  login:
+    client_id: ${GOOGLE_CLIENT_ID}
+    code_uri: ${GOOGLE_CODE_URI}
+    token_uri: ${GOOGLE_TOKEN_URI}
+    client_secret: ${GOOGLE_CLIENT_SECRET}
+    redirect_uri: ${GOOGLE_REDIRECT_URI}
+    code_redirect_uri: ${GOOGLE_CODE_REDIRECT_URI}

@@ -1,0 +1,71 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.4.1'
+    id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'com.tradin'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:2024.0.1"
+    }
+}
+
+dependencies {
+    // Core module dependency
+    implementation project(':Tradin-Core')
+    
+    // Web layer
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    
+    // Database
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    runtimeOnly 'org.postgresql:postgresql'
+    runtimeOnly 'com.h2database:h2'
+    
+    // External APIs
+    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+    
+    // Monitoring & Documentation
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'io.micrometer:micrometer-registry-prometheus'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0'
+    implementation 'io.swagger.core.v3:swagger-annotations:2.2.20'
+    
+    // Test dependencies
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.kafka:spring-kafka-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.12.2'
+    testImplementation 'org.mockito:mockito-core:5.17.0'
+    testImplementation 'org.assertj:assertj-core:3.6.1'
+    testImplementation 'com.squareup.okhttp3:mockwebserver:4.11.0'
+    testImplementation 'org.testcontainers:testcontainers:1.18.0'
+    testImplementation 'org.testcontainers:junit-jupiter:1.18.0'
+    testImplementation 'org.testcontainers:kafka:1.18.0'
+    testImplementation 'org.testcontainers:postgresql:1.18.0'
+    testImplementation 'org.testcontainers:jdbc:1.18.0'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+tasks.withType(JavaCompile) {
+    options.compilerArgs += ["-parameters"]
+} 
