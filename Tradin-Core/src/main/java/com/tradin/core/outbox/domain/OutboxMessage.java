@@ -64,9 +64,6 @@ public class OutboxMessage extends AuditTime {
         this.status = OutboxStatus.PENDING;
     }
 
-    public void markAsPublishing() {
-        this.status = OutboxStatus.PUBLISHING;
-    }
 
     public void markAsPublished() {
         this.status = OutboxStatus.PUBLISHED;

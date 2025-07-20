@@ -73,11 +73,14 @@ public class AutoTradeBatchEventListener {
         if (records.isEmpty()) {
             return;
         }
-
-        List<AutoTradeEventDto> autoTradeEventDtos = parseEvents(records);
-        List<OutboxMessage> outboxMessages = findNonDuplicatedMessages(autoTradeEventDtos);
-        autoTradeEventDtos = collectAutoTradeEvents(autoTradeEventDtos, outboxMessages);
-        handleBatchEvents(autoTradeEventDtos, outboxMessages);
+        try {
+            List<AutoTradeEventDto> autoTradeEventDtos = parseEvents(records);
+            List<OutboxMessage> outboxMessages = findNonDuplicatedMessages(autoTradeEventDtos);
+            autoTradeEventDtos = collectAutoTradeEvents(autoTradeEventDtos, outboxMessages);
+            handleBatchEvents(autoTradeEventDtos, outboxMessages);
+        } catch (Exception e) {
+            log.error("자동매매 이벤트 처리 실패: error={}", e.getMessage(), e);
+        }
     }
 
     private List<AutoTradeEventDto> parseEvents(List<ConsumerRecord<String, String>> records) {
@@ -227,10 +230,7 @@ public class AutoTradeBatchEventListener {
         List<OutboxMessage> outboxMessages = outboxMessageReader.findByMessageIds(collectMessageIds(autoTradeEventDtos));
 
         return outboxMessages.stream()
-            .filter(message ->
-                message.getStatus() == OutboxStatus.PUBLISHED ||
-                    message.getStatus() == OutboxStatus.PUBLISHING_FAILED
-            )
+            .filter(message -> message.getStatus() == OutboxStatus.PUBLISHED)
             .collect(Collectors.toList());
     }
 }

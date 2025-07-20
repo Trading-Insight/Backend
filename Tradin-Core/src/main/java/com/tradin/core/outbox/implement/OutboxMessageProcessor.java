@@ -1,6 +1,8 @@
 package com.tradin.core.outbox.implement;
 
 
+import static com.tradin.core.outbox.domain.OutboxMessageType.AUTO_TRADE;
+import static com.tradin.core.outbox.domain.OutboxStatus.PENDING;
 import static com.tradin.core.outbox.domain.QOutboxMessage.outboxMessage;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -14,12 +16,14 @@ import com.tradin.core.futuresOrder.event.dto.PositionDto;
 import com.tradin.core.outbox.domain.OutboxMessage;
 import com.tradin.core.outbox.domain.OutboxMessageType;
 import com.tradin.core.outbox.domain.repository.OutboxMessageRepository;
+import com.tradin.core.outbox.implement.dto.OutBoxMessagesEvent;
 import com.tradin.core.strategy.domain.Strategy;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
@@ -32,6 +36,7 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 @RequiredArgsConstructor
 public class OutboxMessageProcessor {
 
+    private final ApplicationEventPublisher applicationEventPublisher;
     private final OutboxMessageRepository outboxMessageRepository;
     private final ObjectMapper objectMapper;
     private final JdbcTemplate jdbcTemplate;
@@ -47,6 +52,12 @@ public class OutboxMessageProcessor {
         }
 
         batchInsert(messages);
+        publishEvent();
+    }
+
+    private void publishEvent() {
+        List<OutboxMessage> messages = outboxMessageRepository.findAllByTypeAndStatus(AUTO_TRADE, PENDING);
+        applicationEventPublisher.publishEvent(new OutBoxMessagesEvent(messages));
     }
 
     private void batchInsert(List<OutboxMessage> messages) {
@@ -79,7 +90,7 @@ public class OutboxMessageProcessor {
 
         try {
             String payload = objectMapper.writeValueAsString(event);
-            OutboxMessage outboxMessage = OutboxMessage.of(OutboxMessageType.AUTO_TRADE, messageId, payload);
+            OutboxMessage outboxMessage = OutboxMessage.of(AUTO_TRADE, messageId, payload);
 
             outboxMessageRepository.save(outboxMessage);
         } catch (JsonProcessingException e) {
@@ -87,9 +98,6 @@ public class OutboxMessageProcessor {
         }
     }
 
-    public void markAsPublishing(OutboxMessage outboxMessage) {
-        outboxMessage.markAsPublishing();
-    }
 
     public void markAsPublished(OutboxMessage outboxMessage) {
         outboxMessage.markAsPublished();
@@ -145,7 +153,7 @@ public class OutboxMessageProcessor {
 
         try {
             String payload = objectMapper.writeValueAsString(event);
-            return OutboxMessage.of(OutboxMessageType.AUTO_TRADE, messageId, payload);
+            return OutboxMessage.of(AUTO_TRADE, messageId, payload);
         } catch (JsonProcessingException e) {
             throw new TradinException(ExceptionType.SERIALIZATION_FAIL_EXCEPTION, e.getMessage());
         }

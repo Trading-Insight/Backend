@@ -6,6 +6,7 @@ import static com.tradin.core.outbox.domain.QOutboxMessage.outboxMessage;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import com.tradin.core.outbox.domain.OutboxMessage;
+import com.tradin.core.outbox.domain.OutboxMessageType;
 import com.tradin.core.outbox.domain.OutboxStatus;
 import com.tradin.core.outbox.domain.repository.OutboxMessageQueryRepository;
 import java.util.List;
@@ -33,6 +34,15 @@ public class OutboxMessageQueryRepositoryImpl implements OutboxMessageQueryRepos
     }
 
     @Override
+    public List<OutboxMessage> findAllByTypeAndStatus(OutboxMessageType outboxMessageType, OutboxStatus status) {
+        return jpaQueryFactory
+            .selectFrom(outboxMessage)
+            .where(outboxMessage.messageType.eq(outboxMessageType)
+                .and(outboxMessage.status.eq(status)))
+            .fetch();
+    }
+
+    @Override
     public void markAllAsCompleted(List<Long> ids) {
         jpaQueryFactory
             .update(outboxMessage)
@@ -47,7 +57,8 @@ public class OutboxMessageQueryRepositoryImpl implements OutboxMessageQueryRepos
         jpaQueryFactory
             .update(outboxMessage)
             .set(outboxMessage.status, OutboxStatus.PUBLISHED)
-            .where(outboxMessage.id.in(ids))
+            .where(outboxMessage.id.in(ids)
+            .and(outboxMessage.status.eq(OutboxStatus.PENDING)))
             .execute();
     }
 
