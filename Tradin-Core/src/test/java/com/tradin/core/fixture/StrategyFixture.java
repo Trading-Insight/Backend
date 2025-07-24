@@ -10,6 +10,8 @@ import com.tradin.core.strategy.domain.TimeFrameType;
 import com.tradin.core.strategy.domain.TradingType;
 import com.tradin.core.strategy.domain.Type;
 import java.time.LocalDateTime;
+import java.math.BigDecimal;
+import com.tradin.core.price.domain.vo.Price;
 
 public class StrategyFixture {
 
@@ -27,7 +29,7 @@ public class StrategyFixture {
             .rate(createDefaultRate())
             .count(createDefaultCount())
             .currentPosition(createDefaultPosition())
-            .profitFactor(1.5)
+            .profitFactor(new BigDecimal("1.50"))
             .averageHoldingPeriod(30)
             .build();
     }
@@ -44,12 +46,12 @@ public class StrategyFixture {
      */
     private static Rate createDefaultRate() {
         return Rate.builder()
-            .winningRate(0.6)
-            .simpleProfitRate(0.1)
-            .compoundProfitRate(0.15)
-            .totalProfitRate(0.2)
-            .totalLossRate(0.05)
-            .averageProfitRate(0.08)
+            .winningRate(new BigDecimal("0.60"))
+            .simpleProfitRate(new BigDecimal("0.10"))
+            .compoundProfitRate(new BigDecimal("0.15"))
+            .totalProfitRate(new BigDecimal("0.20"))
+            .totalLossRate(new BigDecimal("0.05"))
+            .averageProfitRate(new BigDecimal("0.08"))
             .build();
     }
 
@@ -68,10 +70,10 @@ public class StrategyFixture {
      * 기본 Position 생성
      */
     private static Position createDefaultPosition() {
-        return Position.builder()
-            .tradingType(TradingType.LONG)
-            .time(LocalDateTime.now())
-            .price(50000)
-            .build();
+        return Position.of(
+            TradingType.LONG,
+            LocalDateTime.now(),
+            Price.of(new BigDecimal("10000.00"))
+        );
     }
 }

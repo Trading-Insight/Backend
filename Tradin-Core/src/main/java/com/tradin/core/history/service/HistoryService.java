@@ -11,12 +11,14 @@ import com.tradin.core.strategy.domain.Strategy;
 import com.tradin.core.strategy.domain.TradingType;
 import com.tradin.core.strategy.domain.repository.dao.StrategyInfoDao;
 import com.tradin.core.strategy.implement.StrategyReader;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.tradin.core.price.domain.vo.Price;
 
 @Service
 @Transactional(readOnly = true)
@@ -30,7 +32,7 @@ public class HistoryService {
     @Transactional
     public void createHistory(Long strategyId) {
         Strategy strategy = strategyReader.findStrategyById(strategyId);
-        Position position = Position.of(TradingType.SHORT, LocalDateTime.now(), 90000);
+        Position position = Position.of(TradingType.SHORT, LocalDateTime.now(), Price.of(new BigDecimal(90000)));
         historyProcessor.createHistory(strategy, position);
     }
 

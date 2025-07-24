@@ -16,6 +16,7 @@ import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.client.WebSocketClient;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
+import com.tradin.core.price.domain.vo.Price;
 
 
 @Slf4j
@@ -43,7 +44,7 @@ public class BinanceWebSocketHandler {
                         BigDecimal price = new BigDecimal(data.get("p").getAsString());
                         //log.info("[WebSocket 수신] {}: {}", symbol, price);
                         CoinType.fromSymbol(symbol).ifPresent(coinType -> {
-                            priceCache.updatePrice(coinType, price);
+                            priceCache.updatePrice(coinType, Price.of(price));
                         });
 
                         //priceCache.getAllPrices().forEach((sym, prc) -> log.info("[현재 시세] {}: {}", sym, prc));

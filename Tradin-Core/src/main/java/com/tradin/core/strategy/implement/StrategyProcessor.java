@@ -12,6 +12,11 @@ import com.tradin.core.strategy.domain.StrategyType;
 import com.tradin.core.strategy.domain.TradingType;
 import com.tradin.core.strategy.domain.Type;
 import com.tradin.core.strategy.domain.repository.StrategyRepository;
+import java.math.BigDecimal;
+import com.tradin.core.strategy.domain.vo.ProfitRate;
+import com.tradin.core.strategy.domain.vo.WinRate;
+import com.tradin.core.strategy.domain.vo.ProfitFactor;
+import com.tradin.core.price.domain.vo.Price;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -27,12 +32,12 @@ public class StrategyProcessor {
             "test",
             Type.of(StrategyType.FUTURE, CoinType.BTC, ONE_HOUR),
             Rate.of(
-                0,
-                0,
-                0,
-                0,
-                0,
-                0
+                WinRate.of(BigDecimal.ZERO),
+                ProfitRate.of(BigDecimal.ZERO),
+                ProfitRate.of(BigDecimal.ZERO),
+                ProfitRate.of(BigDecimal.ZERO),
+                ProfitRate.of(BigDecimal.ZERO),
+                ProfitRate.of(BigDecimal.ZERO)
             ),
             Count.of(
                 0,
@@ -42,9 +47,9 @@ public class StrategyProcessor {
             Position.of(
                 TradingType.NONE,
                 LocalDateTime.now(),
-                0
+                Price.of(BigDecimal.ZERO)
             ),
-            0,
+            ProfitFactor.of(BigDecimal.ZERO),
             0
         );
         strategyRepository.save(strategy);

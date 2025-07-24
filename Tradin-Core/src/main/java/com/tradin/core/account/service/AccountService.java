@@ -19,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.tradin.core.balance.domain.vo.Money;
 
 @Service
 @Transactional(readOnly = true)
@@ -46,7 +47,7 @@ public class AccountService {
     public void faucet(Long userId, Long accountId) {
         Account account = accountReader.findAccountByIdAndUserId(accountId, userId);
         Balance usdtBalance = balanceReader.findByAccountIdAndCoinType(account.getId(), CoinType.USDT);
-        balanceProcessor.updateBalance(usdtBalance, BigDecimal.valueOf(10000));
+        balanceProcessor.updateBalance(usdtBalance, Money.of(BigDecimal.valueOf(10000)));
     }
 
     private AccountsResponseDto readAccountsByUserId(Long userId) {

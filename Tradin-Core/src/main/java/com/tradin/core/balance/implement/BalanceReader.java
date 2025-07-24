@@ -6,7 +6,7 @@ import com.tradin.core.common.exception.TradinException;
 import com.tradin.core.balance.domain.Balance;
 import com.tradin.core.balance.domain.repository.BalanceRepository;
 import com.tradin.core.strategy.domain.CoinType;
-import java.math.BigDecimal;
+import com.tradin.core.balance.domain.vo.Money;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -21,7 +21,7 @@ public class BalanceReader {
             .orElseThrow(() -> new TradinException(ExceptionType.NOT_FOUND_BALANCE_EXCEPTION));
     }
 
-    public BigDecimal getUsdtAmount(Balance balance) {
+    public Money getUsdtAmount(Balance balance) {
         return balance.getAmount();
     }
 

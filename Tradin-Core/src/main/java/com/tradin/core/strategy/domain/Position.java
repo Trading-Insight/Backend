@@ -4,7 +4,10 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import com.tradin.core.price.domain.vo.Price;
+import com.tradin.core.common.converter.PriceConverter;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -28,17 +31,18 @@ public class Position {
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime time;
 
-    @Column(nullable = false)
-    private int price;  //TODO - BigDecimal로 변경
+    @Convert(converter = PriceConverter.class)
+    @Column(nullable = false, precision = 20, scale = 2)
+    private Price price;
 
     @Builder
-    private Position(TradingType tradingType, LocalDateTime time, int price) {
+    private Position(TradingType tradingType, LocalDateTime time, Price price) {
         this.tradingType = tradingType;
         this.time = time;
-        this.price = price;
+        this.price = price == null ? Price.of(null) : price;
     }
 
-    public static Position of(TradingType tradingType, LocalDateTime time, int price) {
+    public static Position of(TradingType tradingType, LocalDateTime time, Price price) {
         return Position.builder()
             .tradingType(tradingType)
             .time(time)

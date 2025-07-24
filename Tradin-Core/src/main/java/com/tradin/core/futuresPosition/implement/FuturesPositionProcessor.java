@@ -6,8 +6,9 @@ import com.tradin.core.futuresPosition.domain.FuturesPosition;
 import com.tradin.core.futuresPosition.domain.repository.FuturesPositionRepository;
 import com.tradin.core.strategy.domain.CoinType;
 import com.tradin.core.strategy.domain.TradingType;
+import com.tradin.core.futuresOrder.domain.vo.Amount;
+import com.tradin.core.price.domain.vo.Price;
 import jakarta.persistence.EntityManager;
-import java.math.BigDecimal;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -26,7 +27,7 @@ public class FuturesPositionProcessor {
 
     }
 
-    public FuturesPosition openPosition(CoinType coinType, TradingType tradingType, BigDecimal amount, BigDecimal price, Account account) {
+    public FuturesPosition openPosition(CoinType coinType, TradingType tradingType, Amount amount, Price price, Account account) {
         FuturesPosition futuresPosition = FuturesPosition.of(coinType, tradingType, price, amount, account);
         return futuresPositionRepository.save(futuresPosition);
     }

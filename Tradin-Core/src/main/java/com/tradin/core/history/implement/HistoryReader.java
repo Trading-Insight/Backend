@@ -14,6 +14,10 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
+import com.tradin.core.price.domain.vo.Price;
+import com.tradin.core.strategy.domain.vo.ProfitRate;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 @Component
 @RequiredArgsConstructor
@@ -84,11 +88,11 @@ public class HistoryReader {
     }
 
     private List<HistoryDao> calculateCompoundProfitRate(List<HistoryDao> filteredHistories, LocalDate startDate, LocalDate endDate) {
-        double[] cumulativeProfitRate = {0.0};
+        ProfitRate[] cumulativeProfitRate = {ProfitRate.of(BigDecimal.ZERO)};
 
         return filteredHistories.stream()
             .map(history -> {
-                cumulativeProfitRate[0] = calculateCompound(cumulativeProfitRate[0], history.profitRate());
+                cumulativeProfitRate[0] = ProfitRate.of(calculateCompound(cumulativeProfitRate[0].getValue(), history.profitRate().getValue()));
                 return new HistoryDao(
                     history.id(),
                     history.entryPosition(),
@@ -100,7 +104,12 @@ public class HistoryReader {
             .collect(Collectors.toList());
     }
 
-    private double calculateCompound(double cumulativeProfitRate, double newProfitRate) {
-        return (1 + cumulativeProfitRate / 100) * (1 + newProfitRate / 100) - 1;
+    private BigDecimal calculateCompound(BigDecimal cumulativeProfitRate, BigDecimal newProfitRate) {
+        // (1 + a/100) * (1 + b/100) - 1
+        return (BigDecimal.ONE.add(cumulativeProfitRate.divide(BigDecimal.valueOf(100), 10, RoundingMode.HALF_UP)))
+            .multiply(BigDecimal.ONE.add(newProfitRate.divide(BigDecimal.valueOf(100), 10, RoundingMode.HALF_UP)))
+            .subtract(BigDecimal.ONE)
+            .multiply(BigDecimal.valueOf(100))
+            .setScale(2, newProfitRate.signum() >= 0 ? RoundingMode.DOWN : RoundingMode.UP);
     }
 }

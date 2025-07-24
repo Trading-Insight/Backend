@@ -8,6 +8,7 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.tradin.core.strategy.domain.Position;
 import com.tradin.core.strategy.domain.TradingType;
 import java.time.LocalDateTime;
+import com.tradin.core.price.domain.vo.Price;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,7 +24,7 @@ public class PositionDto {
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime time;
 
-    private int price;
+    private Price price;
 
     public static PositionDto from(Position position) {
         return new PositionDto(
@@ -40,4 +41,5 @@ public class PositionDto {
             price
         );
     }
+
 }

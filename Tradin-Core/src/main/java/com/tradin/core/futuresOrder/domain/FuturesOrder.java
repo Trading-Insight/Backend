@@ -5,7 +5,14 @@ import com.tradin.core.common.jpa.AuditTime;
 
 import com.tradin.core.strategy.domain.Strategy;
 import com.tradin.core.strategy.domain.TradingType;
+import com.tradin.core.futuresOrder.domain.vo.Amount;
+import com.tradin.core.futuresOrder.domain.vo.Margin;
+import com.tradin.core.price.domain.vo.Price;
+import com.tradin.core.common.converter.AmountConverter;
+import com.tradin.core.common.converter.MarginConverter;
+import com.tradin.core.common.converter.PriceConverter;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -35,17 +42,20 @@ public class FuturesOrder extends AuditTime {
     @Enumerated(EnumType.STRING)
     private TradingType tradingType;
 
+    @Convert(converter = PriceConverter.class)
     @Column(nullable = false, precision = 20, scale = 2)
-    private BigDecimal price;
+    private Price price;
 
+    @Convert(converter = AmountConverter.class)
     @Column(nullable = false, precision = 20, scale = 4)
-    private BigDecimal amount;
+    private Amount amount;
 
     @Column(nullable = false)
     private Integer leverage;
 
+    @Convert(converter = MarginConverter.class)
     @Column(nullable = false, precision = 20, scale = 4)
-    private BigDecimal margin;
+    private Margin margin;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -60,18 +70,18 @@ public class FuturesOrder extends AuditTime {
     private Strategy strategy;
 
     @Builder
-    public FuturesOrder(TradingType tradingType, BigDecimal price, BigDecimal amount, OrderStatus orderStatus, Account account, Strategy strategy) {
+    public FuturesOrder(TradingType tradingType, Price price, Amount amount, OrderStatus orderStatus, Account account, Strategy strategy) {
         this.tradingType = tradingType;
         this.price = price;
         this.amount = amount;
         this.leverage = 1;
-        this.margin = amount.divide(BigDecimal.valueOf(leverage), 2, RoundingMode.CEILING);
+        this.margin = Margin.of(amount.getValue().divide(BigDecimal.valueOf(leverage), 2, RoundingMode.CEILING));
         this.orderStatus = orderStatus;
         this.account = account;
         this.strategy = strategy;
     }
 
-    public static FuturesOrder of(TradingType tradingType, BigDecimal price, BigDecimal amount, OrderStatus orderStatus, Account account, Strategy strategy) {
+    public static FuturesOrder of(TradingType tradingType, Price price, Amount amount, OrderStatus orderStatus, Account account, Strategy strategy) {
         return FuturesOrder.builder()
             .tradingType(tradingType)
             .price(price)

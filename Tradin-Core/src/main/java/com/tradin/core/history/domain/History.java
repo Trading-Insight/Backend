@@ -6,8 +6,11 @@ import static com.tradin.core.strategy.domain.TradingType.LONG;
 import com.tradin.core.common.jpa.AuditTime;
 import com.tradin.core.strategy.domain.Position;
 import com.tradin.core.strategy.domain.Strategy;
+import com.tradin.core.strategy.domain.vo.ProfitRate;
+import com.tradin.core.common.converter.ProfitRateConverter;
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -45,8 +48,9 @@ public class History extends AuditTime {
     @AttributeOverride(name = "price", column = @Column(name = "exit_price"))
     private Position exitPosition;
 
-    @Column
-    private Double profitRate;
+    @Convert(converter = ProfitRateConverter.class)
+    @Column(nullable = false, precision = 20, scale = 2)
+    private ProfitRate profitRate;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "strategy_id", nullable = false)
@@ -85,5 +89,9 @@ public class History extends AuditTime {
 
     private boolean isOpenPositionLong() {
         return this.entryPosition.getTradingType() == LONG;
+    }
+
+    public void setProfitRate(ProfitRate profitRate) {
+        this.profitRate = profitRate;
     }
 }

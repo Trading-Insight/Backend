@@ -14,15 +14,18 @@ import com.tradin.core.futuresPosition.domain.FuturesPosition;
 import com.tradin.core.futuresPosition.implement.FuturesPositionProcessor;
 import com.tradin.core.futuresPosition.implement.FuturesPositionReader;
 import com.tradin.core.price.domain.PriceCache;
+import com.tradin.core.price.domain.vo.Price;
 import com.tradin.core.strategy.domain.CoinType;
 import com.tradin.core.strategy.domain.Position;
 import com.tradin.core.strategy.domain.Strategy;
 import com.tradin.core.strategy.domain.TradingType;
+import com.tradin.core.futuresOrder.domain.vo.Amount;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import com.tradin.core.balance.domain.vo.Money;
 
 @Component
 @RequiredArgsConstructor
@@ -48,7 +51,7 @@ public class FuturesOrderProcessor {
     public void closeExistPosition(Strategy strategy, Account account) {
         futuresPositionReader.findOpenFuturesPositionByAccountAndCoinType(account.getId(), strategy.getCoinType())
             .ifPresent(futuresPosition -> {
-                BigDecimal currentPrice = getCurrentPrice(strategy.getCoinType());
+                Price currentPrice = Price.of(getCurrentPrice(strategy.getCoinType()));
 
                 orderReversePosition(strategy, account, futuresPosition, currentPrice);
                 closeExistPosition(account, futuresPosition);
@@ -68,24 +71,24 @@ public class FuturesOrderProcessor {
     )
     public void openNewPosition(Strategy strategy, Account account, Position strategyPosition) {
         Balance balance = balanceReader.findByAccountIdAndCoinType(account.getId(), CoinType.USDT);
-        BigDecimal orderAmount = balanceReader.getUsdtAmount(balance);
-        BigDecimal currentPrice = getCurrentPrice(strategy.getCoinType());
+        Amount orderAmount = Amount.of(balanceReader.getUsdtAmount(balance).getValue());
+        Price currentPrice = Price.of(getCurrentPrice(strategy.getCoinType()));
 
         reduceMargin(balance, orderAmount);
         orderPosition(strategyPosition.getTradingType(), strategy, account, orderAmount, currentPrice);
         openPosition(strategy, account, strategyPosition, orderAmount, currentPrice);
     }
 
-    private FuturesOrder orderPosition(TradingType tradingType, Strategy strategy, Account account, BigDecimal amount, BigDecimal currentPrice) {
+    private FuturesOrder orderPosition(TradingType tradingType, Strategy strategy, Account account, Amount amount, Price currentPrice) {
         FuturesOrder futuresOrder = FuturesOrder.of(tradingType, currentPrice, amount, OrderStatus.FILLED, account, strategy);
         return futuresOrderRepository.save(futuresOrder);
     }
 
-    private void orderReversePosition(Strategy strategy, Account account, FuturesPosition futuresPosition, BigDecimal currentPrice) {
+    private void orderReversePosition(Strategy strategy, Account account, FuturesPosition futuresPosition, Price currentPrice) {
         if (futuresPosition.isPositionLong()) {
-            orderPosition(TradingType.SHORT, strategy, account, futuresPosition.getAmount(), currentPrice);
+            orderPosition(TradingType.SHORT, strategy, account, Amount.of(futuresPosition.getAmount().getValue()), currentPrice);
         } else if (isPositionShort(futuresPosition)) {
-            orderPosition(TradingType.LONG, strategy, account, futuresPosition.getAmount(), currentPrice);
+            orderPosition(TradingType.LONG, strategy, account, Amount.of(futuresPosition.getAmount().getValue()), currentPrice);
         }
     }
 
@@ -93,7 +96,7 @@ public class FuturesOrderProcessor {
         futuresPositionProcessor.closePosition(account, futuresPosition);
     }
 
-    private FuturesPosition openPosition(Strategy strategy, Account account, Position strategyPosition, BigDecimal amount, BigDecimal currentPrice) {
+    private FuturesPosition openPosition(Strategy strategy, Account account, Position strategyPosition, Amount amount, Price currentPrice) {
         return futuresPositionProcessor.openPosition(
             strategy.getCoinType(),
             strategyPosition.getTradingType(),
@@ -103,24 +106,24 @@ public class FuturesOrderProcessor {
         );
     }
 
-    private void settleUsdtProfit(Balance balance, BigDecimal amount) {
-        balanceProcessor.updateBalance(balance, amount);
+    private void settleUsdtProfit(Balance balance, Amount amount) {
+        balanceProcessor.updateBalance(balance, Money.of(amount.getValue()));
     }
 
-    private void reduceMargin(Balance balance, BigDecimal margin) {
-        balanceProcessor.updateBalance(balance, margin.negate());
+    private void reduceMargin(Balance balance, Amount margin) {
+        balanceProcessor.updateBalance(balance, Money.of(margin.getValue().negate()));
     }
 
-    private BigDecimal calculateProfitAmount(FuturesPosition position, BigDecimal currentPrice) {
+    private Amount calculateProfitAmount(FuturesPosition position, Price currentPrice) {
         if (position.isPositionLong()) {
-            return currentPrice.subtract(position.getEntryPrice())
-                .multiply(position.getAmount())
-                .divide(position.getEntryPrice(), 2, RoundingMode.DOWN).add(position.getMargin());
+            return Amount.of(currentPrice.getValue().subtract(position.getEntryPrice().getValue())
+                .multiply(position.getAmount().getValue())
+                .divide(position.getEntryPrice().getValue(), 2, RoundingMode.DOWN).add(position.getMargin().getValue()));
         }
 
-        return position.getEntryPrice().subtract(currentPrice)
-            .multiply(position.getAmount())
-            .divide(position.getEntryPrice(), 2, RoundingMode.DOWN).add(position.getMargin());
+        return Amount.of(position.getEntryPrice().getValue().subtract(currentPrice.getValue())
+            .multiply(position.getAmount().getValue())
+            .divide(position.getEntryPrice().getValue(), 2, RoundingMode.DOWN).add(position.getMargin().getValue()));
     }
 
 
@@ -130,7 +133,7 @@ public class FuturesOrderProcessor {
 
 
     private BigDecimal getCurrentPrice(CoinType coinType) {
-        return priceCache.getPrice(coinType);
+        return priceCache.getPrice(coinType).getValue();
     }
 
     public void handleLockFailure(Strategy strategy, Account account, Position strategyPosition) {

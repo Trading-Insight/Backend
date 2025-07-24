@@ -2,6 +2,9 @@ package com.tradin.core.strategy.domain.repository.dao;
 
 import com.querydsl.core.annotations.QueryProjection;
 import com.tradin.core.strategy.domain.CoinType;
+import com.tradin.core.strategy.domain.vo.ProfitFactor;
+import com.tradin.core.strategy.domain.vo.WinRate;
+import com.tradin.core.strategy.domain.vo.ProfitRate;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 
@@ -14,19 +17,19 @@ public class SubscriptionStrategyInfoDao {
     private final CoinType coinType;
 
     @Schema(description = "수익팩터")
-    private final double profitFactor;
+    private final ProfitFactor profitFactor;
 
     @Schema(description = "승률")
-    private final double winningRate;
+    private final WinRate winningRate;
 
     @Schema(description = "복리 기준 수익률 -> 누적 손익률")
-    private final double compoundProfitRate;
+    private final ProfitRate compoundProfitRate;
 
     @Schema(description = "평균 수익률")
-    private final double averageProfitRate;
+    private final ProfitRate averageProfitRate;
 
     @QueryProjection
-    public SubscriptionStrategyInfoDao(long id, String name, CoinType coinType, double profitFactor, double winningRate, double compoundProfitRate, double averageProfitRate) {
+    public SubscriptionStrategyInfoDao(long id, String name, CoinType coinType, ProfitFactor profitFactor, WinRate winningRate, ProfitRate compoundProfitRate, ProfitRate averageProfitRate) {
         this.id = id;
         this.name = name;
         this.coinType = coinType;
