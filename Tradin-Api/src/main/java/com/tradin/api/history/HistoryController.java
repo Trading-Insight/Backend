@@ -1,7 +1,7 @@
 package com.tradin.api.history;
 
 import com.tradin.api.history.dto.BackTestRequestDto;
-import com.tradin.core.history.service.HistoryService;
+import com.tradin.core.history.service.HistoryFacadeService;
 import com.tradin.core.history.service.dto.BackTestResponseDto;
 import com.tradin.api.common.response.TradinResponse;
 
@@ -21,18 +21,18 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/v1/histories")
 public class HistoryController implements HistoryApi {
 
-    private final HistoryService historyService;
+    private final HistoryFacadeService historyFacadeService;
 
     @GetMapping("")
     public TradinResponse<BackTestResponseDto> backTest(
         @Valid @ModelAttribute BackTestRequestDto request, Pageable pageable) {
-        return TradinResponse.success(historyService.backTest(request.toServiceDto(), pageable));
+        return TradinResponse.success(historyFacadeService.backTest(request.toServiceDto(), pageable));
     }
 
     @Operation(summary = "테스트 히스토리 생성")
     @PostMapping("/{strategyId}")
     public void createHistory(@PathVariable Long strategyId) {
-        historyService.createHistory(strategyId);
+        historyFacadeService.createHistory(strategyId);
     }
 
 }

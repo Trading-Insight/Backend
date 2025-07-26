@@ -2,8 +2,9 @@ package com.tradin.core.outbox.publisher;
 
 
 import com.tradin.core.outbox.domain.OutboxMessage;
-import com.tradin.core.outbox.implement.OutboxMessageProcessor;
-import com.tradin.core.outbox.implement.dto.OutBoxMessagesEvent;
+
+import com.tradin.core.outbox.service.OutBoxMessageService;
+import com.tradin.core.outbox.service.dto.OutBoxMessagesEvent;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -21,17 +22,16 @@ import org.springframework.transaction.event.TransactionPhase;
 public class OutBoxMessageKafkaPublisher {
 
     private final KafkaTemplate<String, String> kafkaTemplate;
-    private final OutboxMessageProcessor outboxMessageProcessor;
+    private final OutBoxMessageService outBoxMessageService;
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void publishToKafka(OutBoxMessagesEvent event) {
         List<OutboxMessage> outboxMessages = event.getOutboxMessages();
-        outboxMessageProcessor.markAllAsPublished(outboxMessages);
+        outBoxMessageService.markAllAsPublished(outboxMessages);
 
         List<OutboxMessage> failedMessages = new ArrayList<>();
 
-        //TODO
         for (OutboxMessage message : outboxMessages) {
             try {
                 kafkaTemplate.send(message.getMessageType().getTopic(), message.getMessageId(), message.getPayload());
@@ -41,6 +41,6 @@ public class OutBoxMessageKafkaPublisher {
             }
         }
 
-        outboxMessageProcessor.markAllAsPublishingFailed(failedMessages);
+        outBoxMessageService.markAllAsPublishingFailed(failedMessages);
     }
 }

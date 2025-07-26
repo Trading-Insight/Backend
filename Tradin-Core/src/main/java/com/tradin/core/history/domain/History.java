@@ -49,7 +49,7 @@ public class History extends AuditTime {
     private Position exitPosition;
 
     @Convert(converter = ProfitRateConverter.class)
-    @Column(nullable = false, precision = 20, scale = 2)
+    @Column(precision = 20, scale = 2)
     private ProfitRate profitRate;
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -21,12 +21,16 @@ import org.springframework.web.filter.OncePerRequestFilter;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private static final List<String> ALLOW_LIST = List.of("/auth", "/swagger-ui", "/api-docs", "/health-check",
+    private static final List<String> ALLOW_LIST = List.of(
+        "/v1/auth/users",
+        "/swagger-ui",
+        "/api-docs",
+        "/health-check",
         "/notifications", "/actuator", "/test",
         "/actuator/**",
         "/v1/strategies/futures/short-term/webhook",
-        "/v1/subscriptions/activate/accounts/strategies",
-        "/v1/subscriptions/deactivate/accounts/strategies"
+        "/v1/subscriptions/accounts/strategies",
+        "/v1/strategies"
     );
     public static final String BEARER_PREFIX = "Bearer ";
     public static final String AUTHORIZATION_HEADER_PREFIX = "Authorization";

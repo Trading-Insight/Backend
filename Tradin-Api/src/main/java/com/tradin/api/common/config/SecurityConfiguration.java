@@ -39,16 +39,16 @@ public class SecurityConfiguration {
             ).authorizeHttpRequests(authorizeRequest ->
                 authorizeRequest
                     .requestMatchers(
-                        "/v1/auth/test/**",
+                        "/v1/auth/users**",
                         "/actuator/**",
                         "/v1/histories/test/**",
                         "/v1/strategies/test/**",
                         "/v1/strategies/futures/short-term/webhook",
-                        "/v1/subscriptions/activate/accounts/strategies/**",
-                        "/v1/subscriptions/deactivate/accounts/strategies/**",
+                        "/v1/subscriptions/accounts/strategies/**",
                         "/v1/strategies/futures",
                         "/swagger-ui/**",
-                        "/api-docs/**"
+                        "/api-docs/**",
+                        "/v1/strategies"
                     )
                     .permitAll() //TODO
 

@@ -3,7 +3,7 @@ package com.tradin.api.strategy;
 import com.tradin.api.strategy.dto.WebHookRequestDto;
 import com.tradin.api.common.response.TradinResponse;
 
-import com.tradin.core.strategy.service.StrategyService;
+import com.tradin.core.strategy.service.StrategyFacadeService;
 import com.tradin.core.strategy.service.dto.FindStrategiesInfoResponseDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -18,26 +18,26 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/v1/strategies")
 public class StrategyController implements StrategyApi {
 
-    private final StrategyService strategyService;
+    private final StrategyFacadeService strategyFacadeService;
 
     @GetMapping("/futures")
     public TradinResponse<FindStrategiesInfoResponseDto> findFutureStrategiesInfos() {
-        return TradinResponse.success(strategyService.findFutureStrategiesInfo());
+        return TradinResponse.success(strategyFacadeService.findFutureStrategiesInfo());
     }
 
     @GetMapping("/spots")
     public FindStrategiesInfoResponseDto findSpotStrategiesInfos() {
-        return strategyService.findSpotStrategiesInfo();
+        return strategyFacadeService.findSpotStrategiesInfo();
     }
 
     //Test API
     @PostMapping("")
     public void createStrategy() {
-        strategyService.createStrategy();
+        strategyFacadeService.createStrategy();
     }
 
     @PostMapping("/futures/short-term/webhook")
     public void handleFutureShortTermV1WebHook(@RequestBody @Valid WebHookRequestDto request) {
-        strategyService.handleFutureWebHook(request.toServiceDto());
+        strategyFacadeService.handleFutureWebHook(request.toServiceDto());
     }
 }

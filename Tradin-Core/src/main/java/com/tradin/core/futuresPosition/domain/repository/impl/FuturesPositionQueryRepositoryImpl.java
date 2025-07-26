@@ -1,4 +1,4 @@
-package com.tradin.core.futuresPosition.domain.repository;
+package com.tradin.core.futuresPosition.domain.repository.impl;
 
 
 import static com.tradin.core.futuresPosition.domain.QFuturesPosition.futuresPosition;
@@ -6,7 +6,7 @@ import static com.tradin.core.futuresPosition.domain.QFuturesPosition.futuresPos
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import com.tradin.core.futuresPosition.domain.FuturesPosition;
-import com.tradin.core.futuresPosition.domain.FuturesPositionQueryRepository;
+import com.tradin.core.futuresPosition.domain.repository.FuturesPositionQueryRepository;
 import com.tradin.core.strategy.domain.CoinType;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;

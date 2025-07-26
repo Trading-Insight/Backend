@@ -1,5 +1,7 @@
 package com.tradin.core.strategy.domain;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
@@ -16,6 +18,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import com.tradin.core.futuresOrder.event.dto.PositionDto;
 
 @Embeddable
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -56,5 +59,9 @@ public class Position {
 
     public boolean isShort() {
         return tradingType == TradingType.SHORT;
+    }
+
+    public PositionDto toDto() {
+        return PositionDto.from(this);
     }
 }

@@ -1,57 +1,48 @@
-package com.tradin.core.outbox.implement;
-
+package com.tradin.core.outbox.service;
 
 import static com.tradin.core.outbox.domain.OutboxMessageType.AUTO_TRADE;
 import static com.tradin.core.outbox.domain.OutboxStatus.PENDING;
-import static com.tradin.core.outbox.domain.QOutboxMessage.outboxMessage;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tradin.core.account.domain.Account;
 import com.tradin.core.common.exception.ExceptionType;
 import com.tradin.core.common.exception.TradinException;
-
-import com.tradin.core.account.domain.Account;
 import com.tradin.core.futuresOrder.event.dto.AutoTradeEventDto;
 import com.tradin.core.futuresOrder.event.dto.PositionDto;
 import com.tradin.core.outbox.domain.OutboxMessage;
-import com.tradin.core.outbox.domain.OutboxMessageType;
 import com.tradin.core.outbox.domain.repository.OutboxMessageRepository;
-import com.tradin.core.outbox.implement.dto.OutBoxMessagesEvent;
+import com.tradin.core.outbox.service.dto.OutBoxMessagesEvent;
 import com.tradin.core.strategy.domain.Strategy;
+import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionSynchronization;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 
-@Slf4j
-@Component
+@Service
 @RequiredArgsConstructor
-public class OutboxMessageProcessor {
-
+public class OutBoxMessageService {
     private final ApplicationEventPublisher applicationEventPublisher;
     private final OutboxMessageRepository outboxMessageRepository;
     private final ObjectMapper objectMapper;
     private final JdbcTemplate jdbcTemplate;
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void publishAutoTradingMessages(Strategy strategy, List<Account> accounts, PositionDto position) {
-        List<OutboxMessage> messages = new ArrayList<>();
+    public void publishAutoTradingEvents(Strategy strategy, List<Account> accounts, PositionDto position) {
+        List<OutboxMessage> events = new ArrayList<>();
 
-        //TODO
         for (Account account : accounts) {
-            OutboxMessage message = createOutboxMessage(strategy, account, position);
-            messages.add(message);
+            OutboxMessage event = createOutboxMessage(strategy, account, position);
+            events.add(event);
         }
 
-        batchInsert(messages);
+        batchInsert(events);
         publishEvent();
     }
 
@@ -60,12 +51,12 @@ public class OutboxMessageProcessor {
         applicationEventPublisher.publishEvent(new OutBoxMessagesEvent(messages));
     }
 
-    private void batchInsert(List<OutboxMessage> messages) {
+    private void batchInsert(List<OutboxMessage> events) {
         String sql = "INSERT INTO outbox_message (message_type, message_id, payload, status, error_message, created_at, updated_at) VALUES (?, ?, ?::jsonb, ?, ?, now(), now())";
 
         jdbcTemplate.batchUpdate(
             sql,
-            messages,
+            events,
             100,
             (ps, message) -> {
                 ps.setString(1, message.getMessageType().name());
@@ -77,38 +68,17 @@ public class OutboxMessageProcessor {
         );
     }
 
-    public void publishAutoTradingMessage(Strategy strategy, Account account, PositionDto position) {
-        String messageId = UUID.randomUUID().toString();
-
-        AutoTradeEventDto event = AutoTradeEventDto.of(
-            strategy.getId(),
-            account.getId(),
-            position,
-            messageId,
-            System.currentTimeMillis()
-        );
-
-        try {
-            String payload = objectMapper.writeValueAsString(event);
-            OutboxMessage outboxMessage = OutboxMessage.of(AUTO_TRADE, messageId, payload);
-
-            outboxMessageRepository.save(outboxMessage);
-        } catch (JsonProcessingException e) {
-            throw new TradinException(ExceptionType.SERIALIZATION_FAIL_EXCEPTION, e.getMessage());
-        }
+    public List<OutboxMessage> findAllPendingEvents() {
+        return outboxMessageRepository.findAllByStatus(PENDING);
     }
 
-
-    public void markAsPublished(OutboxMessage outboxMessage) {
-        outboxMessage.markAsPublished();
+    public OutboxMessage findByEventId(String eventId) {
+        return outboxMessageRepository.findByMessageId(eventId)
+            .orElseThrow(() -> new TradinException(ExceptionType.NOT_FOUND_OUTBOX_MESSAGE_EXCEPTION));
     }
 
-    public void markAsPublishingFailed(OutboxMessage outboxMessage, String errorMessage) {
-        outboxMessage.markAsPublishingFailed(errorMessage);
-    }
-
-    public void markAsProcessingFailed(OutboxMessage outboxMessage, String errorMessage) {
-        outboxMessage.markAsProcessingFailed(errorMessage);
+    public List<OutboxMessage> findByEventUuids(List<String> eventUuids) {
+        return outboxMessageRepository.findAllByMessageIdIn(eventUuids);
     }
 
     public void markAsCompleted(OutboxMessage outboxMessage) {
@@ -142,20 +112,24 @@ public class OutboxMessageProcessor {
     }
 
     private OutboxMessage createOutboxMessage(Strategy strategy, Account account, PositionDto position) {
-        String messageId = UUID.randomUUID().toString();
+        String eventId = UUID.randomUUID().toString();
         AutoTradeEventDto event = AutoTradeEventDto.of(
             strategy.getId(),
             account.getId(),
             position,
-            messageId,
+            eventId,
             System.currentTimeMillis()
         );
 
         try {
             String payload = objectMapper.writeValueAsString(event);
-            return OutboxMessage.of(AUTO_TRADE, messageId, payload);
+            return OutboxMessage.of(AUTO_TRADE, eventId, payload);
         } catch (JsonProcessingException e) {
             throw new TradinException(ExceptionType.SERIALIZATION_FAIL_EXCEPTION, e.getMessage());
         }
+    }
+
+    public void markAsProcessingFailed(OutboxMessage outboxMessage, String errorMessage) {
+        outboxMessage.markAsProcessingFailed(errorMessage);
     }
 }

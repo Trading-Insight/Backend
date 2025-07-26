@@ -1,56 +1,55 @@
 package com.tradin.core.users.service;
 
+import static com.tradin.core.common.exception.ExceptionType.NOT_FOUND_USER_EXCEPTION;
 
-import com.tradin.core.account.implement.AccountProcessor;
-import com.tradin.core.auth.service.dto.UserDataDto;
+import com.tradin.core.common.exception.TradinException;
 import com.tradin.core.users.domain.UserSocialType;
 import com.tradin.core.users.domain.Users;
-import com.tradin.core.users.implement.UsersProcessor;
-import com.tradin.core.users.implement.UsersReader;
+import com.tradin.core.users.domain.repository.UsersRepository;
 import com.tradin.core.users.service.dto.FindUserInfoResponseDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@Transactional(readOnly = true)
 @RequiredArgsConstructor
-public class UsersService {
+public class UsersService implements UserDetailsService {
 
-    private final UsersReader usersReader;
-    private final UsersProcessor usersProcessor;
-    private final AccountProcessor accountProcessor;
+    private final UsersRepository usersRepository;
 
-    public Users saveOrGetUser(UserDataDto userDataDto, UserSocialType socialType) {
-        if (isUserExist(userDataDto.getEmail())) {
-            return readUserByEmail(userDataDto);
+    public Users saveOrGetUser(String name, String sub, String email, String socialId, UserSocialType socialType) {
+        if (isUserExist(email)) {
+            return findByEmail(email);
         }
-        return createUserAndAccount(userDataDto, socialType);
+        return createUser(name, sub, email, socialId, socialType);
     }
 
     public FindUserInfoResponseDto findUserInfo(Long userId) {
-        Users user = usersReader.findById(userId);
+        Users user = findById(userId);
         return new FindUserInfoResponseDto(user.getName(), user.getEmail());
     }
 
-    private Users createUserAndAccount(UserDataDto userDataDto, UserSocialType socialType) {
-        Users user = usersProcessor.createUser(
-            userDataDto.getName(),
-            userDataDto.getSub(),
-            userDataDto.getEmail(),
-            userDataDto.getSocialId(),
-            socialType
-        );
-        accountProcessor.createAccountAndUsdtBalance(user);
-
-        return user;
+    private Users createUser(String name, String sub, String email, String socialId, UserSocialType socialType) {
+        Users user = Users.of(name, sub, email, socialId, socialType);
+        return usersRepository.save(user);
     }
 
-    private Users readUserByEmail(UserDataDto userDataDto) {
-        return usersReader.findByEmail(userDataDto.getEmail());
+    private Users findByEmail(String email) {
+        return usersRepository.findByEmail(email)
+            .orElseThrow(() -> new TradinException(NOT_FOUND_USER_EXCEPTION));
     }
 
-    private boolean isUserExist(String email) {
-        return usersReader.isUserExist(email);
+    public boolean isUserExist(String email) {
+        return usersRepository.findByEmail(email).isPresent();
+    }
+
+    public Users findById(Long id) {
+        return usersRepository.findById(id)
+            .orElseThrow(() -> new TradinException(NOT_FOUND_USER_EXCEPTION));
+    }
+
+    @Override
+    public Users loadUserByUsername(String userId) {
+        return findById(Long.valueOf(userId));
     }
 }

@@ -4,7 +4,7 @@ import com.tradin.api.auth.dto.TokenReissueRequestDto;
 import com.tradin.core.common.annotation.DisableAuthInSwagger;
 import com.tradin.api.common.response.TradinResponse;
 
-import com.tradin.core.auth.service.AuthService;
+import com.tradin.core.auth.service.AuthFacadeService;
 import com.tradin.core.auth.service.dto.TokenResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
@@ -22,34 +22,34 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(value = "/v1/auth")
 public class AuthController implements AuthApi {
 
-    private final AuthService authService;
+    private final AuthFacadeService authFacadeService;
 
     @DisableAuthInSwagger
     @GetMapping("/google")
     public TradinResponse<TokenResponseDto> auth(@RequestParam String code) {
-        return TradinResponse.success(authService.auth(code));
+        return TradinResponse.success(authFacadeService.auth(code));
     }
 
     @Operation(summary = "엑세스 토큰 재발급")
     @DisableAuthInSwagger
     @PostMapping("/token")
     public TradinResponse<TokenResponseDto> reissueToken(@Valid @RequestBody TokenReissueRequestDto request) {
-        return TradinResponse.success(authService.reissueToken(request.toServiceDto()));
+        return TradinResponse.success(authFacadeService.reissueToken(request.toServiceDto()));
     }
 
     @Operation(summary = "테스트 토큰 발급")
     @DisableAuthInSwagger
     @GetMapping("/token/{userId}")
     public TradinResponse<TokenResponseDto> issueTestToken(@PathVariable Long userId) {
-        return TradinResponse.success(authService.issueTestToken(userId));
+        return TradinResponse.success(authFacadeService.issueTestToken(userId));
     }
 
     @Operation(summary = "테스트 유저 생성")
     @DisableAuthInSwagger
-    @PostMapping("/users?count={count}")
-    public TradinResponse<TokenResponseDto> issueTestAccount(@RequestParam Long count) {
+    @PostMapping("/users")
+    public TradinResponse<Void> createTestUsers(@RequestParam Long count) {
         for (int i = 0; i < count; i++) {
-            authService.testAuth();
+            authFacadeService.createTestUsers();
         }
         return TradinResponse.success();
     }

@@ -1,6 +1,7 @@
-package com.tradin.core.futuresPosition.domain;
+package com.tradin.core.futuresPosition.domain.repository;
 
 
+import com.tradin.core.futuresPosition.domain.FuturesPosition;
 import com.tradin.core.strategy.domain.CoinType;
 import java.util.Optional;
 

@@ -1,6 +1,6 @@
 package com.tradin.api.users;
 
-import com.tradin.core.users.service.UsersService;
+import com.tradin.core.users.service.UserFacadeService;
 import com.tradin.core.users.service.dto.FindUserInfoResponseDto;
 import com.tradin.api.common.response.TradinResponse;
 
@@ -15,10 +15,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(value = "/v1/users")
 public class UsersController implements UsersApi {
 
-    private final UsersService usersService;
+    private final UserFacadeService userFacadeService;
 
     @GetMapping("/me")
     public TradinResponse<FindUserInfoResponseDto> findUserInfo(@AuthenticationPrincipal Long userId) {
-        return TradinResponse.success(usersService.findUserInfo(userId));
+        return TradinResponse.success(userFacadeService.findUserInfo(userId));
     }
 }

@@ -1,6 +1,6 @@
 package com.tradin.core.common.converter;
 
-import com.tradin.core.futuresOrder.domain.vo.Amount;
+import com.tradin.core.balance.domain.vo.Amount;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 import java.math.BigDecimal;

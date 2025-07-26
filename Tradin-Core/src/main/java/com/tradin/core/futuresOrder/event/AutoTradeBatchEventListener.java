@@ -3,25 +3,22 @@ package com.tradin.core.futuresOrder.event;
 import static com.tradin.core.common.exception.ExceptionType.DESERIALIZATION_FAIL_EXCEPTION;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.tradin.core.common.exception.TradinException;
-
 import com.tradin.core.account.domain.Account;
-import com.tradin.core.account.implement.AccountReader;
+import com.tradin.core.common.exception.TradinException;
 import com.tradin.core.futuresOrder.event.dto.AutoTradeEventDto;
-import com.tradin.core.futuresOrder.service.FuturesOrderService;
+import com.tradin.core.futuresOrder.service.FuturesOrderFacadeService;
 import com.tradin.core.outbox.domain.OutboxMessage;
 import com.tradin.core.outbox.domain.OutboxStatus;
-import com.tradin.core.outbox.implement.OutboxMessageProcessor;
-import com.tradin.core.outbox.implement.OutboxMessageReader;
+import com.tradin.core.outbox.service.OutBoxMessageFacadeService;
 import com.tradin.core.strategy.domain.Position;
 import com.tradin.core.strategy.domain.Strategy;
-import com.tradin.core.strategy.implement.StrategyReader;
+import com.tradin.core.strategy.service.StrategyFacadeService;
+import com.tradin.core.account.service.AccountFacadeService;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executor;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -29,38 +26,25 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import java.util.List;
+import java.util.concurrent.Executor;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class AutoTradeBatchEventListener {
 
-    private final FuturesOrderService futuresOrderService;
-    private final StrategyReader strategyReader;
-    private final AccountReader accountReader;
-    private final OutboxMessageReader outboxMessageReader;
-    private final OutboxMessageProcessor outboxMessageProcessor;
+    private final FuturesOrderFacadeService futuresOrderFacadeService;
+    private final StrategyFacadeService strategyFacadeService;
+    private final AccountFacadeService accountFacadeService;
+    private final OutBoxMessageFacadeService outBoxMessageFacadeService;
     private final ObjectMapper objectMapper;
-    private final KafkaTemplate<String, String> kafkaTemplate;
-    private final Executor autoTradeExecutor;
 
-    public AutoTradeBatchEventListener(
-            FuturesOrderService futuresOrderService,
-            StrategyReader strategyReader,
-            AccountReader accountReader,
-            OutboxMessageReader outboxMessageReader,
-            OutboxMessageProcessor outboxMessageProcessor,
-            ObjectMapper objectMapper,
-            KafkaTemplate<String, String> kafkaTemplate,
-            @Qualifier("autoTradeExecutor") Executor autoTradeExecutor) {
-        this.futuresOrderService = futuresOrderService;
-        this.strategyReader = strategyReader;
-        this.accountReader = accountReader;
-        this.outboxMessageReader = outboxMessageReader;
-        this.outboxMessageProcessor = outboxMessageProcessor;
-        this.objectMapper = objectMapper;
-        this.kafkaTemplate = kafkaTemplate;
-        this.autoTradeExecutor = autoTradeExecutor;
-    }
+    private final KafkaTemplate<String, String> kafkaTemplate;
+
+
+    @Qualifier("autoTradeExecutor")
+    private final Executor autoTradeExecutor;
 
     @KafkaListener(
         topics = "auto-trade-topic",
@@ -73,14 +57,11 @@ public class AutoTradeBatchEventListener {
         if (records.isEmpty()) {
             return;
         }
-        try {
-            List<AutoTradeEventDto> autoTradeEventDtos = parseEvents(records);
-            List<OutboxMessage> outboxMessages = findNonDuplicatedMessages(autoTradeEventDtos);
-            autoTradeEventDtos = collectAutoTradeEvents(autoTradeEventDtos, outboxMessages);
-            handleBatchEvents(autoTradeEventDtos, outboxMessages);
-        } catch (Exception e) {
-            log.error("자동매매 이벤트 처리 실패: error={}", e.getMessage(), e);
-        }
+
+        List<AutoTradeEventDto> autoTradeEventDtos = parseEvents(records);
+        List<OutboxMessage> OutboxMessages = findNonDuplicatedEvents(autoTradeEventDtos);
+        autoTradeEventDtos = collectAutoTradeEvents(autoTradeEventDtos, OutboxMessages);
+        handleBatchEvents(autoTradeEventDtos, OutboxMessages);
     }
 
     private List<AutoTradeEventDto> parseEvents(List<ConsumerRecord<String, String>> records) {
@@ -99,31 +80,31 @@ public class AutoTradeBatchEventListener {
             .toList();
     }
 
-    private void handleBatchEvents(List<AutoTradeEventDto> autoTradeEventDtos, List<OutboxMessage> outboxMessages) {
-        List<Strategy> strategies = strategyReader.findStrategiesByIds(collectStrategyIds(autoTradeEventDtos));
-        List<Account> accounts = accountReader.findAccountsByIds(collectAccountIds(autoTradeEventDtos));
+    private void handleBatchEvents(List<AutoTradeEventDto> autoTradeEventDtos, List<OutboxMessage> OutboxMessages) {
+        List<Strategy> strategies = strategyFacadeService.findStrategiesByIds(collectStrategyIds(autoTradeEventDtos));
+        List<Account> accounts = accountFacadeService.findAccountsByIds(collectAccountIds(autoTradeEventDtos));
 
         List<AutoTradeEventDto> successEvents = Collections.synchronizedList(new ArrayList<>());
 
         CompletableFuture
             .allOf(
-                submitAutoTradeTasks(autoTradeEventDtos, strategies, accounts, successEvents, outboxMessages)
+                submitAutoTradeTasks(autoTradeEventDtos, strategies, accounts, successEvents, OutboxMessages)
                     .toArray(CompletableFuture[]::new)
             )
             .join();
 
         if (!successEvents.isEmpty()) {
-            List<Long> ids = getSuccessedOutboxMessageIds(outboxMessages, successEvents);
-            outboxMessageProcessor.markAllAsCompleted(ids);
+            List<Long> ids = getSuccessedOutboxMessageIds(OutboxMessages, successEvents);
+            outBoxMessageFacadeService.markAllAsCompleted(ids);
         }
     }
 
-    private List<CompletableFuture<Void>> submitAutoTradeTasks(List<AutoTradeEventDto> autoTradeEventDtos, List<Strategy> strategies, List<Account> accounts, List<AutoTradeEventDto> successEvents, List<OutboxMessage> outboxMessages) {
+    private List<CompletableFuture<Void>> submitAutoTradeTasks(List<AutoTradeEventDto> autoTradeEventDtos, List<Strategy> strategies, List<Account> accounts, List<AutoTradeEventDto> successEvents, List<OutboxMessage> OutboxMessages) {
         List<CompletableFuture<Void>> futures = new ArrayList<>();
         for (AutoTradeEventDto dto : autoTradeEventDtos) {
             CompletableFuture<Void> future = CompletableFuture.runAsync(
                 () -> {
-                    boolean success = executeAutoTrade(dto, strategies, accounts, outboxMessages);
+                    boolean success = executeAutoTrade(dto, strategies, accounts, OutboxMessages);
                     if (success) {
                         synchronized (successEvents) {
                             successEvents.add(dto);
@@ -136,27 +117,27 @@ public class AutoTradeBatchEventListener {
         return futures;
     }
 
-    private boolean executeAutoTrade(AutoTradeEventDto dto, List<Strategy> strategies, List<Account> accounts, List<OutboxMessage> outboxMessages) {
+    private boolean executeAutoTrade(AutoTradeEventDto dto, List<Strategy> strategies, List<Account> accounts, List<OutboxMessage> OutboxMessages) {
         try {
             Strategy strategy = getMatchedStrategy(strategies, dto);
             Account account = getMatchedAccount(accounts, dto);
             Position position = getMatchedPosition(List.of(dto), dto);
 
-            futuresOrderService.autoTrade(strategy, account, position);
+            futuresOrderFacadeService.autoTrade(strategy, account, position);
 
             return true;
         } catch (Exception e) {
             log.error("이벤트 처리 실패: eventId={}, error={}", dto.getEventId(), e.getMessage(), e);
-
-            publishToRetryTopic(dto);
+            OutboxMessage OutboxMessage = getMatchedOutboxMessage(dto, OutboxMessages);
+            publishToRetryTopic(OutboxMessage);
             return false;
         }
     }
 
-    private static List<AutoTradeEventDto> collectAutoTradeEvents(List<AutoTradeEventDto> autoTradeEventDtos, List<OutboxMessage> outboxMessages) {
+    private static List<AutoTradeEventDto> collectAutoTradeEvents(List<AutoTradeEventDto> autoTradeEventDtos, List<OutboxMessage> OutboxMessages) {
         return autoTradeEventDtos.stream()
-            .filter(event -> outboxMessages.stream()
-                .anyMatch(outboxMessage -> outboxMessage.getMessageId().equals(event.getEventId())))
+            .filter(event -> OutboxMessages.stream()
+                .anyMatch(OutboxMessage -> OutboxMessage.getMessageId().equals(event.getEventId())))
             .collect(Collectors.toList());
     }
 
@@ -164,16 +145,16 @@ public class AutoTradeBatchEventListener {
         return events.stream().map(AutoTradeEventDto::getAccountId).collect(Collectors.toList());
     }
 
-    private List<String> collectMessageIds(List<AutoTradeEventDto> events) {
+    private List<String> collectEventUuids(List<AutoTradeEventDto> events) {
         return events.stream()
             .map(AutoTradeEventDto::getEventId)
             .collect(Collectors.toList());
     }
 
-    private static List<Long> getSuccessedOutboxMessageIds(List<OutboxMessage> outboxMessages, List<AutoTradeEventDto> successEvents) {
-        return outboxMessages.stream()
-            .filter(message -> successEvents.stream()
-                .anyMatch(successEvent -> successEvent.getEventId().equals(message.getMessageId())))
+    private static List<Long> getSuccessedOutboxMessageIds(List<OutboxMessage> OutboxMessages, List<AutoTradeEventDto> successEvents) {
+        return OutboxMessages.stream()
+            .filter(event -> successEvents.stream()
+                .anyMatch(successEvent -> successEvent.getEventId().equals(event.getMessageId())))
             .map(OutboxMessage::getId)
             .collect(Collectors.toList());
     }
@@ -209,28 +190,28 @@ public class AutoTradeBatchEventListener {
                 DESERIALIZATION_FAIL_EXCEPTION));
     }
 
-    private static OutboxMessage getMatchedOutBoxMessage(AutoTradeEventDto dto, List<OutboxMessage> outboxMessages) {
-        return outboxMessages.stream()
-            .filter(message -> message.getMessageId().equals(dto.getEventId()))
+    private static OutboxMessage getMatchedOutboxMessage(AutoTradeEventDto dto, List<OutboxMessage> OutboxMessages) {
+        return OutboxMessages.stream()
+            .filter(event -> event.getMessageId().equals(dto.getEventId()))
             .findFirst()
             .orElseThrow(() -> new TradinException(DESERIALIZATION_FAIL_EXCEPTION));
     }
 
-    private void publishToRetryTopic(AutoTradeEventDto autoTradeEventDto) {
+    private void publishToRetryTopic(OutboxMessage OutboxMessage) {
         String retryTopic = "auto-trade-retry-topic";
         try {
-            String message = objectMapper.writeValueAsString(autoTradeEventDto);
+            String message = objectMapper.writeValueAsString(OutboxMessage);
             kafkaTemplate.send(retryTopic, message);
         } catch (Exception e) {
-            log.error("재처리 토픽 전송 실패: messageId={}, topic={}, error={}", autoTradeEventDto.getEventId(), retryTopic, e.getMessage(), e);
+            log.error("재처리 토픽 전송 실패: eventId={}, topic={}, error={}", OutboxMessage.getMessageId(), retryTopic, e.getMessage(), e);
         }
     }
 
-    private List<OutboxMessage> findNonDuplicatedMessages(List<AutoTradeEventDto> autoTradeEventDtos) {
-        List<OutboxMessage> outboxMessages = outboxMessageReader.findByMessageIds(collectMessageIds(autoTradeEventDtos));
+    private List<OutboxMessage> findNonDuplicatedEvents(List<AutoTradeEventDto> autoTradeEventDtos) {
+        List<OutboxMessage> outboxMessages = outBoxMessageFacadeService.findByEventUuids(collectEventUuids(autoTradeEventDtos));
 
         return outboxMessages.stream()
-            .filter(message -> message.getStatus() == OutboxStatus.PUBLISHED)
+            .filter(event -> event.getStatus() != OutboxStatus.COMPLETED)
             .collect(Collectors.toList());
     }
 }

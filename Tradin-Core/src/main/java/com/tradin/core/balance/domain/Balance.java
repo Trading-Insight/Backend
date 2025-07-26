@@ -1,10 +1,10 @@
 package com.tradin.core.balance.domain;
 
-import com.tradin.core.common.jpa.AuditTime;
 import com.tradin.core.account.domain.Account;
+import com.tradin.core.balance.domain.vo.Amount;
+import com.tradin.core.common.converter.AmountConverter;
+import com.tradin.core.common.jpa.AuditTime;
 import com.tradin.core.strategy.domain.CoinType;
-import com.tradin.core.balance.domain.vo.Money;
-import com.tradin.core.common.converter.MoneyConverter;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
@@ -17,16 +17,15 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Getter
 @Entity
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"account_id", "coin_type"}))
+@Table(name = "balance")
 public class Balance extends AuditTime {
 
     @Id
@@ -37,23 +36,22 @@ public class Balance extends AuditTime {
     @Enumerated(EnumType.STRING)
     private CoinType coinType;
 
-    @Convert(converter = MoneyConverter.class)
-    @Column(nullable = false, precision = 20, scale = 4)
-    private Money amount;
+    @Convert(converter = AmountConverter.class)
+    @Column(nullable = false, precision = 20, scale = 2)
+    private Amount amount;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "account_id", nullable = false)
     private Account account;
 
     @Builder
-    public Balance(CoinType coinType, Money amount, Account account) {
-
+    public Balance(CoinType coinType, Amount amount, Account account) {
         this.coinType = coinType;
         this.amount = amount;
         this.account = account;
     }
 
-    public static Balance of(CoinType coinType, Money amount, Account account) {
+    public static Balance of(CoinType coinType, Amount amount, Account account) {
         return Balance.builder()
             .coinType(coinType)
             .amount(amount)
@@ -61,11 +59,11 @@ public class Balance extends AuditTime {
             .build();
     }
 
-    public void setAccount(Account account) {
-        this.account = account;
+    public void updateAmount(Amount amount) {
+        this.amount = amount;
     }
 
-    public void updateAmount(Money amount) {
-        this.amount = this.amount.add(amount);
+    public Amount getAmount() {
+        return this.amount;
     }
 }

@@ -1,6 +1,6 @@
 package com.tradin.api.account;
 
-import com.tradin.core.account.service.AccountService;
+import com.tradin.core.account.service.AccountFacadeService;
 import com.tradin.core.account.service.dto.AccountsResponseDto;
 import com.tradin.api.common.response.TradinResponse;
 
@@ -17,21 +17,21 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(value = "/v1/accounts")
 public class AccountController implements AccountApi {
 
-    private final AccountService accountService;
+    private final AccountFacadeService accountFacadeService;
 
     @PostMapping("")
     public TradinResponse<String> createAccount(@AuthenticationPrincipal Long userId) {
-        accountService.createAccount(userId);
+        accountFacadeService.createAccount(userId);
         return TradinResponse.success();
     }
 
     @GetMapping()
     public TradinResponse<AccountsResponseDto> getAccounts(@AuthenticationPrincipal Long userId) {
-        return TradinResponse.success(accountService.getAccounts(userId));
+        return TradinResponse.success(accountFacadeService.getAccounts(userId));
     }
 
     @PostMapping("/{accountId}/faucet")
     public void faucet(@AuthenticationPrincipal Long userId, @PathVariable Long accountId) {
-        accountService.faucet(userId, accountId);
+        accountFacadeService.faucet(userId, accountId);
     }
 }

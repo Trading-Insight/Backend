@@ -1,5 +1,7 @@
 package com.tradin.core.price.domain.vo;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Objects;
@@ -15,7 +17,27 @@ public class Price {
         return new Price(value);
     }
 
+    @JsonCreator
+    public static Price from(BigDecimal value) {
+        return of(value);
+    }
+
+    @JsonCreator
+    public static Price from(String value) {
+        return of(new BigDecimal(value));
+    }
+
+    @JsonCreator
+    public static Price from(Number value) {
+        return of(new BigDecimal(value.toString()));
+    }
+
     public BigDecimal getValue() {
+        return value;
+    }
+
+    @JsonValue
+    public BigDecimal toJsonValue() {
         return value;
     }
 

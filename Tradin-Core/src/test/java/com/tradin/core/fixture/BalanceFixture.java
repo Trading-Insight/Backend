@@ -2,7 +2,7 @@ package com.tradin.core.fixture;
 
 import com.tradin.core.account.domain.Account;
 import com.tradin.core.balance.domain.Balance;
-import com.tradin.core.balance.domain.vo.Money;
+import com.tradin.core.balance.domain.vo.Amount;
 import com.tradin.core.strategy.domain.CoinType;
 import java.math.BigDecimal;
 
@@ -14,7 +14,7 @@ public class BalanceFixture {
     public static Balance createDefaultBalance() {
         return Balance.of(
             CoinType.USDT,
-            Money.of(new BigDecimal("10000.0000")),
+            Amount.of(new BigDecimal("10000.0000")),
             AccountFixture.createDefaultAccount()
         );
     }
@@ -22,7 +22,7 @@ public class BalanceFixture {
     /**
      * 커스텀 Balance 생성
      */
-    public static Balance createBalance(Account account, CoinType coinType, Money amount) {
+    public static Balance createBalance(Account account, CoinType coinType, Amount amount) {
         return Balance.builder()
             .account(account)
             .coinType(coinType)
@@ -37,7 +37,7 @@ public class BalanceFixture {
         return Balance.builder()
             .account(account)
             .coinType(CoinType.BTC)
-            .amount(Money.of(new BigDecimal(amount)))
+            .amount(Amount.of(new BigDecimal(amount)))
             .build();
     }
 
@@ -48,7 +48,7 @@ public class BalanceFixture {
         return Balance.builder()
             .account(account)
             .coinType(CoinType.USDT)
-            .amount(Money.of(new BigDecimal(amount)))
+            .amount(Amount.of(new BigDecimal(amount)))
             .build();
     }
 
@@ -59,7 +59,7 @@ public class BalanceFixture {
         return Balance.builder()
             .account(account)
             .coinType(CoinType.ETH)
-            .amount(Money.of(new BigDecimal(amount)))
+            .amount(Amount.of(new BigDecimal(amount)))
             .build();
     }
 
@@ -70,7 +70,7 @@ public class BalanceFixture {
         return Balance.builder()
             .account(account)
             .coinType(coinType)
-            .amount(Money.of(BigDecimal.ZERO))
+            .amount(Amount.of(BigDecimal.ZERO))
             .build();
     }
 }

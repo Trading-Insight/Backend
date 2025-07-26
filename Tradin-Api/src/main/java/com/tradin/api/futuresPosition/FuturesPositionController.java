@@ -1,7 +1,6 @@
 package com.tradin.api.futuresPosition;
 
-
-import com.tradin.core.futuresPosition.service.FuturesPositionService;
+import com.tradin.core.futuresPosition.service.FuturesPositionFacadeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -11,5 +10,5 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/v1/futures/positions")
 public class FuturesPositionController {
 
-    private final FuturesPositionService futuresPositionService;
+    private final FuturesPositionFacadeService futuresPositionFacadeService;
 }

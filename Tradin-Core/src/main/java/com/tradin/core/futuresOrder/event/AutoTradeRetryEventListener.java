@@ -3,19 +3,16 @@ package com.tradin.core.futuresOrder.event;
 import static com.tradin.core.common.exception.ExceptionType.DESERIALIZATION_FAIL_EXCEPTION;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.tradin.core.common.exception.TradinException;
-
 import com.tradin.core.account.domain.Account;
-import com.tradin.core.account.implement.AccountReader;
+import com.tradin.core.account.service.AccountFacadeService;
+import com.tradin.core.common.exception.TradinException;
 import com.tradin.core.futuresOrder.event.dto.AutoTradeEventDto;
 import com.tradin.core.futuresOrder.event.dto.PositionDto;
-import com.tradin.core.futuresOrder.implement.FuturesOrderProcessor;
-import com.tradin.core.futuresOrder.service.FuturesOrderService;
+import com.tradin.core.futuresOrder.service.FuturesOrderFacadeService;
 import com.tradin.core.outbox.domain.OutboxMessage;
-import com.tradin.core.outbox.implement.OutboxMessageProcessor;
-import com.tradin.core.outbox.implement.OutboxMessageReader;
+import com.tradin.core.outbox.service.OutBoxMessageFacadeService;
 import com.tradin.core.strategy.domain.Strategy;
-import com.tradin.core.strategy.implement.StrategyReader;
+import com.tradin.core.strategy.service.StrategyFacadeService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.DltHandler;
@@ -26,17 +23,16 @@ import org.springframework.retry.annotation.Backoff;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class AutoTradeRetryEventListener {
-
-    private final FuturesOrderProcessor futuresOrderProcessor;
-    private final StrategyReader strategyReader;
-    private final AccountReader accountReader;
-    private final OutboxMessageReader outboxMessageReader;
-    private final OutboxMessageProcessor outboxMessageProcessor;
-    private final FuturesOrderService futuresOrderService;
+    private final FuturesOrderFacadeService futuresOrderFacadeService;
+    private final StrategyFacadeService strategyFacadeService;
+    private final OutBoxMessageFacadeService outBoxMessageFacadeService;
+    private final AccountFacadeService accountFacadeService;
+    
     private final ObjectMapper objectMapper;
 
     @RetryableTopic(
@@ -59,13 +55,13 @@ public class AutoTradeRetryEventListener {
             throw new TradinException(DESERIALIZATION_FAIL_EXCEPTION, e.getMessage());
         }
 
-        OutboxMessage outboxMessage = outboxMessageReader.findByMessageId(event.getEventId());
-        Strategy strategy = strategyReader.findStrategyById(event.getStrategyId());
-        Account account = accountReader.findAccountById(event.getAccountId());
+        OutboxMessage outboxMessage = outBoxMessageFacadeService.findByEventId(event.getEventId());
+        Strategy strategy = strategyFacadeService.findStrategyById(event.getStrategyId());
+        Account account = accountFacadeService.findById(event.getAccountId());
         PositionDto positionDto = event.getPosition();
 
-        futuresOrderService.autoTrade(strategy, account, positionDto.toPosition());
-        outboxMessageProcessor.markAsCompleted(outboxMessage);
+        futuresOrderFacadeService.autoTrade(strategy, account, positionDto.toPosition());
+        outBoxMessageFacadeService.markAsCompleted(outboxMessage);
     }
 
     @DltHandler
@@ -77,7 +73,7 @@ public class AutoTradeRetryEventListener {
             throw new TradinException(DESERIALIZATION_FAIL_EXCEPTION, e.getMessage());
         }
 
-        OutboxMessage outboxMessage = outboxMessageReader.findByMessageId(event.getEventId());
-        outboxMessageProcessor.markAsProcessingFailed(outboxMessage, exception.getMessage());
+        OutboxMessage outboxMessage = outBoxMessageFacadeService.findByEventId(event.getEventId());
+        outBoxMessageFacadeService.markAsProcessingFailed(outboxMessage, exception.getMessage());
     }
 } 

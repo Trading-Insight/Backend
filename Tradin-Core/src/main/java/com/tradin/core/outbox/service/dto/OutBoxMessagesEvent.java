@@ -1,8 +1,7 @@
-package com.tradin.core.outbox.implement.dto;
+package com.tradin.core.outbox.service.dto;
 
 import com.tradin.core.outbox.domain.OutboxMessage;
 import java.util.List;
-import lombok.Getter;
 
 public record OutBoxMessagesEvent (
     List<OutboxMessage> outboxMessages

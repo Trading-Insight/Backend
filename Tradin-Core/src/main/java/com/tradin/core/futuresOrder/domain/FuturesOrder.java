@@ -1,11 +1,11 @@
 package com.tradin.core.futuresOrder.domain;
 
 import com.tradin.core.account.domain.Account;
+import com.tradin.core.balance.domain.vo.Amount;
 import com.tradin.core.common.jpa.AuditTime;
 
 import com.tradin.core.strategy.domain.Strategy;
 import com.tradin.core.strategy.domain.TradingType;
-import com.tradin.core.futuresOrder.domain.vo.Amount;
 import com.tradin.core.futuresOrder.domain.vo.Margin;
 import com.tradin.core.price.domain.vo.Price;
 import com.tradin.core.common.converter.AmountConverter;
@@ -47,14 +47,14 @@ public class FuturesOrder extends AuditTime {
     private Price price;
 
     @Convert(converter = AmountConverter.class)
-    @Column(nullable = false, precision = 20, scale = 4)
+    @Column(nullable = false, precision = 20, scale = 2)
     private Amount amount;
 
     @Column(nullable = false)
     private Integer leverage;
 
     @Convert(converter = MarginConverter.class)
-    @Column(nullable = false, precision = 20, scale = 4)
+    @Column(nullable = false, precision = 20, scale = 2)
     private Margin margin;
 
     @Enumerated(EnumType.STRING)

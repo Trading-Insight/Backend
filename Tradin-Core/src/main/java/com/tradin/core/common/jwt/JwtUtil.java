@@ -9,21 +9,27 @@ import static com.tradin.core.common.exception.ExceptionType.NOT_FOUND_JWT_USERI
 import static com.tradin.core.common.exception.ExceptionType.NOT_FOUND_REFRESH_TOKEN_EXCEPTION;
 import static com.tradin.core.common.exception.ExceptionType.UNSUPPORTED_JWT_TOKEN_EXCEPTION;
 
+import com.tradin.core.common.exception.ExceptionType;
 import com.tradin.core.common.exception.TradinException;
-
 import com.tradin.core.users.domain.Users;
-import com.tradin.core.users.implement.UsersReader;
+import com.tradin.core.users.service.UsersService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.UnsupportedJwtException;
+import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
+
+import javax.crypto.SecretKey;
+import java.util.Date;
 
 @Slf4j
 @Component
@@ -31,7 +37,7 @@ import org.springframework.stereotype.Component;
 public class JwtUtil {
 
     private final JwtSecretKeyProvider jwtSecretKeyProvider;
-    private final UsersReader usersReader;
+    private final UsersService usersService;
     private final RedisTemplate<String, Object> redisTemplate;
 
     public Long validateTokensAndGetUserId(String accessToken, String refreshToken) {
@@ -100,7 +106,7 @@ public class JwtUtil {
     }
 
     public Authentication getAuthentication(Long userId) {
-        Users user = usersReader.loadUserByUsername(String.valueOf(userId));
+        Users user = usersService.loadUserByUsername(String.valueOf(userId));
         return new UsernamePasswordAuthenticationToken(user.getId(), null, user.getAuthorities());
     }
 }

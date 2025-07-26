@@ -1,11 +1,11 @@
 package com.tradin.core.fixture;
 
 import com.tradin.core.account.domain.Account;
+import com.tradin.core.balance.domain.vo.Amount;
 import com.tradin.core.futuresOrder.domain.FuturesOrder;
 import com.tradin.core.futuresOrder.domain.OrderStatus;
 import com.tradin.core.strategy.domain.Strategy;
 import com.tradin.core.strategy.domain.TradingType;
-import com.tradin.core.futuresOrder.domain.vo.Amount;
 import com.tradin.core.price.domain.vo.Price;
 import java.math.BigDecimal;
 

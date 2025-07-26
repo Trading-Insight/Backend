@@ -1,70 +1,54 @@
 package com.tradin.core.account.service;
 
-
+import static com.tradin.core.common.exception.ExceptionType.NOT_FOUND_ACCOUNT_EXCEPTION;
 
 import com.tradin.core.account.domain.Account;
-import com.tradin.core.account.implement.AccountProcessor;
-import com.tradin.core.account.implement.AccountReader;
+import com.tradin.core.account.domain.repository.AccountRepository;
 import com.tradin.core.account.service.dto.AccountDto;
 import com.tradin.core.account.service.dto.AccountsResponseDto;
-import com.tradin.core.balance.domain.Balance;
-import com.tradin.core.balance.implement.BalanceProcessor;
-import com.tradin.core.balance.implement.BalanceReader;
-import com.tradin.core.strategy.domain.CoinType;
+import com.tradin.core.common.exception.TradinException;
 import com.tradin.core.users.domain.Users;
-import com.tradin.core.users.implement.UsersReader;
-import java.math.BigDecimal;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import com.tradin.core.balance.domain.vo.Money;
 
 @Service
-@Transactional(readOnly = true)
 @Slf4j
 @RequiredArgsConstructor
 public class AccountService {
 
-    private final AccountReader accountReader;
-    private final UsersReader usersReader;
-    private final BalanceReader balanceReader;
-    private final AccountProcessor accountProcessor;
-    private final BalanceProcessor balanceProcessor;
+    private final AccountRepository accountRepository;
 
-
-    @Transactional
-    public void createAccount(Long userId) {
-        createAccountByUserId(userId);
+    public Account createAccount(Users user) {
+        Account account = createAccountEntity(user);
+        return accountRepository.save(account);
     }
 
     public AccountsResponseDto getAccounts(Long userId) {
-        return readAccountsByUserId(userId);
-    }
-
-    @Transactional
-    public void faucet(Long userId, Long accountId) {
-        Account account = accountReader.findAccountByIdAndUserId(accountId, userId);
-        Balance usdtBalance = balanceReader.findByAccountIdAndCoinType(account.getId(), CoinType.USDT);
-        balanceProcessor.updateBalance(usdtBalance, Money.of(BigDecimal.valueOf(10000)));
-    }
-
-    private AccountsResponseDto readAccountsByUserId(Long userId) {
-        List<AccountDto> accounts = accountReader.findAccountDtosByUserId(userId);
+        List<AccountDto> accounts = accountRepository.findAccountDtosByUserId(userId);
         return AccountsResponseDto.of(accounts);
     }
 
-    private void createAccountByUserId(Long userId) {
-        Users user = readUserById(userId);
-        createAccount(user);
+    public Account findAccountByIdAndUserId(Long accountId, Long userId) {
+        return accountRepository.findByIdAndUserId(accountId, userId)
+            .orElseThrow(() -> new TradinException(NOT_FOUND_ACCOUNT_EXCEPTION));
     }
 
-    private void createAccount(Users user) {
-        accountProcessor.createAccountAndUsdtBalance(user);
+    public List<Account> findAccountsByIds(List<Long> ids) {
+        return accountRepository.findAllById(ids);
     }
 
-    private Users readUserById(Long userId) {
-        return usersReader.findById(userId);
+    public List<Account> findAll() {
+        return accountRepository.findAll();
+    }
+
+    private Account createAccountEntity(Users user) {
+        return Account.of(user);
+    }
+
+    public Account findById(Long accountId) {
+        return accountRepository.findById(accountId)
+            .orElseThrow(() -> new TradinException(NOT_FOUND_ACCOUNT_EXCEPTION));
     }
 }

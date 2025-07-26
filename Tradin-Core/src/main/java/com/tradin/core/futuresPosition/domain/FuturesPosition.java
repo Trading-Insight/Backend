@@ -1,11 +1,11 @@
 package com.tradin.core.futuresPosition.domain;
 
+import com.tradin.core.balance.domain.vo.Amount;
 import com.tradin.core.common.jpa.AuditTime;
 
 import com.tradin.core.account.domain.Account;
 import com.tradin.core.strategy.domain.CoinType;
 import com.tradin.core.strategy.domain.TradingType;
-import com.tradin.core.futuresOrder.domain.vo.Amount;
 import com.tradin.core.common.converter.AmountConverter;
 import com.tradin.core.futuresOrder.domain.vo.Margin;
 import com.tradin.core.common.converter.MarginConverter;
@@ -58,14 +58,14 @@ public class FuturesPosition extends AuditTime {
     private Price liquidationPrice;
 
     @Convert(converter = AmountConverter.class)
-    @Column(nullable = false, precision = 20, scale = 4)
+    @Column(nullable = false, precision = 20, scale = 2)
     private Amount amount;
 
     @Column(nullable = false)
     private Integer leverage;
 
     @Convert(converter = MarginConverter.class)
-    @Column(nullable = false, precision = 20, scale = 4)
+    @Column(nullable = false, precision = 20, scale = 2)
     private Margin margin;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -100,10 +100,6 @@ public class FuturesPosition extends AuditTime {
             .amount(amount)
             .account(account)
             .build();
-    }
-
-    public void setAccount(Account account) {
-        this.account = account;
     }
 
     public boolean isPositionLong() {

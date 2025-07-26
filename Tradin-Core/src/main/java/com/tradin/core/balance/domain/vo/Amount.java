@@ -1,4 +1,4 @@
-package com.tradin.core.futuresOrder.domain.vo;
+package com.tradin.core.balance.domain.vo;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
