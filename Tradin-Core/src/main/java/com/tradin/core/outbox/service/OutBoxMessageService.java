@@ -33,16 +33,15 @@ public class OutBoxMessageService {
     private final ObjectMapper objectMapper;
     private final JdbcTemplate jdbcTemplate;
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void publishAutoTradingEvents(Strategy strategy, List<Account> accounts, PositionDto position) {
-        List<OutboxMessage> events = new ArrayList<>();
+    public void publishAutoTradingMessages(Strategy strategy, List<Account> accounts, PositionDto position) {
+        List<OutboxMessage> messages = new ArrayList<>();
 
         for (Account account : accounts) {
             OutboxMessage event = createOutboxMessage(strategy, account, position);
-            events.add(event);
+            messages.add(event);
         }
 
-        batchInsert(events);
+        batchInsert(messages);
         publishEvent();
     }
 

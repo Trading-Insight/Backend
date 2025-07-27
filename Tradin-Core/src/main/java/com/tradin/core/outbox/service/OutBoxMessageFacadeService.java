@@ -1,9 +1,6 @@
 package com.tradin.core.outbox.service;
 
-import com.tradin.core.account.domain.Account;
-import com.tradin.core.futuresOrder.event.dto.PositionDto;
 import com.tradin.core.outbox.domain.OutboxMessage;
-import com.tradin.core.strategy.domain.Strategy;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,11 +11,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class OutBoxMessageFacadeService {
     private final OutBoxMessageService outBoxMessageService;
-
-    @Transactional(propagation = org.springframework.transaction.annotation.Propagation.REQUIRES_NEW)
-    public void publishAutoTradingEvents(Strategy strategy, List<Account> accounts, PositionDto position) {
-        outBoxMessageService.publishAutoTradingEvents(strategy, accounts, position);
-    }
 
     @Transactional(readOnly = true)
     public List<OutboxMessage> findAllPendingEvents() {

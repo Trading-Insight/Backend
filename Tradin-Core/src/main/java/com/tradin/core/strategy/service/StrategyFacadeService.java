@@ -10,11 +10,9 @@ import com.tradin.core.strategy.domain.Position;
 import com.tradin.core.account.domain.Account;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.tradin.core.futuresOrder.event.dto.AutoTradeEventDto;
-import com.tradin.core.account.service.AccountService;
-import com.tradin.core.futuresOrder.service.FuturesOrderFacadeService;
 
 @Service
 @RequiredArgsConstructor
@@ -35,30 +33,27 @@ public class StrategyFacadeService {
     }
 
     @Transactional
-    public void createStrategy() {
+    public void createTestStrategy() {
         strategyService.createStrategy();
     }
 
     @Transactional
-    public void handleFutureWebHook(WebHookDto request) {
+    public void updateStrategyAndHistoryMetaData(WebHookDto request) {
         // 1. 전략 검증 및 업데이트
-        strategyService.handleFutureWebHook(request);
+        Strategy strategy = strategyService.updateStrategyStatistics(request);
         
-        // 2. 기존 거래내역에 종료 거래 업데이트
-        Strategy strategy = strategyService.findStrategyById(request.getId());
+        // 2. 종료 거래 업데이트 & 신규 거래내역 생성
         Position position = request.getPosition();
-        historyService.closeOpenHistory(strategy.getId(), position);
-        
-        // 3. 거래내역 생성
-        historyService.createHistory(strategy, position);
-        
-        // 4. 구독 계좌 자동매매
-        autoTrading(strategy, position);
+        historyService.closeAndCreateHistory(strategy, position);
     }
 
-    private void autoTrading(Strategy strategy, Position position) {
+    @Async("autoTradeExecutor")
+    public void publishAutoTradingMessages(WebHookDto request) {
+        Strategy strategy = strategyService.findStrategyById(request.getId());
+        Position position = request.getPosition();
+
         List<Account> accounts = subscriptionService.findSubscribedAccountsByStrategyId(strategy.getId());
-        outBoxMessageService.publishAutoTradingEvents(strategy, accounts, position.toDto());
+        outBoxMessageService.publishAutoTradingMessages(strategy, accounts, position.toDto());
     }
 
     @Transactional(readOnly = true)

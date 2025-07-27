@@ -22,6 +22,8 @@ import com.tradin.core.price.domain.vo.Price;
 import com.tradin.core.strategy.service.dto.FindStrategiesInfoResponseDto;
 import com.tradin.core.strategy.service.dto.WebHookDto;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -73,12 +75,14 @@ public class StrategyService {
         return FindStrategiesInfoResponseDto.of(strategiesInfo);
     }
 
-    public void handleFutureWebHook(WebHookDto request) {
+    public Strategy updateStrategyStatistics(WebHookDto request) {
         Strategy strategy = findStrategyById(request.getId());
         Position position = request.getPosition();
 
-        validateSamePosition(strategy, position);
-        updateStrategy(strategy, position);
+        validateIsSamePosition(strategy, position);
+        updateStatistics(strategy, position);
+
+        return strategy;
     }
 
     public Strategy findStrategyById(Long id) {
@@ -94,14 +98,104 @@ public class StrategyService {
         findStrategyById(id);
     }
 
-    private void validateSamePosition(Strategy strategy, Position position) {
+    public StrategyInfoDao findStrategyInfoById(Long id) {
+        return strategyRepository.findStrategyInfoDaoById(id)
+            .orElseThrow(() -> new TradinException(ExceptionType.NOT_FOUND_STRATEGY_EXCEPTION));
+    }
+
+    private void validateIsSamePosition(Strategy strategy, Position position) {
         if (strategy.getCurrentPosition().getTradingType() == position.getTradingType()) {
             throw new TradinException(SAME_POSITION_REQUEST_EXCEPTION);
         }
     }
 
-    private void updateStrategy(Strategy strategy, Position strategyPosition) {
-        strategy.updateRateAndCount(strategyPosition.getPrice(), strategyPosition.getTime());
-        strategy.updateCurrentPosition(strategyPosition);
+    private void updateStatistics(Strategy strategy, Position newPosition) {
+        // 수익률 계산
+        ProfitRate profitRate = calculateProfitRate(strategy, newPosition);
+        
+        // 승패 판정
+        boolean isWin = isWin(profitRate);
+        
+        // 기본 통계 업데이트
+        if (isWin) {
+            strategy.increaseWinCount();
+            strategy.updateTotalProfitRate(profitRate);
+        } else {
+            strategy.increaseLossCount();
+            strategy.updateTotalLossRate(profitRate);
+        }
+        
+        // 평균 보유 기간 업데이트
+        updateAverageHoldingPeriod(strategy, newPosition);
+        
+        // 총 거래 횟수 증가
+        strategy.increaseTotalTradeCount();
+        
+        // 수익 팩터 업데이트
+        updateProfitFactor(strategy);
+        
+        // 기타 통계 업데이트
+        strategy.updateWinRate();
+        strategy.updateSimpleProfitRate();
+        strategy.updateCompoundProfitRate(profitRate);
+        strategy.updateAverageProfitRate();
+        
+        // 최종 포지션 업데이트
+        strategy.updateCurrentPosition(newPosition);
+    }
+
+    private ProfitRate calculateProfitRate(Strategy strategy, Position newPosition) {
+        Price currentPrice = strategy.getCurrentPosition().getPrice();
+        Price newPrice = newPosition.getPrice();
+        
+        if (strategy.isCurrentPositionLong()) {
+            // 롱 포지션: (새로운 가격 - 진입 가격) / 진입 가격 * 100
+            return ProfitRate.of(
+                newPrice.getValue().subtract(currentPrice.getValue())
+                    .divide(currentPrice.getValue(), 10, RoundingMode.HALF_UP)
+                    .multiply(BigDecimal.valueOf(100))
+            );
+        } else {
+            // 숏 포지션: (진입 가격 - 새로운 가격) / 진입 가격 * 100
+            return ProfitRate.of(
+                currentPrice.getValue().subtract(newPrice.getValue())
+                    .divide(currentPrice.getValue(), 10, RoundingMode.HALF_UP)
+                    .multiply(BigDecimal.valueOf(100))
+            );
+        }
+    }
+
+    private boolean isWin(ProfitRate profitRate) {
+        return profitRate.getValue().compareTo(BigDecimal.ZERO) >= 0;
+    }
+
+    private void updateAverageHoldingPeriod(Strategy strategy, Position newPosition) {
+        LocalDateTime entryTime = strategy.getCurrentPosition().getTime();
+        LocalDateTime exitTime = newPosition.getTime();
+        
+        long holdingPeriodMinutes = Duration.between(entryTime, exitTime).toMinutes();
+        int timeFrameValue = strategy.getType().getTimeFrameType().getValue();
+        
+        // 평균 보유 기간 계산: (현재 보유 기간 + 기존 평균 * 기존 거래 횟수) / (기존 거래 횟수 + 1)
+        int currentHoldingPeriod = (int) (holdingPeriodMinutes / timeFrameValue);
+        int totalTradeCount = strategy.getCount().getTotalTradeCount();
+        int currentAverage = strategy.getAverageHoldingPeriod();
+        
+        int newAverage = (currentHoldingPeriod + (currentAverage * totalTradeCount)) / (totalTradeCount + 1);
+        
+        strategy.updateAverageHoldingPeriod(newAverage);
+    }
+
+    private void updateProfitFactor(Strategy strategy) {
+        ProfitRate totalProfitRate = strategy.getRate().getTotalProfitRate();
+        ProfitRate totalLossRate = strategy.getRate().getTotalLossRate();
+        
+        if (totalLossRate == null || totalLossRate.getValue().compareTo(BigDecimal.ZERO) == 0) {
+            strategy.updateProfitFactor(ProfitFactor.of(BigDecimal.ZERO));
+        } else {
+            BigDecimal profitFactorValue = totalProfitRate.getValue()
+                .divide(totalLossRate.getValue(), 2, RoundingMode.DOWN);
+            strategy.updateProfitFactor(ProfitFactor.of(profitFactorValue));
+        }
     }
 }

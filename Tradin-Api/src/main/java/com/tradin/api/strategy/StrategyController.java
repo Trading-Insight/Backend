@@ -30,14 +30,14 @@ public class StrategyController implements StrategyApi {
         return strategyFacadeService.findSpotStrategiesInfo();
     }
 
-    //Test API
     @PostMapping("")
-    public void createStrategy() {
-        strategyFacadeService.createStrategy();
+    public void createTestStrategy() {
+        strategyFacadeService.createTestStrategy();
     }
 
     @PostMapping("/futures/short-term/webhook")
     public void handleFutureShortTermV1WebHook(@RequestBody @Valid WebHookRequestDto request) {
-        strategyFacadeService.handleFutureWebHook(request.toServiceDto());
+        strategyFacadeService.publishAutoTradingMessages(request.toServiceDto());
+        strategyFacadeService.updateStrategyAndHistoryMetaData(request.toServiceDto());
     }
 }

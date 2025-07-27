@@ -75,18 +75,6 @@ public class History extends AuditTime {
         this.exitPosition = position;
     }
 
-//    public void calculateProfitRate() {
-//        if (isOpenPositionLong()) {
-//            this.profitRate =
-//                    (double) (this.exitPosition.getPrice() - this.entryPosition.getPrice()) / this.entryPosition.getPrice()
-//                            * 100;
-//        } else {
-//            this.profitRate =
-//                    (double) (this.entryPosition.getPrice() - this.exitPosition.getPrice()) / this.entryPosition.getPrice()
-//                            * 100;
-//        }
-//    }
-
     private boolean isOpenPositionLong() {
         return this.entryPosition.getTradingType() == LONG;
     }

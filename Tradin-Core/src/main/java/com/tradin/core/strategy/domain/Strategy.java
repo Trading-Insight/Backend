@@ -10,14 +10,11 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import java.time.Duration;
-import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import com.tradin.core.strategy.domain.vo.ProfitRate;
 import com.tradin.core.price.domain.vo.Price;
 import jakarta.persistence.Convert;
@@ -77,107 +74,60 @@ public class Strategy extends AuditTime {
             .build();
     }
 
+    // 기본적인 상태 변경 메서드들
     public void updateCurrentPosition(Position position) {
         this.currentPosition = position;
     }
 
-    public void updateRateAndCount(Price entryPrice, LocalDateTime entryTime) {
-        ProfitRate profitRate = calculateProfitRate(entryPrice);
-
-        if (isWin(profitRate)) {
-            increaseWinCount();
-            updateTotalProfitRate(profitRate);
-        } else {
-            increaseLossCount();
-            updateTotalLossRate(profitRate);
-        }
-
-        updateAverageHoldingPeriod(entryTime);
-        increaseTotalTradeCount();
-        updateProfitFactor(this.rate.getTotalProfitRate(), this.rate.getTotalLossRate());
-        updateWinRate();
-        updateSimpleProfitRate();
-        updateCompoundProfitRate(profitRate);
-        updateAverageProfitRate();
+    public void updateProfitFactor(ProfitFactor profitFactor) {
+        this.profitFactor = profitFactor;
     }
 
-    private ProfitRate calculateProfitRate(Price price) {
-        if (isCurrentPositionLong()) {
-            return ProfitRate.of(
-                price.getValue().subtract(this.currentPosition.getPrice().getValue())
-                    .divide(this.currentPosition.getPrice().getValue(), 10, RoundingMode.HALF_UP)
-                    .multiply(BigDecimal.valueOf(100))
-            );
-        }
-        return ProfitRate.of(
-            this.currentPosition.getPrice().getValue().subtract(price.getValue())
-                .divide(this.currentPosition.getPrice().getValue(), 10, RoundingMode.HALF_UP)
-                .multiply(BigDecimal.valueOf(100))
-        );
+    public void updateAverageHoldingPeriod(int averageHoldingPeriod) {
+        this.averageHoldingPeriod = averageHoldingPeriod;
     }
 
-    private boolean isCurrentPositionLong() {
-        return this.currentPosition.getTradingType() == TradingType.LONG;
-    }
-
-    private void increaseTotalTradeCount() {
+    public void increaseTotalTradeCount() {
         this.count.increaseTotalTradeCount();
     }
 
-    private boolean isWin(ProfitRate profitRate) {
-        return profitRate.getValue().compareTo(BigDecimal.ZERO) >= 0;
-    }
-
-
-    private void increaseWinCount() {
+    public void increaseWinCount() {
         this.count.increaseWinCount();
     }
 
-    private void increaseLossCount() {
+    public void increaseLossCount() {
         this.count.increaseLossCount();
     }
 
-    private void updateTotalProfitRate(ProfitRate profitRate) {
+    public void updateTotalProfitRate(ProfitRate profitRate) {
         this.rate.updateTotalProfitRate(profitRate);
     }
 
-    private void updateTotalLossRate(ProfitRate profitRate) {
+    public void updateTotalLossRate(ProfitRate profitRate) {
         this.rate.updateTotalLossRate(profitRate);
     }
 
-    public void updateProfitFactor(ProfitRate totalProfitRate, ProfitRate totalLossRate) {
-        if (totalLossRate == null || totalLossRate.getValue().compareTo(BigDecimal.ZERO) == 0) {
-            this.profitFactor = ProfitFactor.of(BigDecimal.ZERO);
-        } else {
-            this.profitFactor = ProfitFactor.of(totalProfitRate.getValue().divide(totalLossRate.getValue(), 2, RoundingMode.DOWN));
-        }
-    }
-
-    private void updateWinRate() {
+    public void updateWinRate() {
         this.rate.updateWinRate(this.count.getWinCount(), this.count.getTotalTradeCount());
     }
 
-    private void updateSimpleProfitRate() {
-        rate.updateSimpleProfitRate();
+    public void updateSimpleProfitRate() {
+        this.rate.updateSimpleProfitRate();
     }
 
-    private void updateCompoundProfitRate(ProfitRate profitRate) {
-        rate.updateCompoundProfitRate(profitRate);
+    public void updateCompoundProfitRate(ProfitRate profitRate) {
+        this.rate.updateCompoundProfitRate(profitRate);
     }
 
-    private void updateAverageProfitRate() {
+    public void updateAverageProfitRate() {
         this.rate.updateAverageProfitRate(this.count.getTotalTradeCount());
-    }
-
-    private void updateAverageHoldingPeriod(LocalDateTime entryTime) {
-        long holdingPeriod = Duration.between(entryTime, this.currentPosition.getTime()).toMinutes();
-
-        this.averageHoldingPeriod =
-            (((int) (holdingPeriod) / this.type.getTimeFrameType().getValue()) + (this.averageHoldingPeriod
-                * this.count.getTotalTradeCount())) / (this.count.getTotalTradeCount() + 1);
     }
 
     public CoinType getCoinType() {
         return this.type.getCoinType();
+    }
+
+    public boolean isCurrentPositionLong() {
+        return this.currentPosition.getTradingType() == TradingType.LONG;
     }
 }

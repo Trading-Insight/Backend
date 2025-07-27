@@ -10,5 +10,5 @@ public interface HistoryQueryRepository {
 
     Optional<History> findOpenHistoryByStrategyId(Long id);
 
-    List<HistoryDao> findHistoryByStrategyId(Long id);
+    List<HistoryDao> findHistoryDaosByStrategyId(Long id);
 }

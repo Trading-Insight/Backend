@@ -30,7 +30,7 @@ public class HistoryQueryRepositoryImpl implements HistoryQueryRepository {
     }
 
     @Override
-    public List<HistoryDao> findHistoryByStrategyId(Long id) {
+    public List<HistoryDao> findHistoryDaosByStrategyId(Long id) {
         return jpaQueryFactory.select(new QHistoryDao(history.id, history.entryPosition, history.exitPosition,
                 history.profitRate
             ))
