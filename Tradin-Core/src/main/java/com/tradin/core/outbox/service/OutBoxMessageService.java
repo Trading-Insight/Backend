@@ -8,8 +8,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tradin.core.account.domain.Account;
 import com.tradin.core.common.exception.ExceptionType;
 import com.tradin.core.common.exception.TradinException;
-import com.tradin.core.futuresOrder.event.dto.AutoTradeEventDto;
-import com.tradin.core.futuresOrder.event.dto.PositionDto;
+import com.tradin.core.autotrade.service.dto.AutoTradeEventDto;
+import com.tradin.core.autotrade.service.dto.PositionDto;
 import com.tradin.core.outbox.domain.OutboxMessage;
 import com.tradin.core.outbox.domain.repository.OutboxMessageRepository;
 import com.tradin.core.outbox.service.dto.OutBoxMessagesEvent;
@@ -17,9 +17,8 @@ import com.tradin.core.strategy.domain.Strategy;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -76,7 +75,7 @@ public class OutBoxMessageService {
             .orElseThrow(() -> new TradinException(ExceptionType.NOT_FOUND_OUTBOX_MESSAGE_EXCEPTION));
     }
 
-    public List<OutboxMessage> findByEventUuids(List<String> eventUuids) {
+    public List<OutboxMessage> findByMessageUuids(List<String> eventUuids) {
         return outboxMessageRepository.findAllByMessageIdIn(eventUuids);
     }
 

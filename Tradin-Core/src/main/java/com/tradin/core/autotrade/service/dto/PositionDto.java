@@ -1,4 +1,4 @@
-package com.tradin.core.futuresOrder.event.dto;
+package com.tradin.core.autotrade.service.dto;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;

@@ -47,10 +47,11 @@ public class StrategyFacadeService {
         historyService.closeAndCreateHistory(strategy, position);
     }
 
-    @Async("autoTradeExecutor")
+    @Transactional
     public void publishAutoTradingMessages(WebHookDto request) {
         Strategy strategy = strategyService.findStrategyById(request.getId());
         Position position = request.getPosition();
+        strategyService.validateIsSamePosition(strategy, position);
 
         List<Account> accounts = subscriptionService.findSubscribedAccountsByStrategyId(strategy.getId());
         outBoxMessageService.publishAutoTradingMessages(strategy, accounts, position.toDto());

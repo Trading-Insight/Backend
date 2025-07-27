@@ -39,7 +39,7 @@ public class AccountFacadeService {
 
     @Transactional(readOnly = true)
     public List<Account> findAccountsByIds (List<Long> accountIds) {
-        return accountService.findAccountsByIds(accountIds);
+        return accountService.findAllByIds(accountIds);
     }
 
     @Transactional(readOnly = true)

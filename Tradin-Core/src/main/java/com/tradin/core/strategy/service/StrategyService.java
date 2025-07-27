@@ -103,7 +103,7 @@ public class StrategyService {
             .orElseThrow(() -> new TradinException(ExceptionType.NOT_FOUND_STRATEGY_EXCEPTION));
     }
 
-    private void validateIsSamePosition(Strategy strategy, Position position) {
+    public void validateIsSamePosition(Strategy strategy, Position position) {
         if (strategy.getCurrentPosition().getTradingType() == position.getTradingType()) {
             throw new TradinException(SAME_POSITION_REQUEST_EXCEPTION);
         }

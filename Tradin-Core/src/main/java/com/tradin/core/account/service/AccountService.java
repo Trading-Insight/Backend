@@ -35,7 +35,7 @@ public class AccountService {
             .orElseThrow(() -> new TradinException(NOT_FOUND_ACCOUNT_EXCEPTION));
     }
 
-    public List<Account> findAccountsByIds(List<Long> ids) {
+    public List<Account> findAllByIds(List<Long> ids) {
         return accountRepository.findAllById(ids);
     }
 

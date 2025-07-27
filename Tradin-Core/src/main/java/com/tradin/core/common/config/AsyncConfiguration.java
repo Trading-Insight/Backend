@@ -15,7 +15,7 @@ public class AsyncConfiguration {
         return Executors.newVirtualThreadPerTaskExecutor();
     }
 
-    @Bean(name = "outboxExecutor")
+    @Bean(name = "outboxMessageExecutor")
     public Executor outboxExecutor() {
         return Executors.newVirtualThreadPerTaskExecutor();
     }

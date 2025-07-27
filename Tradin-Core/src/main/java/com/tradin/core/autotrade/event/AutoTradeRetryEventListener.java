@@ -1,4 +1,4 @@
-package com.tradin.core.futuresOrder.event;
+package com.tradin.core.autotrade.event;
 
 import static com.tradin.core.common.exception.ExceptionType.DESERIALIZATION_FAIL_EXCEPTION;
 
@@ -6,8 +6,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tradin.core.account.domain.Account;
 import com.tradin.core.account.service.AccountFacadeService;
 import com.tradin.core.common.exception.TradinException;
-import com.tradin.core.futuresOrder.event.dto.AutoTradeEventDto;
-import com.tradin.core.futuresOrder.event.dto.PositionDto;
+import com.tradin.core.autotrade.service.dto.AutoTradeEventDto;
+import com.tradin.core.autotrade.service.dto.PositionDto;
 import com.tradin.core.futuresOrder.service.FuturesOrderFacadeService;
 import com.tradin.core.outbox.domain.OutboxMessage;
 import com.tradin.core.outbox.service.OutBoxMessageFacadeService;
@@ -22,7 +22,6 @@ import org.springframework.kafka.retrytopic.DltStrategy;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
 
 @Slf4j
 @Component
@@ -39,7 +38,8 @@ public class AutoTradeRetryEventListener {
         attempts = "2",
         backoff = @Backoff(delay = 1000, multiplier = 2.0),
         dltStrategy = DltStrategy.ALWAYS_RETRY_ON_ERROR,
-        dltTopicSuffix = "-dlt"
+        dltTopicSuffix = "-dlt",
+        retryTopicSuffix = "-1"
     )
     @KafkaListener(
         topics = "auto-trade-retry-topic",

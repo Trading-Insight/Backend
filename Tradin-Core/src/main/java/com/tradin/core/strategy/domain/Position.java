@@ -1,7 +1,5 @@
 package com.tradin.core.strategy.domain;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
@@ -18,7 +16,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import com.tradin.core.futuresOrder.event.dto.PositionDto;
+import com.tradin.core.autotrade.service.dto.PositionDto;
 
 @Embeddable
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

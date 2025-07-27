@@ -1,4 +1,4 @@
-package com.tradin.core.futuresOrder.event.dto;
+package com.tradin.core.autotrade.service.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

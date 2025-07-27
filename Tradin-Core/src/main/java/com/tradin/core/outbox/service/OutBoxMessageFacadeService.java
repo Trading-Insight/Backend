@@ -24,7 +24,7 @@ public class OutBoxMessageFacadeService {
 
     @Transactional(readOnly = true)
     public List<OutboxMessage> findByEventUuids(List<String> eventUuids) {
-        return outBoxMessageService.findByEventUuids(eventUuids);
+        return outBoxMessageService.findByMessageUuids(eventUuids);
     }
 
     @Transactional
