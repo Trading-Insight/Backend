@@ -38,6 +38,11 @@ public class Amount {
         return Amount.of(applyPolicy(result));
     }
 
+    public Amount negate() {
+        BigDecimal result = this.value.negate();
+        return Amount.of(applyPolicy(result));
+    }
+
     public boolean isPositive() { return value.signum() >= 0; }
     public boolean isNegative() { return value.signum() < 0; }
 

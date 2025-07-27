@@ -22,6 +22,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.Index;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import lombok.AccessLevel;
@@ -32,6 +34,13 @@ import lombok.NoArgsConstructor;
 @Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(indexes = {
+    @Index(name = "idx_futures_order_account_id", columnList = "account_id"),
+    @Index(name = "idx_futures_order_strategy_id", columnList = "strategy_id"),
+    @Index(name = "idx_futures_order_status", columnList = "order_status"),
+    @Index(name = "idx_futures_order_created_at", columnList = "created_at"),
+    @Index(name = "idx_futures_order_account_strategy", columnList = "account_id, strategy_id")
+})
 public class FuturesOrder extends AuditTime {
 
     @Id

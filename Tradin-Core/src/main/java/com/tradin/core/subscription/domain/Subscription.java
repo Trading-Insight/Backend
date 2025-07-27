@@ -12,6 +12,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -25,7 +26,17 @@ import lombok.NoArgsConstructor;
 @Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"account_id", "strategy_id"}))
+@Table(
+    uniqueConstraints = @UniqueConstraint(columnNames = {"account_id", "strategy_id"}),
+    indexes = {
+        @Index(name = "idx_subscription_account_id", columnList = "account_id"),
+        @Index(name = "idx_subscription_strategy_id", columnList = "strategy_id"),
+        @Index(name = "idx_subscription_status", columnList = "status"),
+        @Index(name = "idx_subscription_strategy_status", columnList = "strategy_id, status"),
+        @Index(name = "idx_subscription_start_date", columnList = "start_date"),
+        @Index(name = "idx_subscription_end_date", columnList = "end_date")
+    }
+)
 public class Subscription extends AuditTime {
 
     @Id

@@ -7,6 +7,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.persistence.Index;
 import java.util.Collection;
 import java.util.Collections;
 import lombok.AccessLevel;
@@ -20,6 +22,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 @Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(indexes = {
+    @Index(name = "idx_users_email", columnList = "email"),
+    @Index(name = "idx_users_sub", columnList = "sub")
+})
 public class Users extends AuditTime implements UserDetails {
 
     @Id

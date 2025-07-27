@@ -1,6 +1,8 @@
 package com.tradin.core.account.service;
 
 import com.tradin.core.account.service.dto.AccountsResponseDto;
+import com.tradin.core.balance.domain.Balance;
+import com.tradin.core.balance.domain.vo.Amount;
 import com.tradin.core.balance.service.BalanceService;
 import com.tradin.core.strategy.domain.CoinType;
 import com.tradin.core.account.domain.Account;
@@ -34,7 +36,8 @@ public class AccountFacadeService {
     @Transactional
     public void faucet(Long userId, Long accountId) {
         accountService.findAccountByIdAndUserId(accountId, userId);
-        balanceService.updateBalance(accountId, CoinType.USDT, BigDecimal.valueOf(10000));
+        Balance balance = balanceService.findByAccountIdAndCoinType(accountId, CoinType.USDT);
+        balanceService.updateBalance(balance, Amount.of(BigDecimal.valueOf(10000)));
     }
 
     @Transactional(readOnly = true)

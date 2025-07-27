@@ -26,12 +26,4 @@ public class FuturesOrderService {
         TradingType reverseTradingType = futuresPosition.isPositionLong() ? TradingType.SHORT : TradingType.LONG;
         return orderPosition(reverseTradingType, strategy, account, Amount.of(futuresPosition.getAmount().getValue()), currentPrice);
     }
-
-    public Amount calculateProfitAmount(FuturesPosition futuresPosition, Price currentPrice) {
-        if (futuresPosition.isPositionLong()) {
-            return Amount.of(currentPrice.getValue().subtract(futuresPosition.getEntryPrice().getValue()));
-        } else {
-            return Amount.of(futuresPosition.getEntryPrice().getValue().subtract(currentPrice.getValue()));
-        }
-    }
 }

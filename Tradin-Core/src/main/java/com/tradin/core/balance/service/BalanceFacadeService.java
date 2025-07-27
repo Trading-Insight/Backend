@@ -29,11 +29,6 @@ public class BalanceFacadeService {
         return balanceService.findByAccountIdAndCoinType(accountId, coinType);
     }
 
-    @Transactional
-    public void updateBalance(Long accountId, CoinType coinType, BigDecimal amount) {
-        balanceService.updateBalance(accountId, coinType, amount);
-    }
-
     @Transactional(readOnly = true)
     public Amount getUsdtAmount(Balance balance) {
         return balanceService.getUsdtAmount(balance);

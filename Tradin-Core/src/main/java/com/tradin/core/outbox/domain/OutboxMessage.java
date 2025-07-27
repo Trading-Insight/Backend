@@ -10,6 +10,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.Index;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -19,7 +20,14 @@ import org.hibernate.annotations.Type;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "outbox_message")
+@Table(name = "outbox_message", indexes = {
+    @Index(name = "idx_outbox_message_type", columnList = "message_type"),
+    @Index(name = "idx_outbox_message_id", columnList = "message_id"),
+    @Index(name = "idx_outbox_status", columnList = "status"),
+    @Index(name = "idx_outbox_type_status", columnList = "message_type, status"),
+    @Index(name = "idx_outbox_created_at", columnList = "created_at"),
+    @Index(name = "idx_outbox_updated_at", columnList = "updated_at")
+})
 public class OutboxMessage extends AuditTime {
 
     @Id

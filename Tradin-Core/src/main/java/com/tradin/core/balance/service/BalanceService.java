@@ -4,14 +4,18 @@ import com.tradin.core.account.domain.Account;
 import com.tradin.core.balance.domain.Balance;
 import com.tradin.core.balance.domain.repository.BalanceRepository;
 import com.tradin.core.balance.domain.vo.Amount;
+import com.tradin.core.common.annotation.DistributedLock;
 import com.tradin.core.strategy.domain.CoinType;
 import com.tradin.core.common.exception.ExceptionType;
 import com.tradin.core.common.exception.TradinException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
+import java.util.concurrent.TimeUnit;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BalanceService {
@@ -31,17 +35,28 @@ public class BalanceService {
             .orElseThrow(() -> new TradinException(ExceptionType.NOT_FOUND_BALANCE_EXCEPTION));
     }
 
-
-    public void updateBalance(Long accountId, CoinType coinType, BigDecimal amount) {
-        Balance balance = findByAccountIdAndCoinType(accountId, coinType);
-        updateBalance(balance, Amount.of(amount));
-    }
-
+    @DistributedLock(
+        key = "'balance-update:' + #balance.id + ':' + #balance.coinType",
+        waitTime = 5L,
+        leaseTime = 10L,
+        timeUnit = TimeUnit.SECONDS,
+        fallbackMethod = "handleBalanceUpdateFallback"
+    )
+    @Transactional
     public void updateBalance(Balance balance, Amount amount) {
         balance.updateAmount(amount);
     }
 
     public Amount getUsdtAmount(Balance balance) {
         return balance.getAmount();
+    }
+
+
+    /**
+     * 분산락 획득 실패 시 호출되는 fallback 메서드
+     */
+    public void handleBalanceUpdateFallback(Balance balance, Amount amount) {
+        log.warn("분산락 획득 실패로 인한 잔고 업데이트 건너뜀 - accountId: {}, coinType: {}",
+            balance.getAccount().getId(), balance.getCoinType());
     }
 }
