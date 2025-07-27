@@ -190,7 +190,7 @@ public class StrategyService {
         ProfitRate totalProfitRate = strategy.getRate().getTotalProfitRate();
         ProfitRate totalLossRate = strategy.getRate().getTotalLossRate();
         
-        if (totalLossRate == null || totalLossRate.getValue().compareTo(BigDecimal.ZERO) == 0) {
+        if (totalLossRate == null || totalLossRate.getValue ( ) == null || totalLossRate.getValue ( ) .compareTo ( BigDecimal.ZERO ) == 0) {
             strategy.updateProfitFactor(ProfitFactor.of(BigDecimal.ZERO));
         } else {
             BigDecimal profitFactorValue = totalProfitRate.getValue()

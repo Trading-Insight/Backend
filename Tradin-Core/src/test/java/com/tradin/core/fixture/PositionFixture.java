@@ -1,5 +1,6 @@
 package com.tradin.core.fixture;
 
+import com.tradin.core.price.domain.vo.Price;
 import com.tradin.core.strategy.domain.Position;
 import com.tradin.core.strategy.domain.TradingType;
 import java.time.LocalDateTime;
@@ -14,7 +15,7 @@ public class PositionFixture {
         return Position.builder()
             .tradingType(position.getTradingType() == TradingType.LONG ? TradingType.SHORT : TradingType.LONG)
             .time(LocalDateTime.now())
-            .price(50000)
+            .price(Price.from(50000))
             .build();
     }
 
@@ -25,7 +26,7 @@ public class PositionFixture {
         return Position.builder()
             .tradingType(TradingType.LONG)
             .time(LocalDateTime.now())
-            .price(50000)
+            .price(Price.from(50000))
             .build();
     }
 }

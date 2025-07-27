@@ -19,26 +19,4 @@ public class UserFacadeService {
     public FindUserInfoResponseDto findUserInfo(Long userId) {
         return usersService.findUserInfo(userId);
     }
-
-    @Transactional
-    public Users saveOrGetUser(UserDataDto userDataDto, UserSocialType socialType) {
-        Users user = usersService.saveOrGetUser(
-            userDataDto.getName(),
-            userDataDto.getSub(),
-            userDataDto.getEmail(),
-            userDataDto.getSocialId(),
-            socialType
-        );
-        
-        // Create account for new user
-        if (!isUserExist(userDataDto.getEmail())) {
-            accountService.createAccount(user);
-        }
-        
-        return user;
-    }
-
-    private boolean isUserExist(String email) {
-        return usersService.isUserExist(email);
-    }
 }

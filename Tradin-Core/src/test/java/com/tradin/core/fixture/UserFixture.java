@@ -1,9 +1,7 @@
 package com.tradin.core.fixture;
 
+import com.tradin.core.users.domain.UserSocialType;
 import com.tradin.core.users.domain.Users;
-import com.tradin.module.users.users.domain.UserSocialType;
-import com.tradin.module.users.users.domain.Users;
-
 public class UserFixture {
 
     /**
