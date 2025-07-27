@@ -1,1 +1,5 @@
 rootProject.name = 'tradin'
+include 'Tradin-Api'
+include 'Tradin-Core'
+include 'Tradin-Batch'
+include 'Tradin-Websocket'
