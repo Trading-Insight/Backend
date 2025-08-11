@@ -35,28 +35,11 @@ public class BalanceService {
             .orElseThrow(() -> new TradinException(ExceptionType.NOT_FOUND_BALANCE_EXCEPTION));
     }
 
-    @DistributedLock(
-        key = "'balance-update:' + #balance.id + ':' + #balance.coinType",
-        waitTime = 5L,
-        leaseTime = 10L,
-        timeUnit = TimeUnit.SECONDS,
-        fallbackMethod = "handleBalanceUpdateFallback"
-    )
-    @Transactional
     public void updateBalance(Balance balance, Amount amount) {
         balance.updateAmount(amount);
     }
 
     public Amount getUsdtAmount(Balance balance) {
         return balance.getAmount();
-    }
-
-
-    /**
-     * 분산락 획득 실패 시 호출되는 fallback 메서드
-     */
-    public void handleBalanceUpdateFallback(Balance balance, Amount amount) {
-        log.warn("분산락 획득 실패로 인한 잔고 업데이트 건너뜀 - accountId: {}, coinType: {}",
-            balance.getAccount().getId(), balance.getCoinType());
     }
 }
