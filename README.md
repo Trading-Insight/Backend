@@ -43,6 +43,11 @@
 
 </br>
 
+## 📚 자동매매 구조도
+<img width="672" alt="image" src="https://github-production-user-asset-6210df.s3.amazonaws.com/62228195/476600704-90830cc0-f392-4e9b-959b-acc1fef7b0ed.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAVCODYLSA53PQK4ZA%2F20250811%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250811T141107Z&X-Amz-Expires=300&X-Amz-Signature=a1bc2a5f55ba39af3823d05e4711eb7d11023976c79971bd00ad0100beacd499&X-Amz-SignedHeaders=host">
+
+</br>
+
 ## 📚 ERD 
 
 <img width="569" alt="스크린샷 2023-02-17 오후 1 40 27" src="https://github-production-user-asset-6210df.s3.amazonaws.com/62228195/476330722-2d8a4ac2-0cb0-4017-baa4-e78f6b0f8a51.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAVCODYLSA53PQK4ZA%2F20250810%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250810T050001Z&X-Amz-Expires=300&X-Amz-Signature=73aaf324b46fdb2c0c376b11d456340869469896fc47ecf656dcc9f1def9704b&X-Amz-SignedHeaders=host">
