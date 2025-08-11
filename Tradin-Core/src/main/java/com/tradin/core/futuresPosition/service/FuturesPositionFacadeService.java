@@ -2,6 +2,7 @@ package com.tradin.core.futuresPosition.service;
 
 import com.tradin.core.account.domain.Account;
 import com.tradin.core.balance.domain.vo.Amount;
+import com.tradin.core.common.annotation.DistributedLock;
 import com.tradin.core.futuresPosition.domain.FuturesPosition;
 import com.tradin.core.strategy.domain.CoinType;
 import com.tradin.core.strategy.domain.TradingType;
@@ -15,16 +16,6 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class FuturesPositionFacadeService {
     private final FuturesPositionService futuresPositionService;
-
-    @Transactional
-    public void closePosition(FuturesPosition futuresPosition) {
-        futuresPositionService.closePosition(futuresPosition);
-    }
-
-    @Transactional
-    public FuturesPosition openPosition(CoinType coinType, TradingType tradingType, Amount amount, Price price, Account account) {
-        return futuresPositionService.openPosition(coinType, tradingType, amount, price, account);
-    }
 
     @Transactional(readOnly = true)
     public Optional<FuturesPosition> findOpenFuturesPositionByAccountAndCoinType(Long accountId, CoinType coinType) {

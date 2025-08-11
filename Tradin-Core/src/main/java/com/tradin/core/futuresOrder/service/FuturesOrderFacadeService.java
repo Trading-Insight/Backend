@@ -27,6 +27,10 @@ public class FuturesOrderFacadeService {
     private final FuturesPositionService futuresPositionService;
     private final PriceCache priceCache;
 
+    @DistributedLock(
+        key = "'asset-lock:' + #account.id + ':USDT'",
+        fallbackMethod = "handleAssetLockFallback"
+    )
     @Transactional
     public void autoTrade(Strategy strategy, Account account, Position position) {
         try {
@@ -114,19 +118,12 @@ public class FuturesOrderFacadeService {
         return priceCache.getPrice(coinType);
     }
 
-    /**
-     * 분산락 획득 실패 시 호출되는 fallback 메서드 (포지션 정리)
-     */
-    public void handleClosePositionFallback(Strategy strategy, Account account) {
-        log.warn("분산락 획득 실패로 인한 포지션 정리 건너뜀 - accountId: {}, strategyId: {}",
-            account.getId(), strategy.getId());
-    }
 
     /**
-     * 분산락 획득 실패 시 호출되는 fallback 메서드 (포지션 생성)
+     * 자동매매 처리 시 분산락 획득 실패하면 호출되는 fallback 메서드
      */
-    public void handleCreatePositionFallback(Strategy strategy, Account account, Position position) {
-        log.warn("분산락 획득 실패로 인한 포지션 생성 건너뜀 - accountId: {}, strategyId: {}",
-            account.getId(), strategy.getId());
+    public void handleAssetLockFallback(Strategy strategy, Account account, Position position) {
+        log.warn("자동매매 분산락 획득 실패 - accountId: {}, strategyId: {}, position: {} ",
+            account.getId(), strategy.getId(), position);
     }
 }
