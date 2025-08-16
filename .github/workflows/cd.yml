@@ -1,8 +1,8 @@
-name: Deploy to Home Server
+name: Tradin_CD
 
 on:
   push:
-    branches: [ dev, feat/* ]
+    branches: [ dev ]
   workflow_dispatch:
 
 env:
@@ -62,7 +62,7 @@ jobs:
             sleep 10
             
             # Check service status
-            docker service ls --filter name=tradin-api
+            docker service ls --filter name=tradin_api
             
             # Show recent logs
-            docker service logs --tail 50 tradin-api
+            docker service logs --tail 50 tradin_api
