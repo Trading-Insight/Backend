@@ -56,13 +56,13 @@ jobs:
             docker pull ${{ env.DOCKER_IMAGE }}:${{ env.DOCKER_TAG }}
             
             # Update the stack with rolling update (Docker Swarm handles rolling updates automatically)
-            docker stack deploy -c docker-stack.yml tradin-stack
+            docker stack deploy -c docker-stack.yml tradin
             
             # Wait for services to be ready
             sleep 10
             
             # Check service status
-            docker service ls --filter name=tradin-stack_api
+            docker service ls --filter name=tradin-api
             
             # Show recent logs
-            docker sㄷervice logs --tail 50 tradin-stack_api
+            docker service logs --tail 50 tradin-api

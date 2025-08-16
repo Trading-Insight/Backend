@@ -27,7 +27,7 @@ public class TradinApplication {
     }
 
     @DisableAuthInSwagger
-    @GetMapping("/health-check")
+    @GetMapping("/health")
     public String healthCheck() {
         return "Health Check Success!";
     }
