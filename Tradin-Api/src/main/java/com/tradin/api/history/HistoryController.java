@@ -30,9 +30,8 @@ public class HistoryController implements HistoryApi {
     }
 
     @Operation(summary = "테스트 히스토리 생성")
-    @PostMapping("/{strategyId}")
-    public void createTestHistory(@PathVariable Long strategyId) {
-        historyFacadeService.createTestHistory(strategyId);
+    @PostMapping("")
+    public void createTestHistory() {
+        historyFacadeService.createTestHistory();
     }
-
 }

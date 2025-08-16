@@ -30,7 +30,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         "/actuator/**",
         "/v1/strategies/futures/short-term/webhook",
         "/v1/subscriptions/accounts/strategies",
-        "/v1/strategies"
+        "/v1/strategies",
+        "/v1/histories"
     );
     public static final String BEARER_PREFIX = "Bearer ";
     public static final String AUTHORIZATION_HEADER_PREFIX = "Authorization";

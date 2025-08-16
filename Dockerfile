@@ -1,4 +1,8 @@
-FROM openjdk:17-alpine
-COPY build/libs/*.jar app.jar
-EXPOSE 80
-ENTRYPOINT ["java","-Duser.timezone=Asia/Seoul","-jar","-Dspring.profiles.active=dev","/app.jar"]
+FROM eclipse-temurin:21-jre
+WORKDIR /app
+
+COPY Tradin-Api/build/libs/*.jar app.jar
+
+ENV SPRING_PROFILES_ACTIVE=dev
+
+ENTRYPOINT ["java", "-jar", "app.jar"]

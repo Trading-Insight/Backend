@@ -41,3 +41,14 @@ out/
 
 # .DS_Store 파일 제외
 .DS_Store
+
+# Docker 관련 파일 제외
+docker-compose.yml
+docker-stack.yml
+.dockerignore
+
+# Gradle 관련 파일 제외
+.gradle/
+gradle-app.setting
+!gradle-wrapper.jar
+!gradle-wrapper.properties
