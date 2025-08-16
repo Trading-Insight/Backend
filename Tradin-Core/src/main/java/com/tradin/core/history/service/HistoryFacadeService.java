@@ -19,8 +19,8 @@ public class HistoryFacadeService {
     private final StrategyService strategyService;
 
     @Transactional
-    public void createTestHistory(Long strategyId) {
-        Strategy strategy = strategyService.findStrategyById(strategyId);
+    public void createTestHistory() {
+        Strategy strategy = strategyService.findStrategyById(1L);
         historyService.createTestHistory(strategy);
     }
 

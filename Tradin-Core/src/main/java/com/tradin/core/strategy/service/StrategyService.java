@@ -50,17 +50,17 @@ public class StrategyService {
                 ProfitRate.of(BigDecimal.ZERO)
             ),
             Count.of(
-                0,
-                0,
-                0
+                2,
+                1,
+                1
             ),
             Position.of(
                 TradingType.NONE,
                 LocalDateTime.now(),
-                Price.of(BigDecimal.ZERO)
+                Price.of(BigDecimal.ONE)
             ),
-            ProfitFactor.of(BigDecimal.ZERO),
-            0
+            ProfitFactor.of(BigDecimal.ONE),
+            1
         );
         strategyRepository.save(strategy);
     }

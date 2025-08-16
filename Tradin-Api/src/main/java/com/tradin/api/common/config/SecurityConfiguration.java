@@ -39,6 +39,7 @@ public class SecurityConfiguration {
             ).authorizeHttpRequests(authorizeRequest ->
                 authorizeRequest
                     .requestMatchers(
+                        "health-check",
                         "/v1/auth/users**",
                         "/actuator/**",
                         "/v1/histories/test/**",
@@ -48,7 +49,8 @@ public class SecurityConfiguration {
                         "/v1/strategies/futures",
                         "/swagger-ui/**",
                         "/api-docs/**",
-                        "/v1/strategies"
+                        "/v1/strategies",
+                        "/v1/histories"
                     )
                     .permitAll() //TODO
 

@@ -1,12 +1,54 @@
-version: '3.8'
-
+version: "3.8"
 services:
+  tradin-api:
+    image: zaaan/tradin:latest
+    depends_on:
+      - redis
+      - db
+      - kafka
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_SCHEMA=postgres
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=1234
+      - KAFKA_HOST=kafka
+      - KAFKA_PORT=9092
+      - JWT_SECRET_KEY=46930c6e2098076c2ffdc8f1de5d7095debe589eea5b0f43819599a3749d88e26fff284659a26f4baecffc1e7ba574d24d4da5164bf2cf21670ce983d58eb91c
+      - AES_SECRET_KEY=AES_SECRET_KEY
+      - COGNITO_AUTH_REDIRECT_URI=COGNITO_AUTH_REDIRECT_URI
+      - COGNITO_CLIENT_ID=COGNITO_CLIENT_ID
+      - COGNITO_ISSUER=COGNITO_ISSUER
+      - GOOGLE_CLIENT_ID=GOOGLE_CLIENT_ID
+      - GOOGLE_CLIENT_SECRET=GOOGLE_CLIENT_SECRET
+      - GOOGLE_CODE_REDIRECT_URI=GOOGLE_CODE_REDIRECT_URI
+      - GOOGLE_CODE_URI=GOOGLE_CODE_URI
+      - GOOGLE_REDIRECT_URI=GOOGLE_REDIRECT_URI
+      - GOOGLE_TOKEN_URI=GOOGLE_TOKEN_URI
+      - SWAGGER_PASSWORD=SWAGGER_PASSWORD
+      - SWAGGER_USERNAME=SWAGGER_USERNAME
+
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1234
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
   kafka:
     image: bitnami/kafka:3.7.0
-    container_name: kafka
     ports:
-      - '9092:9092'         # 내부 Kafka 통신
-      - '19092:19092'       # 외부(Spring 등) 접근
+      - '9092:9092'
+      - '19092:19092'
     environment:
       - KAFKA_ENABLE_KRAFT=yes
       - KAFKA_CFG_NODE_ID=1
@@ -22,17 +64,37 @@ services:
     volumes:
       - kafka-data:/bitnami/kafka
 
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+
+  prometheus:
+    image: prom/prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - prometheus_data:/prometheus
+
+  grafana:
+    image: grafana/grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+
   kafka-ui:
     image: provectuslabs/kafka-ui:latest
-    container_name: kafka-ui
     ports:
-      - "8080:8080"
+      - "8889:8080"
     environment:
       - KAFKA_CLUSTERS_0_NAME=local
       - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka:9092
-      - KAFKA_CLUSTERS_0_ZOOKEEPER=zookeeper:2181
     depends_on:
       - kafka
 
 volumes:
+  db_data:
+  prometheus_data:
+  grafana_data:
   kafka-data:
