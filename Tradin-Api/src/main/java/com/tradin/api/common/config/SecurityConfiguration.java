@@ -39,7 +39,7 @@ public class SecurityConfiguration {
             ).authorizeHttpRequests(authorizeRequest ->
                 authorizeRequest
                     .requestMatchers(
-                        "/health",
+                        "health-check",
                         "/v1/auth/users**",
                         "/actuator/**",
                         "/v1/histories/test/**",
