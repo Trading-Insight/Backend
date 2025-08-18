@@ -38,19 +38,7 @@ public class FuturesPositionService {
     }
 
     public Amount calculateProfitAmount(FuturesPosition futuresPosition) {
-        BigDecimal currentPrice = priceCache.getPrice(futuresPosition.getCoinType()).getValue();
-        BigDecimal entryPrice = futuresPosition.getEntryPrice().getValue();
-
-        if (futuresPosition.isPositionLong()) {
-            return Amount.of(
-                currentPrice.subtract(entryPrice)
-                    .multiply(futuresPosition.getAmount().getValue())
-                    .divide(futuresPosition.getEntryPrice().getValue(),2, RoundingMode.DOWN));
-        }
-
-        return Amount.of(
-            entryPrice.subtract(currentPrice)
-                .multiply(futuresPosition.getAmount().getValue())
-                .divide(futuresPosition.getEntryPrice().getValue(), 2, RoundingMode.DOWN));
+        Price currentPrice = priceCache.getPrice(futuresPosition.getCoinType());
+        return futuresPosition.calculateProfitAmount(currentPrice);
     }
 }
