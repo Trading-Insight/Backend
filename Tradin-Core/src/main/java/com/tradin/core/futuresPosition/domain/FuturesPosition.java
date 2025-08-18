@@ -121,15 +121,12 @@ public class FuturesPosition extends AuditTime {
     public Amount calculateProfitAmount(Price currentPrice) {
         BigDecimal entryPriceValue = this.entryPrice.getValue();
         BigDecimal currentPriceValue = currentPrice.getValue();
-        
+        BigDecimal amountValue = this.amount.getValue();
+
         if (this.tradingType.isLong()) {
-            // 롱 포지션: (현재가 - 진입가) * 수량
-            BigDecimal profitPerUnit = currentPriceValue.subtract(entryPriceValue);
-            return Amount.of(profitPerUnit.multiply(this.amount.getValue()));
-        } else {
-            // 숏 포지션: (진입가 - 현재가) * 수량
-            BigDecimal profitPerUnit = entryPriceValue.subtract(currentPriceValue);
-            return Amount.of(profitPerUnit.multiply(this.amount.getValue()));
+            return Amount.of(currentPriceValue.subtract(entryPriceValue).multiply(amountValue).divide(entryPriceValue, 2, RoundingMode.DOWN));
         }
+
+        return Amount.of(entryPriceValue.subtract(currentPriceValue).multiply(amountValue).divide(entryPriceValue, 2, RoundingMode.DOWN));
     }
 }

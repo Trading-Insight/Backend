@@ -1,8 +1,13 @@
 package com.tradin.core.balance.domain;
 
+import static com.tradin.core.common.exception.ExceptionType.INSUFFICIENT_BALANCE_EXCEPTION;
+import static com.tradin.core.common.exception.ExceptionType.INVALID_AMOUNT_EXCEPTION;
+
 import com.tradin.core.account.domain.Account;
 import com.tradin.core.balance.domain.vo.Amount;
 import com.tradin.core.common.converter.AmountConverter;
+import com.tradin.core.common.exception.ExceptionType;
+import com.tradin.core.common.exception.TradinException;
 import com.tradin.core.common.jpa.AuditTime;
 import com.tradin.core.strategy.domain.CoinType;
 import jakarta.persistence.Column;
@@ -66,6 +71,33 @@ public class Balance extends AuditTime {
 
     public void updateAmount(Amount amount) {
         this.amount = amount;
+    }
+
+    public void subtractMargin(Amount amount) {
+        if (amount.isNegative()) {
+            throw new TradinException(INVALID_AMOUNT_EXCEPTION);
+        }
+
+        if (this.amount.isLessThan(amount)) {
+            throw new TradinException(INSUFFICIENT_BALANCE_EXCEPTION);
+        }
+        this.amount = this.amount.subtract(amount);
+    }
+
+    public void addBalance(Amount amount) {
+        if (amount.isNegative()) {
+            throw new TradinException(INVALID_AMOUNT_EXCEPTION);
+        }
+        this.amount = this.amount.add(amount);
+    }
+
+    public void settleProfit(Amount margin, Amount profitAmount) {
+        addBalance(margin);
+
+        if (profitAmount.isNegative()) {
+            subtractMargin(profitAmount.negate());
+        }
+        addBalance(profitAmount);
     }
 
     public Amount getAmount() {

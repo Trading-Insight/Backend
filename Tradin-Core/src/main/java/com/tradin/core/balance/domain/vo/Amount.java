@@ -45,6 +45,9 @@ public class Amount {
 
     public boolean isPositive() { return value.signum() >= 0; }
     public boolean isNegative() { return value.signum() < 0; }
+    public boolean isLessThan(Amount other) {
+        return this.value.compareTo(other.value) < 0;
+    }
 
     @Override
     public boolean equals(Object o) {
