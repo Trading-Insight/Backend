@@ -97,7 +97,9 @@ public class Balance extends AuditTime {
         if (profitAmount.isNegative()) {
             subtractMargin(profitAmount.negate());
         }
-        addBalance(profitAmount);
+        else {
+            addBalance(profitAmount);
+        }
     }
 
     public Amount getAmount() {
