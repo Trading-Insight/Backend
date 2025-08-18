@@ -16,7 +16,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Service
@@ -25,7 +24,6 @@ public class FuturesOrderFacadeService {
     private final FuturesOrderService futuresOrderService;
     private final BalanceService balanceService;
     private final FuturesPositionService futuresPositionService;
-    private final PriceCache priceCache;
 
     @DistributedLock(
         key = "'asset-lock:' + #account.id + ':USDT'",
@@ -49,16 +47,19 @@ public class FuturesOrderFacadeService {
     private void closeExistingPositionIfExists(Strategy strategy, Account account) {
         futuresPositionService.findOpenFuturesPositionByAccountAndCoinType(account.getId(), strategy.getCoinType())
             .ifPresent(futuresPosition -> {
-                           Price currentPrice = getCurrentPrice(strategy.getCoinType());
 
                 // 1. 역방향 주문 생성
-                futuresOrderService.orderReversePosition(strategy, account, futuresPosition, currentPrice);
+                futuresOrderService.orderReversePosition(strategy, account, futuresPosition);
 
                 // 2. 포지션 정리
                 futuresPositionService.closePosition(futuresPosition);
 
-                // 3. 수익 계산 및 잔고 업데이트
-                updateBalanceWithProfit(futuresPosition, currentPrice, account);
+                // 3. 수익 계산
+                Amount profitAmount = futuresPositionService.calculateProfitAmount(futuresPosition);
+
+                // 4. 수익 정산
+                Balance balance = balanceService.findUsdtBalanceByAccount(account.getId());
+                balanceService.settleProfit(balance, futuresPosition.getMargin(), profitAmount);
             });
     }
 
@@ -67,55 +68,15 @@ public class FuturesOrderFacadeService {
      */
     private void createNewPosition(Strategy strategy, Account account, Position position) {
         // 1. 잔고 확인 및 차감
-        Balance balance = getBalance(account);
-        Amount orderAmount = getOrderAmount(balance);
-        updateBalanceWithMargin(balance, orderAmount);
+        Balance balance = balanceService.findUsdtBalanceByAccount(account.getId());
+        Amount margin = balanceService.getUsdtAmount(balance);
+        balanceService.subtractMargin(balance, margin);
 
-        // 2. 현재 가격 조회
-        Price currentPrice = getCurrentPrice(strategy.getCoinType());
+        // 2. 주문 생성
+        futuresOrderService.orderPosition(position.getTradingType(), strategy, account, margin);
 
-        // 3. 주문 생성
-        futuresOrderService.orderPosition(position.getTradingType(), strategy, account, orderAmount, currentPrice);
-
-        // 4. 포지션 생성
-        futuresPositionService.openPosition(strategy.getCoinType(), position.getTradingType(), orderAmount, currentPrice, account);
-    }
-
-    /**
-     * 수익 계산 및 잔고 업데이트
-     */
-    private void updateBalanceWithProfit(FuturesPosition futuresPosition, Price currentPrice, Account account) {
-        Amount profitAmount = futuresPosition.calculateProfitAmount(currentPrice);
-        Balance balance = balanceService.findByAccountIdAndCoinType(account.getId(), CoinType.USDT);
-        balanceService.updateBalance(balance, profitAmount);
-    }
-
-    /**
-     * 잔고 조회
-     */
-    private Balance getBalance(Account account) {
-        return balanceService.findByAccountIdAndCoinType(account.getId(), CoinType.USDT);
-    }
-
-    /**
-     * 주문 금액 조회
-     */
-    private Amount getOrderAmount(Balance balance) {
-        return Amount.of(balanceService.getUsdtAmount(balance).getValue());
-    }
-
-    /**
-     * 잔고에서 마진 차감
-     */
-    private void updateBalanceWithMargin(Balance balance, Amount orderAmount) {
-        balanceService.updateBalance(balance, orderAmount.negate());
-    }
-
-    /**
-     * 현재 가격 조회
-     */
-    private Price getCurrentPrice(CoinType coinType) {
-        return priceCache.getPrice(coinType);
+        // 3. 포지션 생성
+        futuresPositionService.openPosition(strategy.getCoinType(), position.getTradingType(), margin, account);
     }
 
 

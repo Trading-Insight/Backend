@@ -12,6 +12,8 @@ import org.springframework.http.HttpStatus;
 @Getter
 public enum ExceptionType {
     //400 Bad Request
+    INSUFFICIENT_BALANCE_EXCEPTION(BAD_REQUEST, "잔고가 부족합니다."),
+    INVALID_AMOUNT_EXCEPTION(BAD_REQUEST, "유효하지 않은 금액입니다."),
 
     //401 Unauthorized
     EMPTY_HEADER_EXCEPTION(UNAUTHORIZED, "헤더가 비어있습니다."),
