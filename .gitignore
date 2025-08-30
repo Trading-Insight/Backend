@@ -52,3 +52,9 @@ docker-stack.yml
 gradle-app.setting
 !gradle-wrapper.jar
 !gradle-wrapper.properties
+
+# 테스트 파일 제외
+/Performance-Test/load-test/README.md
+/Performance-Test/endurance-test/README.md
+/Performance-Test/stress-test/README.md
+/Performance-Test/spike-test/README.md
