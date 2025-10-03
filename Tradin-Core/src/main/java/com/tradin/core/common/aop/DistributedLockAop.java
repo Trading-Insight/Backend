@@ -30,7 +30,6 @@ public class DistributedLockAop {
     @Around("@annotation(distributedLock)")
     public Object handleDistributedLock(ProceedingJoinPoint joinPoint, DistributedLock distributedLock) throws Throwable {
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
-        Method method = signature.getMethod();
 
         String key = createKey(joinPoint, distributedLock, signature);
         RLock lock = redissonClient.getLock(key);
@@ -38,29 +37,27 @@ public class DistributedLockAop {
         boolean isLocked = false;
 
         try {
-            isLocked = lock.tryLock(distributedLock.waitTime(), distributedLock.leaseTime(), distributedLock.timeUnit());
+            isLocked = lock.tryLock(distributedLock.waitTime(), -1L, distributedLock.timeUnit());
 
             if (!isLocked) {
                 log.warn("🔒 락 획득 실패 - key: {}", key);
                 return invokeFallback(joinPoint, distributedLock.fallbackMethod());
             }
 
-//            log.info("🔐 락 획득 성공 - key: {}", key);
-            return aopForTransaction.proceed(joinPoint);
+            try {
+                Object result = aopForTransaction.proceedWithTimeout(joinPoint, distributedLock.leaseTime());
+                releaseLock(lock, key);
+                return result;
+            } catch (Throwable throwable) {
+                releaseLock(lock, key);
+                throw throwable;
+            }
 
         } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
             log.error("🚫 락 처리 중 인터럽트 발생 - key: {}", key, e);
+            Thread.currentThread().interrupt();
+            releaseLock(lock, key);
             return invokeFallback(joinPoint, distributedLock.fallbackMethod());
-        } finally {
-            if (isLocked && lock.isHeldByCurrentThread()) {
-                try {
-                    lock.unlock();
-//                    log.info("🔓 락 해제 - key: {}", key);
-                } catch (IllegalMonitorStateException e) {
-//                    log.warn("⚠️ 락 이미 해제됨 - method: {}, key: {}", method.getName(), key);
-                }
-            }
         }
     }
 
@@ -105,5 +102,19 @@ public class DistributedLockAop {
             }
         }
         return null;
+    }
+
+    private void releaseLock(RLock lock, String key) {
+        if (lock.isHeldByCurrentThread()) {
+            try {
+                lock.unlock();
+            } catch (IllegalMonitorStateException e) {
+                log.warn("⚠️ 락 이미 해제됨 - key: {}", key);
+            } catch (Exception e) {
+                log.error("🚫 락 해제 실패 - key: {}, error: {}", key, e.getMessage());
+            }
+        } else {
+            log.warn("⚠️ 현재 스레드가 락을 소유하지 않음 - key: {}", key);
+        }
     }
 }

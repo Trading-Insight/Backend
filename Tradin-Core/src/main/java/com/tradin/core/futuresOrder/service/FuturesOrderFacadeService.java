@@ -1,5 +1,7 @@
 package com.tradin.core.futuresOrder.service;
 
+import static java.lang.Thread.sleep;
+
 import com.tradin.core.account.domain.Account;
 import com.tradin.core.balance.domain.Balance;
 import com.tradin.core.balance.domain.vo.Amount;
@@ -29,7 +31,6 @@ public class FuturesOrderFacadeService {
         key = "'asset-lock:' + #account.id + ':USDT'",
         fallbackMethod = "handleAssetLockFallback"
     )
-    @Transactional
     public void autoTrade(Strategy strategy, Account account, Position position) {
         try {
             closeExistingPositionIfExists(strategy, account);

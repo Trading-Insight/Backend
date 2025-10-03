@@ -7,8 +7,6 @@ import com.tradin.core.balance.service.BalanceService;
 import com.tradin.core.common.annotation.DistributedLock;
 import com.tradin.core.strategy.domain.CoinType;
 import com.tradin.core.account.domain.Account;
-import com.tradin.core.strategy.domain.Position;
-import com.tradin.core.strategy.domain.Strategy;
 import com.tradin.core.users.domain.Users;
 import com.tradin.core.users.service.UsersService;
 import java.math.BigDecimal;
