@@ -24,6 +24,7 @@ import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Index;
 import jakarta.persistence.UniqueConstraint;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -37,10 +38,11 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(
-    uniqueConstraints = @UniqueConstraint(columnNames = {"account_id", "coinType"}),
+    uniqueConstraints = {
+        @UniqueConstraint(name = "uk_futures_position_account_coin_type", columnNames = {"account_id", "coin_type"})
+    },
     indexes = {
-        @Index(name = "idx_futures_position_account_coin", columnList = "account_id, coinType"),
-        @Index(name = "idx_futures_position_created_at", columnList = "created_at")
+        @Index(name = "ix_futures_position_coin_type_liquidation_price", columnList = "coin_type, liquidation_price")
     }
 )
 public class FuturesPosition extends AuditTime {

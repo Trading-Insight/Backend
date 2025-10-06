@@ -21,6 +21,7 @@ import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Index;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -28,12 +29,10 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@Table(indexes = {
-    @Index(name = "idx_history_strategy_id", columnList = "strategy_id"),
-    @Index(name = "idx_history_created_at", columnList = "created_at"),
-    @Index(name = "idx_history_strategy_created", columnList = "strategy_id, created_at")
-})
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(indexes = {
+    @Index(name = "idx_history_strategy_exit", columnList = "strategy_id, exit_time DESC")
+})
 public class History extends AuditTime {
 
     @Id

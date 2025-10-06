@@ -23,8 +23,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(indexes = {
-    @Index(name = "idx_users_email", columnList = "email"),
-    @Index(name = "idx_users_sub", columnList = "sub")
+    @Index(name = "ix_users_email", columnList = "email"),
+    @Index(name = "ix_users_sub", columnList = "sub")
 })
 public class Users extends AuditTime implements UserDetails {
 
