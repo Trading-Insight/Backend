@@ -24,14 +24,6 @@ import jakarta.persistence.Index;
 @Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(indexes = {
-    @Index(name = "idx_strategy_name", columnList = "name"),
-    @Index(name = "idx_strategy_type_strategy", columnList = "strategy_type"),
-    @Index(name = "idx_strategy_type_coin", columnList = "coin_type"),
-    @Index(name = "idx_strategy_type_timeframe", columnList = "time_frame_type"),
-    @Index(name = "idx_strategy_profit_factor", columnList = "profit_factor"),
-    @Index(name = "idx_strategy_created_at", columnList = "created_at")
-})
 public class Strategy extends AuditTime {
 
     @Id

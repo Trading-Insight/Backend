@@ -16,6 +16,7 @@ import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Index;
 import jakarta.persistence.UniqueConstraint;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
@@ -27,14 +28,11 @@ import lombok.NoArgsConstructor;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(
-    uniqueConstraints = @UniqueConstraint(columnNames = {"account_id", "strategy_id"}),
+    uniqueConstraints = {
+        @UniqueConstraint(name = "uk_subscription_strategy_account", columnNames = {"strategy_id", "account_id"})
+    },
     indexes = {
-        @Index(name = "idx_subscription_account_id", columnList = "account_id"),
-        @Index(name = "idx_subscription_strategy_id", columnList = "strategy_id"),
-        @Index(name = "idx_subscription_status", columnList = "status"),
-        @Index(name = "idx_subscription_strategy_status", columnList = "strategy_id, status"),
-        @Index(name = "idx_subscription_start_date", columnList = "start_date"),
-        @Index(name = "idx_subscription_end_date", columnList = "end_date")
+        @Index(name = "ix_subscription_strategy_status_account", columnList = "strategy_id, status, account_id")
     }
 )
 public class Subscription extends AuditTime {
@@ -44,12 +42,12 @@ public class Subscription extends AuditTime {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "account_id", nullable = false)
-    private Account account;
-
-    @ManyToOne
     @JoinColumn(name = "strategy_id", nullable = false)
     private Strategy strategy;
+
+    @ManyToOne
+    @JoinColumn(name = "account_id", nullable = false)
+    private Account account;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

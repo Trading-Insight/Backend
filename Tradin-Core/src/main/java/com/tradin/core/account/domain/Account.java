@@ -13,6 +13,7 @@ import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Index;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -24,9 +25,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(indexes = {
-    @Index(name = "idx_account_user_id", columnList = "user_id"),
-    @Index(name = "idx_account_is_deleted", columnList = "is_deleted"),
-    @Index(name = "idx_account_user_deleted", columnList = "user_id, is_deleted")
+    @Index(name = "ix_account_user_is_deleted", columnList = "user_id, is_deleted")
 })
 public class Account extends AuditTime {
 
