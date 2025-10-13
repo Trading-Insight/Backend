@@ -4,12 +4,12 @@ import com.tradin.core.account.domain.Account;
 import com.tradin.core.balance.domain.vo.Amount;
 import com.tradin.core.futuresPosition.domain.FuturesPosition;
 import com.tradin.core.futuresPosition.domain.repository.FuturesPositionRepository;
+import com.tradin.core.futuresPosition.domain.repository.dao.FuturesPositionDao;
 import com.tradin.core.price.domain.PriceCache;
 import com.tradin.core.strategy.domain.CoinType;
 import com.tradin.core.strategy.domain.TradingType;
 import com.tradin.core.price.domain.vo.Price;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -40,5 +40,9 @@ public class FuturesPositionService {
     public Amount calculateProfitAmount(FuturesPosition futuresPosition) {
         Price currentPrice = priceCache.getPrice(futuresPosition.getCoinType());
         return futuresPosition.calculateProfitAmount(currentPrice);
+    }
+
+    public List<FuturesPositionDao> findOpenFuturesPositionByAccountId(Long accountId) {
+        return futuresPositionRepository.findOpenFuturesPositionDaosByAccountId(accountId);
     }
 }

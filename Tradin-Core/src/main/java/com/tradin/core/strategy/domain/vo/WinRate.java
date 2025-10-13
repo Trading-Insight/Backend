@@ -1,5 +1,6 @@
 package com.tradin.core.strategy.domain.vo;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Objects;
@@ -32,7 +33,10 @@ public class WinRate {
         return WinRate.of(this.value.subtract(other.value));
     }
 
+    @JsonIgnore
     public boolean isPositive() { return value.signum() >= 0; }
+
+    @JsonIgnore
     public boolean isNegative() { return value.signum() < 0; }
 
     @Override

@@ -3,12 +3,14 @@ package com.tradin.core.balance.service;
 import com.tradin.core.account.domain.Account;
 import com.tradin.core.balance.domain.Balance;
 import com.tradin.core.balance.domain.repository.BalanceRepository;
+import com.tradin.core.balance.domain.repository.dao.BalanceDaos;
 import com.tradin.core.balance.domain.vo.Amount;
 import com.tradin.core.common.annotation.DistributedLock;
 import com.tradin.core.futuresOrder.domain.vo.Margin;
 import com.tradin.core.strategy.domain.CoinType;
 import com.tradin.core.common.exception.ExceptionType;
 import com.tradin.core.common.exception.TradinException;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -27,7 +29,7 @@ public class BalanceService {
     }
 
     public Balance createCoinBalance(Account account, CoinType coinType) {
-        Balance balance = Balance.of(coinType, Amount.of(BigDecimal.ZERO), account);
+        Balance balance = Balance.of(coinType, Amount.of(BigDecimal.valueOf(10000)), account);
         return balanceRepository.save(balance);
     }
 
@@ -55,5 +57,9 @@ public class BalanceService {
 
     public Amount getUsdtAmount(Balance balance) {
         return balance.getAmount();
+    }
+
+    public List<BalanceDaos> findBalanceDaosByAccountId(Long accountId) {
+        return balanceRepository.findBalanceDaosByAccountId(accountId);
     }
 }

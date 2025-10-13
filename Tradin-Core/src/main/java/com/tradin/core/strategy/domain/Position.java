@@ -1,5 +1,6 @@
 package com.tradin.core.strategy.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
@@ -51,10 +52,12 @@ public class Position {
             .build();
     }
 
+    @JsonIgnore
     public boolean isLong() {
         return tradingType == TradingType.LONG;
     }
 
+    @JsonIgnore
     public boolean isShort() {
         return tradingType == TradingType.SHORT;
     }

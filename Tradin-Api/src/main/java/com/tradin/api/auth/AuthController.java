@@ -30,27 +30,9 @@ public class AuthController implements AuthApi {
         return TradinResponse.success(authFacadeService.auth(code));
     }
 
-    @Operation(summary = "엑세스 토큰 재발급")
     @DisableAuthInSwagger
     @PostMapping("/token")
     public TradinResponse<TokenResponseDto> reissueToken(@Valid @RequestBody TokenReissueRequestDto request) {
         return TradinResponse.success(authFacadeService.reissueToken(request.toServiceDto()));
-    }
-
-    @Operation(summary = "테스트 토큰 발급")
-    @DisableAuthInSwagger
-    @GetMapping("/token/{userId}")
-    public TradinResponse<TokenResponseDto> issueTestToken(@PathVariable Long userId) {
-        return TradinResponse.success(authFacadeService.issueTestToken(userId));
-    }
-
-    @Operation(summary = "테스트 유저 생성")
-    @DisableAuthInSwagger
-    @PostMapping("/users")
-    public TradinResponse<Void> createTestUsers(@RequestParam Long count) {
-        for (int i = 0; i < count; i++) {
-            authFacadeService.createTestUsers();
-        }
-        return TradinResponse.success();
     }
 }

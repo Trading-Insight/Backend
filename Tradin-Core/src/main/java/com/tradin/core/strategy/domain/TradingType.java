@@ -1,5 +1,6 @@
 package com.tradin.core.strategy.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 
@@ -12,10 +13,12 @@ public enum TradingType {
 
     private final String value;
 
+    @JsonIgnore
     public boolean isLong() {
         return this == LONG;
     }
 
+    @JsonIgnore
     public boolean isShort() {
         return this == SHORT;
     }

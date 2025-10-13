@@ -1,6 +1,7 @@
 package com.tradin.core.price.domain.vo;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonValue;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -60,7 +61,10 @@ public class Price {
         return Price.of(applyPolicy(result));
     }
 
+    @JsonIgnore
     public boolean isPositive() { return value.signum() >= 0; }
+
+    @JsonIgnore
     public boolean isNegative() { return value.signum() < 0; }
 
     @Override

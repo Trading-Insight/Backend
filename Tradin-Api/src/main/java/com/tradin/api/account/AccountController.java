@@ -30,8 +30,8 @@ public class AccountController implements AccountApi {
         return TradinResponse.success(accountFacadeService.getAccounts(userId));
     }
 
-    @PostMapping("/{accountId}/faucet")
-    public void faucet(@AuthenticationPrincipal Long userId, @PathVariable Long accountId) {
-        accountFacadeService.faucet(userId, accountId);
+    @PostMapping("/{accountId}/deposits")
+    public void deposit(@AuthenticationPrincipal Long userId, @PathVariable Long accountId) {
+        accountFacadeService.deposit(userId, accountId);
     }
 }

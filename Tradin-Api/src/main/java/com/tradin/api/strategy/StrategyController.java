@@ -15,27 +15,22 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/v1/strategies")
+@RequestMapping("/v1")
 public class StrategyController implements StrategyApi {
 
     private final StrategyFacadeService strategyFacadeService;
 
-    @GetMapping("/futures")
+    @GetMapping("/strategies/futures")
     public TradinResponse<FindStrategiesInfoResponseDto> findFutureStrategiesInfos() {
         return TradinResponse.success(strategyFacadeService.findFutureStrategiesInfo());
     }
 
-    @GetMapping("/spots")
+    @GetMapping("/strategies/spots")
     public FindStrategiesInfoResponseDto findSpotStrategiesInfos() {
         return strategyFacadeService.findSpotStrategiesInfo();
     }
 
-    @PostMapping("")
-    public void createTestStrategy() {
-        strategyFacadeService.createTestStrategy();
-    }
-
-    @PostMapping("/futures/short-term/webhook")
+    @PostMapping("/webhooks/tradingview/signals")
     public void handleFutureShortTermV1WebHook(@RequestBody @Valid WebHookRequestDto request) {
         strategyFacadeService.publishAutoTradingMessages(request.toServiceDto());
         strategyFacadeService.updateStrategyAndHistoryMetaData(request.toServiceDto());

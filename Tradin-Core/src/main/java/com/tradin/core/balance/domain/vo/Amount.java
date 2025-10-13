@@ -1,5 +1,6 @@
 package com.tradin.core.balance.domain.vo;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Objects;
@@ -43,7 +44,10 @@ public class Amount {
         return Amount.of(applyPolicy(result));
     }
 
+    @JsonIgnore
     public boolean isPositive() { return value.signum() >= 0; }
+
+    @JsonIgnore
     public boolean isNegative() { return value.signum() < 0; }
     public boolean isLessThan(Amount other) {
         return this.value.compareTo(other.value) < 0;

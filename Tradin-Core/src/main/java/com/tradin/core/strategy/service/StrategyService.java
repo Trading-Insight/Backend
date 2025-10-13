@@ -5,6 +5,7 @@ import static com.tradin.core.strategy.domain.TimeFrameType.ONE_HOUR;
 
 import com.tradin.core.common.exception.ExceptionType;
 import com.tradin.core.common.exception.TradinException;
+import com.tradin.core.price.domain.PriceCache;
 import com.tradin.core.strategy.domain.CoinType;
 import com.tradin.core.strategy.domain.Count;
 import com.tradin.core.strategy.domain.Position;
@@ -34,7 +35,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @RequiredArgsConstructor
 public class StrategyService {
-
+    private final PriceCache priceCache;
     private final StrategyRepository strategyRepository;
 
     public void createStrategy() {
@@ -50,14 +51,14 @@ public class StrategyService {
                 ProfitRate.of(BigDecimal.ZERO)
             ),
             Count.of(
-                2,
                 1,
-                1
+                0,
+                0
             ),
             Position.of(
-                TradingType.NONE,
+                TradingType.SHORT,
                 LocalDateTime.now(),
-                Price.of(BigDecimal.ONE)
+                Price.of(priceCache.getPrice(CoinType.BTC).getValue())
             ),
             ProfitFactor.of(BigDecimal.ONE),
             1
@@ -145,24 +146,12 @@ public class StrategyService {
     }
 
     private ProfitRate calculateProfitRate(Strategy strategy, Position newPosition) {
-        Price currentPrice = strategy.getCurrentPosition().getPrice();
-        Price newPrice = newPosition.getPrice();
-        
-        if (strategy.isCurrentPositionLong()) {
-            // 롱 포지션: (새로운 가격 - 진입 가격) / 진입 가격 * 100
-            return ProfitRate.of(
-                newPrice.getValue().subtract(currentPrice.getValue())
-                    .divide(currentPrice.getValue(), 10, RoundingMode.HALF_UP)
-                    .multiply(BigDecimal.valueOf(100))
-            );
-        } else {
-            // 숏 포지션: (진입 가격 - 새로운 가격) / 진입 가격 * 100
-            return ProfitRate.of(
-                currentPrice.getValue().subtract(newPrice.getValue())
-                    .divide(currentPrice.getValue(), 10, RoundingMode.HALF_UP)
-                    .multiply(BigDecimal.valueOf(100))
-            );
-        }
+        BigDecimal newPrice = newPosition.getPrice().getValue();
+        BigDecimal currentPrice = strategy.getCurrentPosition().getPrice().getValue();
+
+        return ProfitRate.of(strategy.getCurrentPosition().isLong()
+            ? newPrice.subtract(currentPrice).multiply(BigDecimal.valueOf(100)).divide(currentPrice, 2, RoundingMode.DOWN)
+            : currentPrice.subtract(newPrice).multiply(BigDecimal.valueOf(100)).divide(currentPrice, 2, RoundingMode.DOWN));
     }
 
     private boolean isWin(ProfitRate profitRate) {

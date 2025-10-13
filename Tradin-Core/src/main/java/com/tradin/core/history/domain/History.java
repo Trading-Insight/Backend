@@ -22,6 +22,8 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Index;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -76,13 +78,16 @@ public class History extends AuditTime {
 
     public void closeHistory(Position position) {
         this.exitPosition = position;
+        this.profitRate = calculateProfitRate(position);
     }
 
-    private boolean isOpenPositionLong() {
-        return this.entryPosition.getTradingType() == LONG;
-    }
+    public ProfitRate calculateProfitRate(Position exitPosition) {
+        BigDecimal currentPrice = exitPosition.getPrice().getValue();
+        BigDecimal entryPrice = this.entryPosition.getPrice().getValue();
 
-    public void setProfitRate(ProfitRate profitRate) {
-        this.profitRate = profitRate;
+        return ProfitRate.of(this.entryPosition.isLong()
+            ? currentPrice.subtract(entryPrice).multiply(BigDecimal.valueOf(100)).divide(entryPrice, 2, RoundingMode.DOWN)
+            : entryPrice.subtract(currentPrice).multiply(BigDecimal.valueOf(100)).divide(entryPrice, 2, RoundingMode.DOWN));
+
     }
 }

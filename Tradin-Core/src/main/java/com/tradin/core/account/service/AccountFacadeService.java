@@ -40,8 +40,7 @@ public class AccountFacadeService {
         key = "'asset-lock:' + #accountId + ':USDT'",
         fallbackMethod = "handleAssetLockFallback"
     )
-    @Transactional
-    public void faucet(Long userId, Long accountId) {
+    public void deposit(Long userId, Long accountId) {
         accountService.findAccountByIdAndUserId(accountId, userId);
         Balance balance = balanceService.findByAccountIdAndCoinType(accountId, CoinType.USDT);
         balanceService.updateBalance(balance, Amount.of(BigDecimal.valueOf(10000)));

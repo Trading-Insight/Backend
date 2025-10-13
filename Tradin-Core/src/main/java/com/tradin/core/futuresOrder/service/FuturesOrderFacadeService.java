@@ -3,10 +3,12 @@ package com.tradin.core.futuresOrder.service;
 import static java.lang.Thread.sleep;
 
 import com.tradin.core.account.domain.Account;
+import com.tradin.core.account.service.AccountService;
 import com.tradin.core.balance.domain.Balance;
 import com.tradin.core.balance.domain.vo.Amount;
 import com.tradin.core.balance.service.BalanceService;
 import com.tradin.core.common.annotation.DistributedLock;
+import com.tradin.core.futuresOrder.service.dto.FuturesOrderResponseDto;
 import com.tradin.core.futuresPosition.domain.FuturesPosition;
 import com.tradin.core.futuresPosition.service.FuturesPositionService;
 import com.tradin.core.price.domain.PriceCache;
@@ -26,6 +28,7 @@ public class FuturesOrderFacadeService {
     private final FuturesOrderService futuresOrderService;
     private final BalanceService balanceService;
     private final FuturesPositionService futuresPositionService;
+    private final AccountService accountService;
 
     @DistributedLock(
         key = "'asset-lock:' + #account.id + ':USDT'",
@@ -87,5 +90,11 @@ public class FuturesOrderFacadeService {
     public void handleAssetLockFallback(Strategy strategy, Account account, Position position) {
         log.warn("자동매매 분산락 획득 실패 - accountId: {}, strategyId: {}, position: {} ",
             account.getId(), strategy.getId(), position);
+    }
+
+    @Transactional(readOnly = true)
+    public FuturesOrderResponseDto findFuturesOrdersByAccountId(Long userId, Long accountId) {
+        accountService.findAccountByIdAndUserId(accountId, userId);
+        return FuturesOrderResponseDto.of(futuresOrderService.findFuturesOrdersByAccountId(accountId));
     }
 }

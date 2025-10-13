@@ -18,8 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/v1/subscriptions")
-public class SubscriptionController {
+@RequestMapping("/v1")
+public class SubscriptionController implements SubscriptionApi {
 
     private final SubscriptionFacadeService subscriptionFacadeService;
 
@@ -29,29 +29,15 @@ public class SubscriptionController {
     }
 
 
-    @PostMapping("/accounts/{accountId}/strategies/{strategyId}")
+    @PostMapping("/accounts/{accountId}/strategies/{strategyId}/subscription")
     public TradinResponse<String> activateAutoTrading(@AuthenticationPrincipal Long userId, @PathVariable Long accountId, @PathVariable Long strategyId) {
         subscriptionFacadeService.activateSubscription(ActivateSubscriptionDto.of(userId, accountId, strategyId));
         return TradinResponse.success();
     }
 
-    @DeleteMapping("/accounts/{accountId}/strategies/{strategyId}")
+    @DeleteMapping("/accounts/{accountId}/strategies/{strategyId}/subscription")
     public TradinResponse<String> deactivateAutoTrading(@AuthenticationPrincipal Long userId, @PathVariable Long accountId, @PathVariable Long strategyId) {
         subscriptionFacadeService.deActivateSubscription(DeactivateSubscriptionDto.of(userId, accountId, strategyId));
-        return TradinResponse.success();
-    }
-
-    @Operation(summary = "테스트 전략 전체 구독")
-    @PostMapping("/accounts/strategies/{strategyId}")
-    public TradinResponse<String> activateAutoTradingTest(@AuthenticationPrincipal Long userId, @PathVariable Long strategyId) {
-        subscriptionFacadeService.activateSubscriptionTest(userId, strategyId);
-        return TradinResponse.success();
-    }
-
-    @Operation(summary = "테스트 전략 전체 구독 해제")
-    @DeleteMapping("/accounts/strategies/{strategyId}")
-    public TradinResponse<String> deactivateAutoTradingTest(@AuthenticationPrincipal Long userId, @PathVariable Long strategyId) {
-        subscriptionFacadeService.deActivateSubscriptionTest(userId, strategyId);
         return TradinResponse.success();
     }
 }

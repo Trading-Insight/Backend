@@ -7,9 +7,12 @@ import com.tradin.core.history.domain.History;
 import com.tradin.core.history.domain.repository.HistoryRepository;
 import com.tradin.core.history.domain.repository.dao.HistoryDao;
 import com.tradin.core.history.service.dto.BackTestDto;
+import com.tradin.core.price.domain.PriceCache;
+import com.tradin.core.strategy.domain.CoinType;
 import com.tradin.core.strategy.domain.Position;
 import com.tradin.core.strategy.domain.Strategy;
 import com.tradin.core.strategy.domain.TradingType;
+import com.tradin.core.strategy.domain.vo.ProfitRate;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.LocalDate;
@@ -18,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -26,16 +30,17 @@ import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
 import com.tradin.core.price.domain.vo.Price;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class HistoryService {
     private final String cacheKeyPrefix = "strategyId:";
-
+    private final PriceCache priceCache;
     private final HistoryRepository historyRepository;
     private final RedisTemplate<String, HistoryDao> historyRedisTemplate;
 
     public void createTestHistory(Strategy strategy) {
-        Position position = Position.of(TradingType.SHORT, LocalDateTime.now(), Price.of(new BigDecimal(90000)));
+        Position position = Position.of(TradingType.SHORT, LocalDateTime.now(), Price.of(priceCache.getPrice(CoinType.BTC).getValue()));
         createHistoryEntity(strategy, position);
     }
 
@@ -51,13 +56,14 @@ public class HistoryService {
     }
 
     private List<HistoryDao> findAllAndFilterByStrategyIdAndPeriodAndTradingType(Long strategyId, LocalDate startDate, LocalDate endDate, TradingType tradingType, Pageable pageable) {
-        List<HistoryDao> historyDaos = findAllByStrategyIdAndPeriodInCache(strategyId, startDate, endDate, pageable);
-
-        if (historyDaos.isEmpty()) {
-            historyDaos = historyRepository.findHistoryDaosByStrategyId(strategyId);
-            addHistoryDaosToCache(strategyId, historyDaos);
-        }
-
+//        List<HistoryDao> historyDaos = findAllByStrategyIdAndPeriodInCache(strategyId, startDate, endDate, pageable);
+//
+//        // 캐시에 없으면 DB에서 조회 후 캐시에 저장
+//        if (historyDaos.isEmpty()) {
+//            historyDaos = historyRepository.findHistoryDaosByStrategyId(strategyId);
+//            addHistoryDaosToCache(strategyId, historyDaos);
+//        }
+        List<HistoryDao> historyDaos = historyRepository.findHistoryDaosByStrategyId(strategyId);
         return historyDaos.stream()
             .filter(history -> isInPeriod(history, startDate, endDate))
             .filter(history -> isCorrespondTradingType(history, tradingType))
@@ -76,6 +82,10 @@ public class HistoryService {
     }
 
     private boolean isInPeriod(HistoryDao history, LocalDate startDate, LocalDate endDate) {
+        if (history.exitPosition() == null) {
+            return history.entryPosition().getTime().toLocalDate().isAfter(startDate);
+        }
+
         return history.entryPosition().getTime().toLocalDate().isAfter(startDate) &&
             history.exitPosition().getTime().toLocalDate().isBefore(endDate);
     }
@@ -123,11 +133,13 @@ public class HistoryService {
             public Void execute(RedisOperations operations) {
                 ZSetOperations<String, HistoryDao> zSetOperations = operations.opsForZSet();
                 for (HistoryDao history : histories) {
-                    double score = history.entryPosition().getTime().toInstant(ZoneOffset.UTC).toEpochMilli();
+                    double score = history.entryPosition().getTime().toEpochSecond(ZoneOffset.UTC);
                     zSetOperations.add(cacheKey, history, score);
                 }
                 return null;
             }
         });
+
+        historyRedisTemplate.expire(cacheKey, java.time.Duration.ofHours(1));
     }
 }

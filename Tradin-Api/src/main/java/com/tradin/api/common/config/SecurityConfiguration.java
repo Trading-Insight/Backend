@@ -50,7 +50,8 @@ public class SecurityConfiguration {
                         "/swagger-ui/**",
                         "/api-docs/**",
                         "/v1/strategies",
-                        "/v1/histories"
+                        "/v1/histories",
+                        "/v1/tests/**"
                     )
                     .permitAll() //TODO
 

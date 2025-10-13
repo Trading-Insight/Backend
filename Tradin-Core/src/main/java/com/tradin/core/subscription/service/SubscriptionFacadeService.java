@@ -51,14 +51,14 @@ public class SubscriptionFacadeService {
     }
 
     @Transactional
-    public void activateSubscriptionTest(Long userId, Long strategyId) {
+    public void activateSubscriptionTest(Long strategyId) {
         List<Account> accounts = accountService.findAll();
         Strategy strategy = strategyService.findStrategyById(strategyId);
         subscriptionService.activateSubscriptionTest(accounts, strategy);
     }
 
     @Transactional
-    public void deActivateSubscriptionTest(Long userId, Long strategyId) {
+    public void deActivateSubscriptionTest(Long strategyId) {
         List<Account> accounts = accountService.findAll();
         Strategy strategy = strategyService.findStrategyById(strategyId);
         subscriptionService.deActivateSubscriptionTest(accounts, strategy);

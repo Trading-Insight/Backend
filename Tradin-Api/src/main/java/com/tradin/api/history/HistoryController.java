@@ -28,10 +28,4 @@ public class HistoryController implements HistoryApi {
         @Valid @ModelAttribute BackTestRequestDto request, Pageable pageable) {
         return TradinResponse.success(historyFacadeService.backTest(request.toServiceDto(), pageable));
     }
-
-    @Operation(summary = "테스트 히스토리 생성")
-    @PostMapping("")
-    public void createTestHistory() {
-        historyFacadeService.createTestHistory();
-    }
 }

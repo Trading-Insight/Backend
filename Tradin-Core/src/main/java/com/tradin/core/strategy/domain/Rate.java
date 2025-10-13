@@ -77,18 +77,18 @@ public class Rate {
         if (totalTradeCount == 0) {
             this.winningRate = WinRate.of(null);
         } else {
-            this.winningRate = WinRate.of(BigDecimal.valueOf(winCount).divide(BigDecimal.valueOf(totalTradeCount), 4, RoundingMode.DOWN).multiply(BigDecimal.valueOf(100)));
+            this.winningRate = WinRate.of(BigDecimal.valueOf(winCount).divide(BigDecimal.valueOf(totalTradeCount-1), 2, RoundingMode.DOWN).multiply(BigDecimal.valueOf(100)));
         }
     }
 
     public void updateSimpleProfitRate() {
-        this.simpleProfitRate = this.totalProfitRate.subtract(this.totalLossRate);
+        this.simpleProfitRate = this.simpleProfitRate.add(this.simpleProfitRate);
     }
 
     public void updateCompoundProfitRate(ProfitRate profitRate) {
         this.compoundProfitRate = ProfitRate.of(
-            (BigDecimal.ONE.add(this.compoundProfitRate.getValue().divide(BigDecimal.valueOf(100), 10, RoundingMode.HALF_UP)))
-                .multiply(BigDecimal.ONE.add(profitRate.getValue().divide(BigDecimal.valueOf(100), 10, RoundingMode.HALF_UP)))
+            (BigDecimal.ONE.add(this.compoundProfitRate.getValue().divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP)))
+                .multiply(BigDecimal.ONE.add(profitRate.getValue().divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP)))
                 .subtract(BigDecimal.ONE)
                 .multiply(BigDecimal.valueOf(100))
         );

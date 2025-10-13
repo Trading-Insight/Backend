@@ -4,6 +4,7 @@ import com.tradin.core.account.domain.Account;
 import com.tradin.core.balance.domain.vo.Amount;
 import com.tradin.core.common.jpa.AuditTime;
 
+import com.tradin.core.strategy.domain.CoinType;
 import com.tradin.core.strategy.domain.Strategy;
 import com.tradin.core.strategy.domain.TradingType;
 import com.tradin.core.futuresOrder.domain.vo.Margin;
@@ -48,6 +49,10 @@ public class FuturesOrder extends AuditTime {
     @Enumerated(EnumType.STRING)
     private TradingType tradingType;
 
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private CoinType coinType;
+
     @Convert(converter = PriceConverter.class)
     @Column(nullable = false, precision = 20, scale = 2)
     private Price price;
@@ -76,8 +81,9 @@ public class FuturesOrder extends AuditTime {
     private Strategy strategy;
 
     @Builder
-    public FuturesOrder(TradingType tradingType, Price price, Amount amount, OrderStatus orderStatus, Account account, Strategy strategy) {
+    public FuturesOrder(TradingType tradingType, CoinType coinType, Price price, Amount amount, OrderStatus orderStatus, Account account, Strategy strategy) {
         this.tradingType = tradingType;
+        this.coinType = coinType;
         this.price = price;
         this.amount = amount;
         this.leverage = 1;
@@ -87,9 +93,10 @@ public class FuturesOrder extends AuditTime {
         this.strategy = strategy;
     }
 
-    public static FuturesOrder of(TradingType tradingType, Price price, Amount amount, OrderStatus orderStatus, Account account, Strategy strategy) {
+    public static FuturesOrder of(TradingType tradingType, CoinType coinType, Price price, Amount amount, OrderStatus orderStatus, Account account, Strategy strategy) {
         return FuturesOrder.builder()
             .tradingType(tradingType)
+            .coinType(coinType)
             .price(price)
             .amount(amount)
             .orderStatus(orderStatus)

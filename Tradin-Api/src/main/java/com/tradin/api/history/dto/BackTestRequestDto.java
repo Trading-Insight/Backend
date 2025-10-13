@@ -11,8 +11,10 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 @Schema(description = "백테스트 실행 DTO")
 public record BackTestRequestDto(
+    @Schema(description = "전략 ID", example = "1")
     @NotNull(message = "StrategyId must not be null") long id,
 
+    @Schema(description = "전략 이름", example = "test")
     @NotBlank(message = "StrategyName must not be blank") String name,
 
     @NotNull(message = "StartDate must not be null")
@@ -22,10 +24,10 @@ public record BackTestRequestDto(
     @NotNull(message = "EndDate must not be null")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
 
-    @Schema(description = "종료 연,월,일", example = "2021-01-01") LocalDate endDate,
+    @Schema(description = "종료 연,월,일", example = "2026-01-01") LocalDate endDate,
     @NotNull(message = "TradingType must not be null")
 
-    @Schema(description = "매매 타입", example = "LONG") TradingType tradingType
+    @Schema(description = "매매 타입", example = "BOTH") TradingType tradingType
 ) {
 
     public BackTestDto toServiceDto() {
