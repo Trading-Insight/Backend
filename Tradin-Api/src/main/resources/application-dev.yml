@@ -7,7 +7,7 @@ spring:
       on-profile: dev
   datasource:
     hikari:
-      maximum-pool-size: 12
+      maximum-pool-size: 15
       minimum-idle: 10
       connection-timeout: 30000
       idle-timeout: 600000
@@ -50,7 +50,7 @@ spring:
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:
         spring.json.trusted.packages: com.tradin.*
-      max-poll-records: 3
+      max-poll-records: 5
       fetch-min-bytes: 1024 #5KB
       fetch-max-wait-ms: 100
       session-timeout-ms: 30000  # 30초
