@@ -1,3 +1,11 @@
+[스웨거 문서](http://tradin.duckdns.org:8888/swagger-ui/index.html)
+
+[그라파나](http://tradin.duckdns.org:3000/dashboards)
+
+[카프카 UI](http://tradin.duckdns.org:8889/ui/clusters/local/all-topics?perPage=25)
+
+
+
 <p align="center"><img width="200" alt="image" src="https://github-production-user-asset-6210df.s3.amazonaws.com/62228195/476330606-b58b44be-8abc-447d-979f-39c9e95f889a.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAVCODYLSA53PQK4ZA%2F20250810%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250810T045623Z&X-Amz-Expires=300&X-Amz-Signature=5aa3d64dfead295f39560e99f18b83b4abd3ccc938a1ca30f4a90844b25f0594&X-Amz-SignedHeaders=host"></p>
 
 <p align = center> <em> 트레이딩 전략을 구독하고, 자동매매하는 서비스 Tradin 입니다. </em> </p>
